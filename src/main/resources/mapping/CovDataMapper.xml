@@ -1,0 +1,328 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.nCov.DataView.dao.CovDataMapper">
+    <resultMap id="BaseResultMap" type="com.nCov.DataView.model.entity.CovData">
+        <id column="Id" property="id" jdbcType="INTEGER"/>
+        <result column="provinceName" property="provincename" jdbcType="VARCHAR"/>
+        <result column="cityName" property="cityname" jdbcType="VARCHAR"/>
+        <result column="date" property="date" jdbcType="DATE"/>
+        <result column="totalConfirm" property="totalconfirm" jdbcType="INTEGER"/>
+        <result column="totalSuspect" property="totalsuspect" jdbcType="INTEGER"/>
+        <result column="totalDead" property="totaldead" jdbcType="INTEGER"/>
+        <result column="totalHeal" property="totalheal" jdbcType="INTEGER"/>
+        <result column="todayConfirm" property="todayconfirm" jdbcType="INTEGER"/>
+        <result column="todaySuspect" property="todaysuspect" jdbcType="INTEGER"/>
+        <result column="todayDead" property="todaydead" jdbcType="INTEGER"/>
+        <result column="todayHeal" property="todayheal" jdbcType="INTEGER"/>
+    </resultMap>
+    <sql id="Example_Where_Clause">
+        <where>
+            <foreach collection="oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" suffix=")" prefixOverrides="and">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach collection="criterion.value" item="listItem" open="(" close=")"
+                                             separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+    <sql id="Update_By_Example_Where_Clause">
+        <where>
+            <foreach collection="example.oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" suffix=")" prefixOverrides="and">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach collection="criterion.value" item="listItem" open="(" close=")"
+                                             separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+    <sql id="Base_Column_List">
+        Id, provinceName, cityName, date, totalConfirm, totalSuspect, totalDead, totalHeal,
+        todayConfirm, todaySuspect, todayDead, todayHeal
+    </sql>
+    <select id="selectByExample" resultMap="BaseResultMap"
+            parameterType="com.nCov.DataView.model.entity.CovDataExample">
+        select
+        <if test="distinct">
+            distinct
+        </if>
+        'true' as QUERYID,
+        <include refid="Base_Column_List"/>
+        from dataFromTencent_dev
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+        <if test="orderByClause != null">
+            order by ${orderByClause}
+        </if>
+    </select>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+        select
+        <include refid="Base_Column_List"/>
+        from dataFromTencent_dev
+        where Id = #{id,jdbcType=INTEGER}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        delete from dataFromTencent_dev
+        where Id = #{id,jdbcType=INTEGER}
+    </delete>
+    <delete id="deleteByExample" parameterType="com.nCov.DataView.model.entity.CovDataExample">
+        delete from dataFromTencent_dev
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+    </delete>
+    <insert id="insert" parameterType="com.nCov.DataView.model.entity.CovData">
+        insert into dataFromTencent_dev (Id, provinceName, cityName,
+        date, totalConfirm, totalSuspect,
+        totalDead, totalHeal, todayConfirm,
+        todaySuspect, todayDead, todayHeal
+        )
+        values (#{id,jdbcType=INTEGER}, #{provincename,jdbcType=VARCHAR}, #{cityname,jdbcType=VARCHAR},
+        #{date,jdbcType=DATE}, #{totalconfirm,jdbcType=INTEGER}, #{totalsuspect,jdbcType=INTEGER},
+        #{totaldead,jdbcType=INTEGER}, #{totalheal,jdbcType=INTEGER}, #{todayconfirm,jdbcType=INTEGER},
+        #{todaysuspect,jdbcType=INTEGER}, #{todaydead,jdbcType=INTEGER}, #{todayheal,jdbcType=INTEGER}
+        )
+    </insert>
+    <insert id="insertSelective" parameterType="com.nCov.DataView.model.entity.CovData">
+        insert into dataFromTencent_dev
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                Id,
+            </if>
+            <if test="provincename != null">
+                provinceName,
+            </if>
+            <if test="cityname != null">
+                cityName,
+            </if>
+            <if test="date != null">
+                date,
+            </if>
+            <if test="totalconfirm != null">
+                totalConfirm,
+            </if>
+            <if test="totalsuspect != null">
+                totalSuspect,
+            </if>
+            <if test="totaldead != null">
+                totalDead,
+            </if>
+            <if test="totalheal != null">
+                totalHeal,
+            </if>
+            <if test="todayconfirm != null">
+                todayConfirm,
+            </if>
+            <if test="todaysuspect != null">
+                todaySuspect,
+            </if>
+            <if test="todaydead != null">
+                todayDead,
+            </if>
+            <if test="todayheal != null">
+                todayHeal,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="provincename != null">
+                #{provincename,jdbcType=VARCHAR},
+            </if>
+            <if test="cityname != null">
+                #{cityname,jdbcType=VARCHAR},
+            </if>
+            <if test="date != null">
+                #{date,jdbcType=DATE},
+            </if>
+            <if test="totalconfirm != null">
+                #{totalconfirm,jdbcType=INTEGER},
+            </if>
+            <if test="totalsuspect != null">
+                #{totalsuspect,jdbcType=INTEGER},
+            </if>
+            <if test="totaldead != null">
+                #{totaldead,jdbcType=INTEGER},
+            </if>
+            <if test="totalheal != null">
+                #{totalheal,jdbcType=INTEGER},
+            </if>
+            <if test="todayconfirm != null">
+                #{todayconfirm,jdbcType=INTEGER},
+            </if>
+            <if test="todaysuspect != null">
+                #{todaysuspect,jdbcType=INTEGER},
+            </if>
+            <if test="todaydead != null">
+                #{todaydead,jdbcType=INTEGER},
+            </if>
+            <if test="todayheal != null">
+                #{todayheal,jdbcType=INTEGER},
+            </if>
+        </trim>
+    </insert>
+    <select id="countByExample" parameterType="com.nCov.DataView.model.entity.CovDataExample"
+            resultType="java.lang.Integer">
+        select count(*) from dataFromTencent_dev
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+    </select>
+    <update id="updateByExampleSelective" parameterType="map">
+        update dataFromTencent_dev
+        <set>
+            <if test="record.id != null">
+                Id = #{record.id,jdbcType=INTEGER},
+            </if>
+            <if test="record.provincename != null">
+                provinceName = #{record.provincename,jdbcType=VARCHAR},
+            </if>
+            <if test="record.cityname != null">
+                cityName = #{record.cityname,jdbcType=VARCHAR},
+            </if>
+            <if test="record.date != null">
+                date = #{record.date,jdbcType=DATE},
+            </if>
+            <if test="record.totalconfirm != null">
+                totalConfirm = #{record.totalconfirm,jdbcType=INTEGER},
+            </if>
+            <if test="record.totalsuspect != null">
+                totalSuspect = #{record.totalsuspect,jdbcType=INTEGER},
+            </if>
+            <if test="record.totaldead != null">
+                totalDead = #{record.totaldead,jdbcType=INTEGER},
+            </if>
+            <if test="record.totalheal != null">
+                totalHeal = #{record.totalheal,jdbcType=INTEGER},
+            </if>
+            <if test="record.todayconfirm != null">
+                todayConfirm = #{record.todayconfirm,jdbcType=INTEGER},
+            </if>
+            <if test="record.todaysuspect != null">
+                todaySuspect = #{record.todaysuspect,jdbcType=INTEGER},
+            </if>
+            <if test="record.todaydead != null">
+                todayDead = #{record.todaydead,jdbcType=INTEGER},
+            </if>
+            <if test="record.todayheal != null">
+                todayHeal = #{record.todayheal,jdbcType=INTEGER},
+            </if>
+        </set>
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause"/>
+        </if>
+    </update>
+    <update id="updateByExample" parameterType="map">
+        update dataFromTencent_dev
+        set Id = #{record.id,jdbcType=INTEGER},
+        provinceName = #{record.provincename,jdbcType=VARCHAR},
+        cityName = #{record.cityname,jdbcType=VARCHAR},
+        date = #{record.date,jdbcType=DATE},
+        totalConfirm = #{record.totalconfirm,jdbcType=INTEGER},
+        totalSuspect = #{record.totalsuspect,jdbcType=INTEGER},
+        totalDead = #{record.totaldead,jdbcType=INTEGER},
+        totalHeal = #{record.totalheal,jdbcType=INTEGER},
+        todayConfirm = #{record.todayconfirm,jdbcType=INTEGER},
+        todaySuspect = #{record.todaysuspect,jdbcType=INTEGER},
+        todayDead = #{record.todaydead,jdbcType=INTEGER},
+        todayHeal = #{record.todayheal,jdbcType=INTEGER}
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause"/>
+        </if>
+    </update>
+    <update id="updateByPrimaryKeySelective" parameterType="com.nCov.DataView.model.entity.CovData">
+        update dataFromTencent_dev
+        <set>
+            <if test="provincename != null">
+                provinceName = #{provincename,jdbcType=VARCHAR},
+            </if>
+            <if test="cityname != null">
+                cityName = #{cityname,jdbcType=VARCHAR},
+            </if>
+            <if test="date != null">
+                date = #{date,jdbcType=DATE},
+            </if>
+            <if test="totalconfirm != null">
+                totalConfirm = #{totalconfirm,jdbcType=INTEGER},
+            </if>
+            <if test="totalsuspect != null">
+                totalSuspect = #{totalsuspect,jdbcType=INTEGER},
+            </if>
+            <if test="totaldead != null">
+                totalDead = #{totaldead,jdbcType=INTEGER},
+            </if>
+            <if test="totalheal != null">
+                totalHeal = #{totalheal,jdbcType=INTEGER},
+            </if>
+            <if test="todayconfirm != null">
+                todayConfirm = #{todayconfirm,jdbcType=INTEGER},
+            </if>
+            <if test="todaysuspect != null">
+                todaySuspect = #{todaysuspect,jdbcType=INTEGER},
+            </if>
+            <if test="todaydead != null">
+                todayDead = #{todaydead,jdbcType=INTEGER},
+            </if>
+            <if test="todayheal != null">
+                todayHeal = #{todayheal,jdbcType=INTEGER},
+            </if>
+        </set>
+        where Id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.nCov.DataView.model.entity.CovData">
+        update dataFromTencent_dev
+        set provinceName = #{provincename,jdbcType=VARCHAR},
+        cityName = #{cityname,jdbcType=VARCHAR},
+        date = #{date,jdbcType=DATE},
+        totalConfirm = #{totalconfirm,jdbcType=INTEGER},
+        totalSuspect = #{totalsuspect,jdbcType=INTEGER},
+        totalDead = #{totaldead,jdbcType=INTEGER},
+        totalHeal = #{totalheal,jdbcType=INTEGER},
+        todayConfirm = #{todayconfirm,jdbcType=INTEGER},
+        todaySuspect = #{todaysuspect,jdbcType=INTEGER},
+        todayDead = #{todaydead,jdbcType=INTEGER},
+        todayHeal = #{todayheal,jdbcType=INTEGER}
+        where Id = #{id,jdbcType=INTEGER}
+    </update>
+</mapper>
