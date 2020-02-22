@@ -29,3 +29,7 @@ build/
 
 ### VS Code ###
 .vscode/
+
+##security##
+/src/main/resources/application.yml
+/src/main/resources/generator.xml
