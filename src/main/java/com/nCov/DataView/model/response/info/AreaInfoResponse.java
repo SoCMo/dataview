@@ -57,7 +57,7 @@ public class AreaInfoResponse implements Comparable {
         if (this.totalconfirm == 0) return this.confirmInMillion = "0";
         else if (population == 0) return this.confirmInMillion = "该地区暂无人口数据";
         else
-            return this.confirmInMillion = NumberTool.doubleToString(NumberTool.intDivision(this.totalconfirm, population) * 1000000);
+            return this.confirmInMillion = String.valueOf(NumberTool.intDivision(this.totalconfirm, population) * 1000000);
     }
 
     /**
@@ -86,20 +86,25 @@ public class AreaInfoResponse implements Comparable {
                 if (this.totaldead > a.totaldead) return isUp;
                 else if (this.totaldead.equals(a.totaldead)) return 0;
                 else return -1 * isUp;
-            case 3:
-                if (this.cureRate.compareTo(a.cureRate) > 0) return isUp;
-                else if (this.cureRate.equals(a.cureRate)) return 0;
-                else return -1 * isUp;
-            case 4:
-                if (this.mortality.compareTo(a.mortality) > 0) return isUp;
-                else if (this.mortality.equals(a.mortality)) return 0;
-                else return -1 * isUp;
+            case 3: {
+                if (this.cureRate.equals(a.cureRate)) return 0;
+                Double tempA = Double.valueOf(this.cureRate.substring(0, this.cureRate.length() - 1));
+                Double tempB = Double.valueOf(a.cureRate.substring(0, a.cureRate.length() - 1));
+                return isUp * tempA.compareTo(tempB);
+            }
+            case 4: {
+                if (this.mortality.equals(a.mortality)) return 0;
+                Double tempA = Double.valueOf(this.mortality.substring(0, this.mortality.length() - 1));
+                Double tempB = Double.valueOf(a.mortality.substring(0, a.mortality.length() - 1));
+                return isUp * tempA.compareTo(tempB);
+            }
             case 5:
                 if (this.confirmInMillion.equals(a.confirmInMillion)) return 0;
-                else if (this.confirmInMillion.equals("该地区暂无人口数据")) return -1;
-                else if (a.confirmInMillion.equals("该地区暂无人口数据")) return 1;
-                else if (this.confirmInMillion.compareTo(a.confirmInMillion) > 0) return isUp;
-                else if (this.confirmInMillion.compareTo(a.confirmInMillion) < 0) return -1 * isUp;
+                else if (this.confirmInMillion.equals("该地区暂无人口数据")) return -1 * isUp;
+                else if (a.confirmInMillion.equals("该地区暂无人口数据")) return isUp;
+                Double tempA = Double.valueOf(this.confirmInMillion);
+                Double tempB = Double.valueOf(a.confirmInMillion);
+                return isUp * tempA.compareTo(tempB);
         }
         return 0;
     }

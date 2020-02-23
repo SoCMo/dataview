@@ -101,8 +101,18 @@ public class EpidemicServiceImpl implements EpidemicService {
             List<AreaInfoResponse> areaInfoResponseList = new ArrayList<>();
             cityMap.forEach((key, value) -> {
                 AreaInfoResponse areaInfoResponse = new AreaInfoResponse();
-                if (covDataMap.get(key) == null) return;
-                BeanUtils.copyProperties(covDataMap.get(key), areaInfoResponse);
+                if (covDataMap.get(key) == null) {
+                    //模糊搜索
+                    CovData covData = null;
+                    for (CovData travel : covDataMap.values()) {
+                        if (travel.getCityname().contains(key))
+                            covData = travel;
+                    }
+                    if (covData == null) return;
+                    else BeanUtils.copyProperties(covData, areaInfoResponse);
+                } else {
+                    BeanUtils.copyProperties(covDataMap.get(key), areaInfoResponse);
+                }
                 areaInfoResponse.confirmCalculation(value.getPopulation());
                 areaInfoResponse.mortalityCalculation();
                 areaInfoResponse.cureRateCalculation();
