@@ -7,6 +7,7 @@ import com.nCov.DataView.exception.EmAllException;
 import com.nCov.DataView.model.entity.AreaDO;
 import com.nCov.DataView.model.entity.CovData;
 import com.nCov.DataView.model.entity.CovDataExample;
+import com.nCov.DataView.model.request.AllAreaRequest;
 import com.nCov.DataView.model.request.AreaInfoRequest;
 import com.nCov.DataView.model.response.Result;
 import com.nCov.DataView.model.response.info.AreaInfoResponse;
@@ -61,14 +62,10 @@ public class EpidemicServiceImpl implements EpidemicService {
                 areaInfoResponse.cureRateCalculation();
                 areaInfoResponse.mortalityCalculation();
                 List<AreaDO> areaDOList = areaDOMapper.selectByName(areaInfoRequest.getCityName() + "%");
-                if (areaDOList.size() != 1) {
+                if (areaDOList.size() > 1) {
                     throw new AllException(EmAllException.DATABASE_ERROR, "查询数据有误");
                 }
-
-//                if(areaDOList.get(0).getPopulation() == 0){
-//                    throw new AllException(EmAllException.DATABASE_ERROR, "城市" + areaDOList.get(0).getName() + "暂无人口数据");
-//                }
-                areaInfoResponse.confirmCalculation(areaDOList.get(0).getPopulation());
+                areaInfoResponse.confirmCalculation(areaDOList.size() == 1 ? areaDOList.get(0).getPopulation() : 0);
                 return ResultTool.success(areaInfoResponse);
             }
         } catch (AllException e) {
@@ -88,15 +85,15 @@ public class EpidemicServiceImpl implements EpidemicService {
      * @Date: 2020/2/21
      */
     @Override
-    public Result allAreaInfo(String date) {
+    public Result allAreaInfo(AllAreaRequest allAreaRequest) {
         try {
             Map<String, AreaDO> cityMap = areaDOMapper.getCityMap();
             Map<Integer, AreaDO> provinceMap = areaDOMapper.getProvinceMap();
             if (cityMap.isEmpty() || provinceMap.isEmpty()) {
-                throw new AllException(EmAllException.DATABASE_ERROR, "地区数据未录入.");
+                throw new AllException(EmAllException.DATABASE_ERROR, "地区信息未录入.");
             }
 
-            Map<String, CovData> covDataMap = covDataMapper.getInfoByDate(TimeTool.timeToDay2(TimeTool.stringToDay(date)));
+            Map<String, CovData> covDataMap = covDataMapper.getInfoByDate(allAreaRequest.getDate());
             if (covDataMap.isEmpty()) {
                 throw new AllException(EmAllException.DATABASE_ERROR, "日期数据不存在或传入参数错误");
             }
@@ -111,6 +108,8 @@ public class EpidemicServiceImpl implements EpidemicService {
                 areaInfoResponse.cureRateCalculation();
                 areaInfoResponseList.add(areaInfoResponse);
             });
+            AreaInfoResponse.init(Integer.valueOf(allAreaRequest.getIsUp()), allAreaRequest.getOrder());
+            areaInfoResponseList.sort(AreaInfoResponse::compareTo);
             return ResultTool.success(areaInfoResponseList);
         } catch (AllException e) {
             log.error(e.getMsg());

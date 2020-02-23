@@ -1,9 +1,9 @@
 package com.nCov.DataView.controller;
 
+import com.nCov.DataView.model.request.AllAreaRequest;
 import com.nCov.DataView.model.request.AreaInfoRequest;
 import com.nCov.DataView.model.response.Result;
 import com.nCov.DataView.service.EpidemicService;
-import org.apache.ibatis.annotations.Param;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -41,8 +41,8 @@ public class EpidemicController {
      * @Author: SoCMo
      * @Date: 2020/2/22
      */
-    @GetMapping("/allAreaInfo")
-    public Result areaInfo(@Param("date") String date) {
-        return epidemicService.allAreaInfo(date);
+    @PostMapping("/allAreaInfo")
+    public Result areaInfo(@Validated @RequestBody AllAreaRequest allAreaRequest) {
+        return epidemicService.allAreaInfo(allAreaRequest);
     }
 }

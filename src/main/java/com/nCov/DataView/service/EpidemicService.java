@@ -1,5 +1,6 @@
 package com.nCov.DataView.service;
 
+import com.nCov.DataView.model.request.AllAreaRequest;
 import com.nCov.DataView.model.request.AreaInfoRequest;
 import com.nCov.DataView.model.response.Result;
 
@@ -26,5 +27,5 @@ public interface EpidemicService {
      * @Author: SoCMo
      * @Date: 2020/2/21
      */
-    public Result allAreaInfo(String date);
+    public Result allAreaInfo(AllAreaRequest allAreaRequest);
 }
