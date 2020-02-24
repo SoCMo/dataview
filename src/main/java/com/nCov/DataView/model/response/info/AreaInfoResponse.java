@@ -44,10 +44,10 @@ public class AreaInfoResponse implements Comparable {
     }
 
     public String cureRateCalculation() {
-        if (this.totalconfirm == 0) {
+        if (this.totalheal + this.totaldead == 0) {
             return this.cureRate = "0%";
         }
-        return this.cureRate = NumberTool.doubleToString(NumberTool.intDivision(this.totalheal, this.totalconfirm));
+        return this.cureRate = NumberTool.doubleToString(NumberTool.intDivision(this.totalheal, this.totalheal + this.totaldead));
     }
 
     public String mortalityCalculation() {
