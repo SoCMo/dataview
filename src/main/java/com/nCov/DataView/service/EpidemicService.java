@@ -28,4 +28,13 @@ public interface EpidemicService {
      * @Date: 2020/2/21
      */
     public Result allAreaInfo(AllAreaRequest allAreaRequest);
+
+    /**
+     * @Description: 获取某地区全部疫情数据
+     * @Param: [name]
+     * @return: com.nCov.DataView.model.response.Result
+     * @Author: SoCMo
+     * @Date: 2020/2/24
+     */
+    public Result allDateInfo(String name);
 }

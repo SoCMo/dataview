@@ -60,6 +60,11 @@ public class AreaInfoResponse implements Comparable {
             return this.confirmInMillion = String.valueOf(NumberTool.intDivision(this.totalconfirm, population) * 1000000);
     }
 
+    public void Calculation(Integer population) {
+        this.cureRateCalculation();
+        this.mortalityCalculation();
+        this.confirmCalculation(population);
+    }
     /**
      * @Description: 排序方法
      * @Param: [o]

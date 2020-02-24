@@ -33,7 +33,7 @@ public class TimeTool {
      * @Author: SoCMo
      * @Date: 2019/12/6
      */
-    public static String timeToDay(Date date) {
+    public static String timeToDayCN(Date date) {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy年MM月dd日");
         //设置时区为Asia/Shanghai
         simpleDateFormat.setTimeZone(TimeZone.getTimeZone("Asia/Shanghai"));
@@ -47,7 +47,7 @@ public class TimeTool {
      * @Author: SoCMo
      * @Date: 2019/12/11
      */
-    public static String timeToDay2(Date date) {
+    public static String timeToDaySy(Date date) {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
         //设置时区为Asia/Shanghai
         simpleDateFormat.setTimeZone(TimeZone.getTimeZone("Asia/Shanghai"));

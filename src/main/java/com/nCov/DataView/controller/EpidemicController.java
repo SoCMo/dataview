@@ -4,6 +4,7 @@ import com.nCov.DataView.model.request.AllAreaRequest;
 import com.nCov.DataView.model.request.AreaInfoRequest;
 import com.nCov.DataView.model.response.Result;
 import com.nCov.DataView.service.EpidemicService;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -44,5 +45,17 @@ public class EpidemicController {
     @PostMapping("/allAreaInfo")
     public Result areaInfo(@Validated @RequestBody AllAreaRequest allAreaRequest) {
         return epidemicService.allAreaInfo(allAreaRequest);
+    }
+
+    /**
+     * @Description: 获取某地区全部疫情数据
+     * @Param: [name]
+     * @return: com.nCov.DataView.model.response.Result
+     * @Author: SoCMo
+     * @Date: 2020/2/24
+     */
+    @GetMapping("/allDateInfo")
+    public Result dateInfo(@Param("name") String name) {
+        return epidemicService.allDateInfo(name);
     }
 }

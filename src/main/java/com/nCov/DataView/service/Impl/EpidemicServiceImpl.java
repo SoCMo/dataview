@@ -11,6 +11,7 @@ import com.nCov.DataView.model.request.AllAreaRequest;
 import com.nCov.DataView.model.request.AreaInfoRequest;
 import com.nCov.DataView.model.response.Result;
 import com.nCov.DataView.model.response.info.AreaInfoResponse;
+import com.nCov.DataView.model.response.info.DateInfoResponse;
 import com.nCov.DataView.service.EpidemicService;
 import com.nCov.DataView.tools.ResultTool;
 import com.nCov.DataView.tools.TimeTool;
@@ -59,13 +60,11 @@ public class EpidemicServiceImpl implements EpidemicService {
             } else {
                 AreaInfoResponse areaInfoResponse = new AreaInfoResponse();
                 BeanUtils.copyProperties(covDataList.get(0), areaInfoResponse);
-                areaInfoResponse.cureRateCalculation();
-                areaInfoResponse.mortalityCalculation();
-                List<AreaDO> areaDOList = areaDOMapper.selectByName(areaInfoRequest.getCityName() + "%");
+                List<AreaDO> areaDOList = areaDOMapper.mapSelectByName(areaInfoRequest.getCityName() + "%");
                 if (areaDOList.size() > 1) {
                     throw new AllException(EmAllException.DATABASE_ERROR, "查询数据有误");
                 }
-                areaInfoResponse.confirmCalculation(areaDOList.size() == 1 ? areaDOList.get(0).getPopulation() : 0);
+                areaInfoResponse.Calculation(areaDOList.size() == 1 ? areaDOList.get(0).getPopulation() : 0);
                 return ResultTool.success(areaInfoResponse);
             }
         } catch (AllException e) {
@@ -113,14 +112,54 @@ public class EpidemicServiceImpl implements EpidemicService {
                 } else {
                     BeanUtils.copyProperties(covDataMap.get(key), areaInfoResponse);
                 }
-                areaInfoResponse.confirmCalculation(value.getPopulation());
-                areaInfoResponse.mortalityCalculation();
-                areaInfoResponse.cureRateCalculation();
+                areaInfoResponse.Calculation(value.getPopulation());
                 areaInfoResponseList.add(areaInfoResponse);
             });
             AreaInfoResponse.init(Integer.valueOf(allAreaRequest.getIsUp()), allAreaRequest.getOrder());
             areaInfoResponseList.sort(AreaInfoResponse::compareTo);
             return ResultTool.success(areaInfoResponseList);
+        } catch (AllException e) {
+            log.error(e.getMsg());
+            return ResultTool.error(e.getErrCode(), e.getMsg());
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return ResultTool.error(500, e.getMessage());
+        }
+    }
+
+    /**
+     * @Description: 获取某地区全部疫情数据
+     * @Param: [name]
+     * @return: com.nCov.DataView.model.response.Result
+     * @Author: SoCMo
+     * @Date: 2020/2/24
+     */
+    @Override
+    public Result allDateInfo(String name) {
+        try {
+            CovDataExample covDataExample = new CovDataExample();
+            covDataExample.createCriteria().andCitynameLike(name + "%");
+            covDataExample.setOrderByClause("date ASC");
+            List<CovData> covDataList = covDataMapper.selectByExample(covDataExample);
+            if (covDataList.isEmpty()) {
+                throw new AllException(EmAllException.DATABASE_ERROR, "搜索地区暂无疫情数据");
+            }
+
+            AreaDO areaDO = areaDOMapper.nameLike(name);
+            if (areaDO == null) {
+                throw new AllException(EmAllException.DATABASE_ERROR, "暂无地区数据");
+            }
+
+            List<DateInfoResponse> dateInfoResponseList = new ArrayList<>();
+            covDataList.forEach(covData -> {
+                DateInfoResponse dateInfoResponse = new DateInfoResponse();
+                BeanUtils.copyProperties(covData, dateInfoResponse);
+                dateInfoResponse.Calculation(areaDO.getPopulation());
+                dateInfoResponse.setDate(TimeTool.timeToDaySy(covData.getDate()));
+                dateInfoResponseList.add(dateInfoResponse);
+                System.out.println(name + ": " + covData.getDate());
+            });
+            return ResultTool.success(dateInfoResponseList);
         } catch (AllException e) {
             log.error(e.getMsg());
             return ResultTool.error(e.getErrCode(), e.getMsg());

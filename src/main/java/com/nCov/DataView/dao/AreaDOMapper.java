@@ -36,7 +36,7 @@ public interface AreaDOMapper {
             "SELECT * FROM area",
             "WHERE name like '${cityName}'",
             "</script>"})
-    List<AreaDO> selectByName(@Param("cityName") String cityName);
+    List<AreaDO> mapSelectByName(@Param("cityName") String cityName);
 
     @MapKey("name")
     @Select({"<script>",
@@ -53,4 +53,10 @@ public interface AreaDOMapper {
             "GROUP BY id",
             "</script>"})
     Map<Integer, AreaDO> getProvinceMap();
+
+    @Select({"<script>",
+            "SELECT * FROM area",
+            "WHERE name LIKE '${name}%'",
+            "</script>"})
+    AreaDO nameLike(@Param("name") String name);
 }
