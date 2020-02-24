@@ -137,27 +137,30 @@ public class EpidemicServiceImpl implements EpidemicService {
     @Override
     public Result allDateInfo(String name) {
         try {
+            Map<Integer, AreaDO> provinceMap = areaDOMapper.getProvinceMap();
+            List<AreaDO> areaDOList = areaDOMapper.nameLike(name);
+            if (areaDOList.isEmpty()) {
+                throw new AllException(EmAllException.DATABASE_ERROR, "暂无地区数据");
+            } else if (areaDOList.size() > 1) {
+                throw new AllException(EmAllException.DATABASE_ERROR, "地区名称重复，请精确查找");
+            }
+
             CovDataExample covDataExample = new CovDataExample();
-            covDataExample.createCriteria().andCitynameLike(name + "%");
+            covDataExample.createCriteria()
+                    .andProvincenameLike(provinceMap.get(areaDOList.get(0).getParentid()).getName() + "%")
+                    .andCitynameLike(name + "%");
             covDataExample.setOrderByClause("date ASC");
             List<CovData> covDataList = covDataMapper.selectByExample(covDataExample);
             if (covDataList.isEmpty()) {
                 throw new AllException(EmAllException.DATABASE_ERROR, "搜索地区暂无疫情数据");
             }
-
-            AreaDO areaDO = areaDOMapper.nameLike(name);
-            if (areaDO == null) {
-                throw new AllException(EmAllException.DATABASE_ERROR, "暂无地区数据");
-            }
-
             List<DateInfoResponse> dateInfoResponseList = new ArrayList<>();
             covDataList.forEach(covData -> {
                 DateInfoResponse dateInfoResponse = new DateInfoResponse();
                 BeanUtils.copyProperties(covData, dateInfoResponse);
-                dateInfoResponse.Calculation(areaDO.getPopulation());
+                dateInfoResponse.Calculation(areaDOList.get(0).getPopulation());
                 dateInfoResponse.setDate(TimeTool.timeToDaySy(covData.getDate()));
                 dateInfoResponseList.add(dateInfoResponse);
-                System.out.println(name + ": " + covData.getDate());
             });
             return ResultTool.success(dateInfoResponseList);
         } catch (AllException e) {

@@ -58,5 +58,5 @@ public interface AreaDOMapper {
             "SELECT * FROM area",
             "WHERE name LIKE '${name}%'",
             "</script>"})
-    AreaDO nameLike(@Param("name") String name);
+    List<AreaDO> nameLike(@Param("name") String name);
 }
