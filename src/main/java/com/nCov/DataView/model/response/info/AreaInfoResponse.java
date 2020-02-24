@@ -23,6 +23,8 @@ public class AreaInfoResponse implements Comparable {
 
     private Integer totalheal;
 
+    private Integer remainConfirm;
+
     private static Integer order;
     private static Integer isUp;
     private String cureRate;
@@ -53,6 +55,10 @@ public class AreaInfoResponse implements Comparable {
         return this.mortality = NumberTool.doubleToString(NumberTool.intDivision(this.totaldead, this.totalconfirm));
     }
 
+    public Integer remainCalculation() {
+        return this.remainConfirm = Math.max(this.totalconfirm - this.totaldead - this.totalheal, 0);
+    }
+
     public String confirmCalculation(Integer population) {
         if (this.totalconfirm == 0) return this.confirmInMillion = "0";
         else if (population == 0) return this.confirmInMillion = "该地区暂无人口数据";
@@ -64,6 +70,7 @@ public class AreaInfoResponse implements Comparable {
         this.cureRateCalculation();
         this.mortalityCalculation();
         this.confirmCalculation(population);
+        this.remainCalculation();
     }
     /**
      * @Description: 排序方法
