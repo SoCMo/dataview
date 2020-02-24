@@ -57,7 +57,7 @@ public class AreaInfoResponse implements Comparable {
         if (this.totalconfirm == 0) return this.confirmInMillion = "0";
         else if (population == 0) return this.confirmInMillion = "该地区暂无人口数据";
         else
-            return this.confirmInMillion = String.valueOf(NumberTool.intDivision(this.totalconfirm, population) * 1000000);
+            return this.confirmInMillion = String.format("%.2f", NumberTool.intDivision(this.totalconfirm, population) * 1000000);
     }
 
     public void Calculation(Integer population) {
