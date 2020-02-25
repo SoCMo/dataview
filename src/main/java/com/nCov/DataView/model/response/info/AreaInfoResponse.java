@@ -45,7 +45,7 @@ public class AreaInfoResponse implements Comparable {
 
     public String cureRateCalculation() {
         if (this.totalheal + this.totaldead == 0) {
-            return this.cureRate = "0%";
+            return this.cureRate = "暂无出院数据";
         }
         return this.cureRate = NumberTool.doubleToString(NumberTool.intDivision(this.totalheal, this.totalheal + this.totaldead));
     }
