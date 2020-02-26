@@ -5,6 +5,7 @@ import com.nCov.DataView.model.request.AreaInfoRequest;
 import com.nCov.DataView.model.response.Result;
 import com.nCov.DataView.service.EpidemicService;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,6 +31,7 @@ public class EpidemicController {
      * @Author: SoCMo
      * @Date: 2020/2/21
      */
+    @Cacheable(value = "areaInfo", key = "#allAreaRequest")
     @PostMapping("/areaInfo")
     public Result areaInfo(@Validated @RequestBody AreaInfoRequest areaInfoRequest) {
         return epidemicService.areaInfo(areaInfoRequest);
@@ -42,8 +44,9 @@ public class EpidemicController {
      * @Author: SoCMo
      * @Date: 2020/2/22
      */
+    @Cacheable(value = "allAreaInfo", key = "#allAreaRequest")
     @PostMapping("/allAreaInfo")
-    public Result areaInfo(@Validated @RequestBody AllAreaRequest allAreaRequest) {
+    public Result allAreaInfo(@Validated @RequestBody AllAreaRequest allAreaRequest) {
         return epidemicService.allAreaInfo(allAreaRequest);
     }
 
@@ -54,6 +57,7 @@ public class EpidemicController {
      * @Author: SoCMo
      * @Date: 2020/2/24
      */
+    @Cacheable(value = "dateInfo", key = "#name")
     @GetMapping("/allDateInfo")
     public Result dateInfo(@Param("name") String name) {
         return epidemicService.allDateInfo(name);
