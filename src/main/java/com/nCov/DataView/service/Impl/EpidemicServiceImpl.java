@@ -191,8 +191,9 @@ public class EpidemicServiceImpl implements EpidemicService {
 
             Calendar calendarNow = Calendar.getInstance();
             while (TimeTool.dayDiffDate(calendarNow.getTime(), calendarNeed.getTime()) <= 0) {
-                dateInfoResponseTemp.setDate(TimeTool.timeToDaySy(calendarNeed.getTime()));
-                dateInfoResponseList.add(DateInfoResponse.objectCopy(dateInfoResponseTemp));
+                DateInfoResponse dateInfoResponseEnd = DateInfoResponse.objectCopy(dateInfoResponseList.get(dateInfoResponseList.size() - 1));
+                dateInfoResponseEnd.setDate(TimeTool.timeToDaySy(calendarNeed.getTime()));
+                dateInfoResponseList.add(dateInfoResponseEnd);
                 calendarNeed.add(Calendar.DATE, 1);
             }
             return ResultTool.success(dateInfoResponseList);
