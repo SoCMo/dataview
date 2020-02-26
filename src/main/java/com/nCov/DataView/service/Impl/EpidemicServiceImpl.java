@@ -110,9 +110,13 @@ public class EpidemicServiceImpl implements EpidemicService {
                             covData = travel;
                     }
                     if (covData == null) return;
-                    else BeanUtils.copyProperties(covData, areaInfoResponse);
+                    else {
+                        BeanUtils.copyProperties(covData, areaInfoResponse);
+                        areaInfoResponse.setCityname(value.getName());
+                    }
                 } else {
                     BeanUtils.copyProperties(covDataMap.get(key), areaInfoResponse);
+                    areaInfoResponse.setCityname(value.getName());
                 }
                 areaInfoResponse.Calculation(value.getPopulation());
                 areaInfoResponseList.add(areaInfoResponse);
