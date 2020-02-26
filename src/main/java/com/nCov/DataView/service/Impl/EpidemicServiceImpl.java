@@ -20,9 +20,8 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.text.ParseException;
+import java.util.*;
 
 /**
  * program: EpidemicImpl
@@ -48,12 +47,12 @@ public class EpidemicServiceImpl implements EpidemicService {
      */
     @Override
     public Result areaInfo(AreaInfoRequest areaInfoRequest) {
+        try {
         CovDataExample covDataExample = new CovDataExample();
         covDataExample.createCriteria()
                 .andProvincenameLike(areaInfoRequest.getProvinceName() + "%")
                 .andCitynameLike(areaInfoRequest.getCityName() + "%")
                 .andDateEqualTo(TimeTool.stringToDay(areaInfoRequest.getDate()));
-        try {
             List<CovData> covDataList = covDataMapper.selectByExample(covDataExample);
             if (covDataList.size() != 1) {
                 throw new AllException(EmAllException.DATABASE_ERROR, "查询数据有误");
@@ -70,6 +69,9 @@ public class EpidemicServiceImpl implements EpidemicService {
         } catch (AllException e) {
             log.error(e.getMsg());
             return ResultTool.error(e.getErrCode(), e.getMsg());
+        } catch (ParseException e) {
+            log.error(e.getMessage());
+            return ResultTool.error(500, "日期格式错误！");
         } catch (Exception e) {
             log.error(e.getMessage());
             return ResultTool.error(500, e.getMessage());
@@ -154,18 +156,48 @@ public class EpidemicServiceImpl implements EpidemicService {
             if (covDataList.isEmpty()) {
                 throw new AllException(EmAllException.DATABASE_ERROR, "搜索地区暂无疫情数据");
             }
+
+            Calendar calendarNeed = new GregorianCalendar();
+            calendarNeed.set(2020, Calendar.JANUARY, 24, 0, 0, 0);
+
+            DateInfoResponse dateInfoResponseTemp = new DateInfoResponse();
+            dateInfoResponseTemp.setProvincename(provinceMap.get(areaDOList.get(0).getParentid()).getName());
+            dateInfoResponseTemp.setCityname(areaDOList.get(0).getName());
+            dateInfoResponseTemp.setTotalconfirm(0);
+            dateInfoResponseTemp.setTotaldead(0);
+            dateInfoResponseTemp.setTotalsuspect(0);
+            dateInfoResponseTemp.setTotalheal(0);
+            dateInfoResponseTemp.Calculation(areaDOList.get(0).getPopulation());
+
             List<DateInfoResponse> dateInfoResponseList = new ArrayList<>();
-            covDataList.forEach(covData -> {
+            for (CovData covData : covDataList) {
                 DateInfoResponse dateInfoResponse = new DateInfoResponse();
                 BeanUtils.copyProperties(covData, dateInfoResponse);
                 dateInfoResponse.Calculation(areaDOList.get(0).getPopulation());
                 dateInfoResponse.setDate(TimeTool.timeToDaySy(covData.getDate()));
+
+                while (TimeTool.dayDiffDate(covData.getDate(), calendarNeed.getTime()) != 0) {
+                    dateInfoResponseTemp.setDate(TimeTool.timeToDaySy(calendarNeed.getTime()));
+                    dateInfoResponseList.add(DateInfoResponse.objectCopy(dateInfoResponseTemp));
+                    calendarNeed.add(Calendar.DATE, 1);
+                }
                 dateInfoResponseList.add(dateInfoResponse);
-            });
+                calendarNeed.add(Calendar.DATE, 1);
+            }
+
+            Calendar calendarNow = Calendar.getInstance();
+            while (TimeTool.dayDiffDate(calendarNow.getTime(), calendarNeed.getTime()) != 0) {
+                dateInfoResponseTemp.setDate(TimeTool.timeToDaySy(calendarNeed.getTime()));
+                dateInfoResponseList.add(dateInfoResponseTemp);
+                calendarNeed.add(Calendar.DATE, 1);
+            }
             return ResultTool.success(dateInfoResponseList);
         } catch (AllException e) {
             log.error(e.getMsg());
             return ResultTool.error(e.getErrCode(), e.getMsg());
+        } catch (ParseException e) {
+            log.error(e.getMessage());
+            return ResultTool.error(500, "日期处理有误.");
         } catch (Exception e) {
             log.error(e.getMessage());
             return ResultTool.error(500, e.getMessage());

@@ -61,13 +61,33 @@ public class TimeTool {
      * @Author: SoCMo
      * @Date: 2019/12/11
      */
-    public static Date stringToDay(String time) {
+    public static Date stringToDay(String time) throws ParseException {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        try {
-            return dateFormat.parse(time);
-        } catch (ParseException e) {
-            e.printStackTrace();
-            return null;
-        }
+        return dateFormat.parse(time);
+    }
+
+    /**
+     * @Description: 计算字符串类型的日期差
+     * @Param: [begin, end]
+     * @return: int
+     * @Author: SoCMo
+     * @Date: 2020/2/26
+     */
+    public static int dayDiffStr(String begin, String end) throws ParseException {
+        long from = TimeTool.stringToDay(begin).getTime();
+        long to = TimeTool.stringToDay(end).getTime();
+        return (int) ((to - from) / (1000 * 60 * 60 * 24));
+    }
+
+    /**
+     * @Description: 计算Date类型日期差
+     * @Param: [begin, end]
+     * @return: int
+     * @Author: SoCMo
+     * @Date: 2020/2/26
+     */
+    public static int dayDiffDate(Date begin, Date end) throws ParseException {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        return TimeTool.dayDiffStr(dateFormat.format(begin), dateFormat.format(end));
     }
 }

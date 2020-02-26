@@ -51,7 +51,7 @@ public class AreaInfoResponse implements Comparable {
     }
 
     public String mortalityCalculation() {
-        if (this.totalconfirm == 0) return this.cureRate = "0%";
+        if (this.totalconfirm == 0) return this.mortality = "0%";
         return this.mortality = NumberTool.doubleToString(NumberTool.intDivision(this.totaldead, this.totalconfirm));
     }
 

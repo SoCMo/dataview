@@ -1,6 +1,7 @@
 package com.nCov.DataView.model.response.info;
 
 import lombok.Data;
+import org.springframework.beans.BeanUtils;
 
 /**
  * program: DateInfoResponse
@@ -11,4 +12,10 @@ import lombok.Data;
 @Data
 public class DateInfoResponse extends AreaInfoResponse {
     private String date;
+
+    public static DateInfoResponse objectCopy(DateInfoResponse dateInfoResponse) {
+        DateInfoResponse dateInfoResponseNew = new DateInfoResponse();
+        BeanUtils.copyProperties(dateInfoResponse, dateInfoResponseNew);
+        return dateInfoResponseNew;
+    }
 }
