@@ -100,8 +100,8 @@ public class AreaInfoResponse implements Comparable {
                 else return -1 * isUp;
             case 3: {
                 if (this.cureRate.equals(a.cureRate)) return 0;
-                else if (this.cureRate.equals("暂无出院数据")) return -1 * isUp;
-                else if (a.cureRate.equals("暂无出院数据")) return isUp;
+                else if (this.cureRate.equals("暂无出院数据")) return 1;
+                else if (a.cureRate.equals("暂无出院数据")) return -1;
                 Double tempA = Double.valueOf(this.cureRate.substring(0, this.cureRate.length() - 1));
                 Double tempB = Double.valueOf(a.cureRate.substring(0, a.cureRate.length() - 1));
                 return isUp * tempA.compareTo(tempB);
@@ -114,8 +114,8 @@ public class AreaInfoResponse implements Comparable {
             }
             case 5:
                 if (this.confirmInMillion.equals(a.confirmInMillion)) return 0;
-                else if (this.confirmInMillion.equals("该地区暂无人口数据")) return -1 * isUp;
-                else if (a.confirmInMillion.equals("该地区暂无人口数据")) return isUp;
+                else if (this.confirmInMillion.equals("该地区暂无人口数据")) return 1;
+                else if (a.confirmInMillion.equals("该地区暂无人口数据")) return -1;
                 Double tempA = Double.valueOf(this.confirmInMillion);
                 Double tempB = Double.valueOf(a.confirmInMillion);
                 return isUp * tempA.compareTo(tempB);
