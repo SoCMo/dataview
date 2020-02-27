@@ -172,6 +172,7 @@ public class EpidemicServiceImpl implements EpidemicService {
             dateInfoResponseTemp.setTotalsuspect(0);
             dateInfoResponseTemp.setTotalheal(0);
             dateInfoResponseTemp.Calculation(areaDOList.get(0).getPopulation());
+            boolean begin = true;
 
             List<DateInfoResponse> dateInfoResponseList = new ArrayList<>();
             for (CovData covData : covDataList) {
@@ -180,12 +181,22 @@ public class EpidemicServiceImpl implements EpidemicService {
                 dateInfoResponse.Calculation(areaDOList.get(0).getPopulation());
                 dateInfoResponse.setDate(TimeTool.timeToDaySy(covData.getDate()));
 
-                while (TimeTool.dayDiffDate(covData.getDate(), calendarNeed.getTime()) < 0) {
-                    dateInfoResponseTemp.setDate(TimeTool.timeToDaySy(calendarNeed.getTime()));
-                    dateInfoResponseList.add(DateInfoResponse.objectCopy(dateInfoResponseTemp));
-                    calendarNeed.add(Calendar.DATE, 1);
+                if (begin && TimeTool.dayDiffDate(covData.getDate(), calendarNeed.getTime()) < 0) {
+                    while (TimeTool.dayDiffDate(covData.getDate(), calendarNeed.getTime()) < 0) {
+                        dateInfoResponseTemp.setDate(TimeTool.timeToDaySy(calendarNeed.getTime()));
+                        dateInfoResponseList.add(DateInfoResponse.objectCopy(dateInfoResponseTemp));
+                        calendarNeed.add(Calendar.DATE, 1);
+                    }
+                } else if (!begin && TimeTool.dayDiffDate(covData.getDate(), calendarNeed.getTime()) < 0) {
+                    while (TimeTool.dayDiffDate(covData.getDate(), calendarNeed.getTime()) < 0) {
+                        DateInfoResponse dateInfoResponseEnd = DateInfoResponse.objectCopy(dateInfoResponseList.get(dateInfoResponseList.size() - 1));
+                        dateInfoResponseEnd.setDate(TimeTool.timeToDaySy(calendarNeed.getTime()));
+                        dateInfoResponseList.add(dateInfoResponseEnd);
+                        calendarNeed.add(Calendar.DATE, 1);
+                    }
                 }
                 dateInfoResponseList.add(dateInfoResponse);
+                begin = false;
                 calendarNeed.add(Calendar.DATE, 1);
             }
 
