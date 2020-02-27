@@ -13,6 +13,8 @@ import org.springframework.beans.BeanUtils;
 public class DateInfoResponse extends AreaInfoResponse {
     private String date;
 
+    private Boolean isReal;
+
     public static DateInfoResponse objectCopy(DateInfoResponse dateInfoResponse) {
         DateInfoResponse dateInfoResponseNew = new DateInfoResponse();
         BeanUtils.copyProperties(dateInfoResponse, dateInfoResponseNew);

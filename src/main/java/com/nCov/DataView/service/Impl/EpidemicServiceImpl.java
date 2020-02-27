@@ -171,6 +171,7 @@ public class EpidemicServiceImpl implements EpidemicService {
             dateInfoResponseTemp.setTotaldead(0);
             dateInfoResponseTemp.setTotalsuspect(0);
             dateInfoResponseTemp.setTotalheal(0);
+            dateInfoResponseTemp.setIsReal(false);
             dateInfoResponseTemp.Calculation(areaDOList.get(0).getPopulation());
             boolean begin = true;
 
@@ -180,6 +181,7 @@ public class EpidemicServiceImpl implements EpidemicService {
                 BeanUtils.copyProperties(covData, dateInfoResponse);
                 dateInfoResponse.Calculation(areaDOList.get(0).getPopulation());
                 dateInfoResponse.setDate(TimeTool.timeToDaySy(covData.getDate()));
+                dateInfoResponse.setIsReal(true);
 
                 if (begin && TimeTool.dayDiffDate(covData.getDate(), calendarNeed.getTime()) < 0) {
                     while (TimeTool.dayDiffDate(covData.getDate(), calendarNeed.getTime()) < 0) {
