@@ -4,8 +4,9 @@
     <resultMap id="BaseResultMap" type="com.nCov.DataView.model.entity.CovData">
         <id column="Id" property="id" jdbcType="INTEGER"/>
         <result column="provinceName" property="provincename" jdbcType="VARCHAR"/>
-        <result column="cityName" property="cityname" jdbcType="VARCHAR"/>
+        <result column="areaName" property="areaname" jdbcType="VARCHAR"/>
         <result column="date" property="date" jdbcType="DATE"/>
+        <result column="isProvince" property="isprovince" jdbcType="INTEGER"/>
         <result column="totalConfirm" property="totalconfirm" jdbcType="INTEGER"/>
         <result column="totalSuspect" property="totalsuspect" jdbcType="INTEGER"/>
         <result column="totalDead" property="totaldead" jdbcType="INTEGER"/>
@@ -76,8 +77,8 @@
         </where>
     </sql>
     <sql id="Base_Column_List">
-        Id, provinceName, cityName, date, totalConfirm, totalSuspect, totalDead, totalHeal,
-        todayConfirm, todaySuspect, todayDead, todayHeal
+        Id, provinceName, areaName, date, isProvince, totalConfirm, totalSuspect, totalDead,
+        totalHeal, todayConfirm, todaySuspect, todayDead, todayHeal
     </sql>
     <select id="selectByExample" resultMap="BaseResultMap"
             parameterType="com.nCov.DataView.model.entity.CovDataExample">
@@ -112,16 +113,16 @@
         </if>
     </delete>
     <insert id="insert" parameterType="com.nCov.DataView.model.entity.CovData">
-        insert into dataFromTencent_dev (Id, provinceName, cityName,
-        date, totalConfirm, totalSuspect,
-        totalDead, totalHeal, todayConfirm,
-        todaySuspect, todayDead, todayHeal
-        )
-        values (#{id,jdbcType=INTEGER}, #{provincename,jdbcType=VARCHAR}, #{cityname,jdbcType=VARCHAR},
-        #{date,jdbcType=DATE}, #{totalconfirm,jdbcType=INTEGER}, #{totalsuspect,jdbcType=INTEGER},
-        #{totaldead,jdbcType=INTEGER}, #{totalheal,jdbcType=INTEGER}, #{todayconfirm,jdbcType=INTEGER},
-        #{todaysuspect,jdbcType=INTEGER}, #{todaydead,jdbcType=INTEGER}, #{todayheal,jdbcType=INTEGER}
-        )
+        insert into dataFromTencent_dev (Id, provinceName, areaName,
+        date, isProvince, totalConfirm,
+        totalSuspect, totalDead, totalHeal,
+        todayConfirm, todaySuspect, todayDead,
+        todayHeal)
+        values (#{id,jdbcType=INTEGER}, #{provincename,jdbcType=VARCHAR}, #{areaname,jdbcType=VARCHAR},
+        #{date,jdbcType=DATE}, #{isprovince,jdbcType=INTEGER}, #{totalconfirm,jdbcType=INTEGER},
+        #{totalsuspect,jdbcType=INTEGER}, #{totaldead,jdbcType=INTEGER}, #{totalheal,jdbcType=INTEGER},
+        #{todayconfirm,jdbcType=INTEGER}, #{todaysuspect,jdbcType=INTEGER}, #{todaydead,jdbcType=INTEGER},
+        #{todayheal,jdbcType=INTEGER})
     </insert>
     <insert id="insertSelective" parameterType="com.nCov.DataView.model.entity.CovData">
         insert into dataFromTencent_dev
@@ -132,11 +133,14 @@
             <if test="provincename != null">
                 provinceName,
             </if>
-            <if test="cityname != null">
-                cityName,
+            <if test="areaname != null">
+                areaName,
             </if>
             <if test="date != null">
                 date,
+            </if>
+            <if test="isprovince != null">
+                isProvince,
             </if>
             <if test="totalconfirm != null">
                 totalConfirm,
@@ -170,11 +174,14 @@
             <if test="provincename != null">
                 #{provincename,jdbcType=VARCHAR},
             </if>
-            <if test="cityname != null">
-                #{cityname,jdbcType=VARCHAR},
+            <if test="areaname != null">
+                #{areaname,jdbcType=VARCHAR},
             </if>
             <if test="date != null">
                 #{date,jdbcType=DATE},
+            </if>
+            <if test="isprovince != null">
+                #{isprovince,jdbcType=INTEGER},
             </if>
             <if test="totalconfirm != null">
                 #{totalconfirm,jdbcType=INTEGER},
@@ -218,11 +225,14 @@
             <if test="record.provincename != null">
                 provinceName = #{record.provincename,jdbcType=VARCHAR},
             </if>
-            <if test="record.cityname != null">
-                cityName = #{record.cityname,jdbcType=VARCHAR},
+            <if test="record.areaname != null">
+                areaName = #{record.areaname,jdbcType=VARCHAR},
             </if>
             <if test="record.date != null">
                 date = #{record.date,jdbcType=DATE},
+            </if>
+            <if test="record.isprovince != null">
+                isProvince = #{record.isprovince,jdbcType=INTEGER},
             </if>
             <if test="record.totalconfirm != null">
                 totalConfirm = #{record.totalconfirm,jdbcType=INTEGER},
@@ -257,8 +267,9 @@
         update dataFromTencent_dev
         set Id = #{record.id,jdbcType=INTEGER},
         provinceName = #{record.provincename,jdbcType=VARCHAR},
-        cityName = #{record.cityname,jdbcType=VARCHAR},
+        areaName = #{record.areaname,jdbcType=VARCHAR},
         date = #{record.date,jdbcType=DATE},
+        isProvince = #{record.isprovince,jdbcType=INTEGER},
         totalConfirm = #{record.totalconfirm,jdbcType=INTEGER},
         totalSuspect = #{record.totalsuspect,jdbcType=INTEGER},
         totalDead = #{record.totaldead,jdbcType=INTEGER},
@@ -277,11 +288,14 @@
             <if test="provincename != null">
                 provinceName = #{provincename,jdbcType=VARCHAR},
             </if>
-            <if test="cityname != null">
-                cityName = #{cityname,jdbcType=VARCHAR},
+            <if test="areaname != null">
+                areaName = #{areaname,jdbcType=VARCHAR},
             </if>
             <if test="date != null">
                 date = #{date,jdbcType=DATE},
+            </if>
+            <if test="isprovince != null">
+                isProvince = #{isprovince,jdbcType=INTEGER},
             </if>
             <if test="totalconfirm != null">
                 totalConfirm = #{totalconfirm,jdbcType=INTEGER},
@@ -313,8 +327,9 @@
     <update id="updateByPrimaryKey" parameterType="com.nCov.DataView.model.entity.CovData">
         update dataFromTencent_dev
         set provinceName = #{provincename,jdbcType=VARCHAR},
-        cityName = #{cityname,jdbcType=VARCHAR},
+        areaName = #{areaname,jdbcType=VARCHAR},
         date = #{date,jdbcType=DATE},
+        isProvince = #{isprovince,jdbcType=INTEGER},
         totalConfirm = #{totalconfirm,jdbcType=INTEGER},
         totalSuspect = #{totalsuspect,jdbcType=INTEGER},
         totalDead = #{totaldead,jdbcType=INTEGER},

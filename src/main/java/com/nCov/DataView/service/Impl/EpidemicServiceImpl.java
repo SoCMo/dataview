@@ -48,24 +48,36 @@ public class EpidemicServiceImpl implements EpidemicService {
     @Override
     public Result areaInfo(AreaInfoRequest areaInfoRequest) {
         try {
-        CovDataExample covDataExample = new CovDataExample();
-        covDataExample.createCriteria()
+            CovDataExample covDataExample = new CovDataExample();
+            covDataExample.createCriteria()
                 .andProvincenameLike(areaInfoRequest.getProvinceName() + "%")
-                .andCitynameLike(areaInfoRequest.getCityName() + "%")
-                .andDateEqualTo(TimeTool.stringToDay(areaInfoRequest.getDate()));
+                    .andAreanameLike(areaInfoRequest.getCityName() + "%")
+                    .andIsprovinceEqualTo(0);
+            covDataExample.setOrderByClause("date DESC");
             List<CovData> covDataList = covDataMapper.selectByExample(covDataExample);
-            if (covDataList.size() != 1) {
+            if (covDataList.isEmpty()) {
                 throw new AllException(EmAllException.DATABASE_ERROR, "查询数据有误");
-            } else {
-                AreaInfoResponse areaInfoResponse = new AreaInfoResponse();
-                BeanUtils.copyProperties(covDataList.get(0), areaInfoResponse);
-                List<AreaDO> areaDOList = areaDOMapper.mapSelectByName(areaInfoRequest.getCityName() + "%");
-                if (areaDOList.size() > 1) {
-                    throw new AllException(EmAllException.DATABASE_ERROR, "查询数据有误");
-                }
-                areaInfoResponse.Calculation(areaDOList.size() == 1 ? areaDOList.get(0).getPopulation() : 0);
-                return ResultTool.success(areaInfoResponse);
             }
+            Calendar calendar = new GregorianCalendar();
+            calendar.setTime(TimeTool.stringToDay(areaInfoRequest.getDate()));
+            CovData getCovData = null;
+            for (CovData covData : covDataList) {
+                if (!covData.getDate().before(calendar.getTime())) {
+                    getCovData = covData;
+                }
+            }
+            if (getCovData == null) {
+                throw new AllException(EmAllException.BAD_REQUEST, "数据不存在");
+            }
+
+            AreaInfoResponse areaInfoResponse = new AreaInfoResponse();
+            BeanUtils.copyProperties(getCovData, areaInfoResponse);
+            List<AreaDO> areaDOList = areaDOMapper.mapSelectByName(areaInfoRequest.getCityName() + "%");
+            if (areaDOList.size() > 1) {
+                throw new AllException(EmAllException.DATABASE_ERROR, "查询数据有误");
+            }
+            areaInfoResponse.Calculation(areaDOList.size() == 1 ? areaDOList.get(0).getPopulation() : 0);
+            return ResultTool.success(areaInfoResponse);
         } catch (AllException e) {
             log.error(e.getMsg());
             return ResultTool.error(e.getErrCode(), e.getMsg());
@@ -89,7 +101,7 @@ public class EpidemicServiceImpl implements EpidemicService {
     public Result allAreaInfo(AllAreaRequest allAreaRequest) {
         try {
             Map<String, AreaDO> cityMap = areaDOMapper.getCityMap();
-            Map<Integer, AreaDO> provinceMap = areaDOMapper.getProvinceMap();
+            Map<Integer, AreaDO> provinceMap = areaDOMapper.getProvinceMapInt();
             if (cityMap.isEmpty() || provinceMap.isEmpty()) {
                 throw new AllException(EmAllException.DATABASE_ERROR, "地区信息未录入.");
             }
@@ -106,17 +118,17 @@ public class EpidemicServiceImpl implements EpidemicService {
                     //模糊搜索
                     CovData covData = null;
                     for (CovData travel : covDataMap.values()) {
-                        if (travel.getCityname().contains(key))
+                        if (travel.getAreaname().contains(key))
                             covData = travel;
                     }
                     if (covData == null) return;
                     else {
                         BeanUtils.copyProperties(covData, areaInfoResponse);
-                        areaInfoResponse.setCityname(value.getName());
+                        areaInfoResponse.setAreaname(value.getName());
                     }
                 } else {
                     BeanUtils.copyProperties(covDataMap.get(key), areaInfoResponse);
-                    areaInfoResponse.setCityname(value.getName());
+                    areaInfoResponse.setAreaname(value.getName());
                 }
                 areaInfoResponse.Calculation(value.getPopulation());
                 areaInfoResponseList.add(areaInfoResponse);
@@ -143,7 +155,7 @@ public class EpidemicServiceImpl implements EpidemicService {
     @Override
     public Result allDateInfo(String name) {
         try {
-            Map<Integer, AreaDO> provinceMap = areaDOMapper.getProvinceMap();
+            Map<Integer, AreaDO> provinceMap = areaDOMapper.getProvinceMapInt();
             List<AreaDO> areaDOList = areaDOMapper.nameLike(name);
             if (areaDOList.isEmpty()) {
                 throw new AllException(EmAllException.DATABASE_ERROR, "暂无地区数据");
@@ -154,7 +166,8 @@ public class EpidemicServiceImpl implements EpidemicService {
             CovDataExample covDataExample = new CovDataExample();
             covDataExample.createCriteria()
                     .andProvincenameLike(provinceMap.get(areaDOList.get(0).getParentid()).getName() + "%")
-                    .andCitynameLike(name + "%");
+                    .andAreanameLike(name + "%")
+                    .andIsprovinceEqualTo(0);
             covDataExample.setOrderByClause("date ASC");
             List<CovData> covDataList = covDataMapper.selectByExample(covDataExample);
             if (covDataList.isEmpty()) {
@@ -166,7 +179,7 @@ public class EpidemicServiceImpl implements EpidemicService {
 
             DateInfoResponse dateInfoResponseTemp = new DateInfoResponse();
             dateInfoResponseTemp.setProvincename(provinceMap.get(areaDOList.get(0).getParentid()).getName());
-            dateInfoResponseTemp.setCityname(areaDOList.get(0).getName());
+            dateInfoResponseTemp.setAreaname(areaDOList.get(0).getName());
             dateInfoResponseTemp.setTotalconfirm(0);
             dateInfoResponseTemp.setTotaldead(0);
             dateInfoResponseTemp.setTotalsuspect(0);

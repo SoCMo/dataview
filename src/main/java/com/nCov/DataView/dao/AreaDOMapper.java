@@ -56,7 +56,16 @@ public interface AreaDOMapper {
             "WHERE parentId = 0",
             "GROUP BY id",
             "</script>"})
-    Map<Integer, AreaDO> getProvinceMap();
+    Map<Integer, AreaDO> getProvinceMapInt();
+
+    @Cacheable(value = "provinceMap")
+    @MapKey("name")
+    @Select({"<script>",
+            "SELECT * FROM area",
+            "WHERE parentId = 0",
+            "GROUP BY id",
+            "</script>"})
+    Map<String, AreaDO> getProvinceMapString();
 
     @Cacheable(value = "nameLike", key = "#name")
     @Select({"<script>",

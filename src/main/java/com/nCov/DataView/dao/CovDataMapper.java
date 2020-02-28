@@ -34,10 +34,10 @@ public interface CovDataMapper {
     int updateByPrimaryKey(CovData record);
 
     @Cacheable(value = "getInfoByDate", key = "#date")
-    @MapKey("cityname")
+    @MapKey("areaname")
     @Select({"<script>",
             "SELECT * FROM dataFromTencent_dev",
-            "WHERE date(date) = '${date}'",
+            "WHERE date(date) = '${date}' AND isprovince = 0",
             "GROUP BY id",
             "</script>"})
     Map<String, CovData> getInfoByDate(@Param("date") String date);

@@ -16,20 +16,20 @@ public class CovDataExample {
         oredCriteria = new ArrayList<Criteria>();
     }
 
-    public String getOrderByClause() {
-        return orderByClause;
-    }
-
     public void setOrderByClause(String orderByClause) {
         this.orderByClause = orderByClause;
     }
 
-    public boolean isDistinct() {
-        return distinct;
+    public String getOrderByClause() {
+        return orderByClause;
     }
 
     public void setDistinct(boolean distinct) {
         this.distinct = distinct;
+    }
+
+    public boolean isDistinct() {
+        return distinct;
     }
 
     public List<Criteria> getOredCriteria() {
@@ -262,73 +262,73 @@ public class CovDataExample {
             return (Criteria) this;
         }
 
-        public Criteria andCitynameIsNull() {
-            addCriterion("cityName is null");
+        public Criteria andAreanameIsNull() {
+            addCriterion("areaName is null");
             return (Criteria) this;
         }
 
-        public Criteria andCitynameIsNotNull() {
-            addCriterion("cityName is not null");
+        public Criteria andAreanameIsNotNull() {
+            addCriterion("areaName is not null");
             return (Criteria) this;
         }
 
-        public Criteria andCitynameEqualTo(String value) {
-            addCriterion("cityName =", value, "cityname");
+        public Criteria andAreanameEqualTo(String value) {
+            addCriterion("areaName =", value, "areaname");
             return (Criteria) this;
         }
 
-        public Criteria andCitynameNotEqualTo(String value) {
-            addCriterion("cityName <>", value, "cityname");
+        public Criteria andAreanameNotEqualTo(String value) {
+            addCriterion("areaName <>", value, "areaname");
             return (Criteria) this;
         }
 
-        public Criteria andCitynameGreaterThan(String value) {
-            addCriterion("cityName >", value, "cityname");
+        public Criteria andAreanameGreaterThan(String value) {
+            addCriterion("areaName >", value, "areaname");
             return (Criteria) this;
         }
 
-        public Criteria andCitynameGreaterThanOrEqualTo(String value) {
-            addCriterion("cityName >=", value, "cityname");
+        public Criteria andAreanameGreaterThanOrEqualTo(String value) {
+            addCriterion("areaName >=", value, "areaname");
             return (Criteria) this;
         }
 
-        public Criteria andCitynameLessThan(String value) {
-            addCriterion("cityName <", value, "cityname");
+        public Criteria andAreanameLessThan(String value) {
+            addCriterion("areaName <", value, "areaname");
             return (Criteria) this;
         }
 
-        public Criteria andCitynameLessThanOrEqualTo(String value) {
-            addCriterion("cityName <=", value, "cityname");
+        public Criteria andAreanameLessThanOrEqualTo(String value) {
+            addCriterion("areaName <=", value, "areaname");
             return (Criteria) this;
         }
 
-        public Criteria andCitynameLike(String value) {
-            addCriterion("cityName like", value, "cityname");
+        public Criteria andAreanameLike(String value) {
+            addCriterion("areaName like", value, "areaname");
             return (Criteria) this;
         }
 
-        public Criteria andCitynameNotLike(String value) {
-            addCriterion("cityName not like", value, "cityname");
+        public Criteria andAreanameNotLike(String value) {
+            addCriterion("areaName not like", value, "areaname");
             return (Criteria) this;
         }
 
-        public Criteria andCitynameIn(List<String> values) {
-            addCriterion("cityName in", values, "cityname");
+        public Criteria andAreanameIn(List<String> values) {
+            addCriterion("areaName in", values, "areaname");
             return (Criteria) this;
         }
 
-        public Criteria andCitynameNotIn(List<String> values) {
-            addCriterion("cityName not in", values, "cityname");
+        public Criteria andAreanameNotIn(List<String> values) {
+            addCriterion("areaName not in", values, "areaname");
             return (Criteria) this;
         }
 
-        public Criteria andCitynameBetween(String value1, String value2) {
-            addCriterion("cityName between", value1, value2, "cityname");
+        public Criteria andAreanameBetween(String value1, String value2) {
+            addCriterion("areaName between", value1, value2, "areaname");
             return (Criteria) this;
         }
 
-        public Criteria andCitynameNotBetween(String value1, String value2) {
-            addCriterion("cityName not between", value1, value2, "cityname");
+        public Criteria andAreanameNotBetween(String value1, String value2) {
+            addCriterion("areaName not between", value1, value2, "areaname");
             return (Criteria) this;
         }
 
@@ -389,6 +389,66 @@ public class CovDataExample {
 
         public Criteria andDateNotBetween(Date value1, Date value2) {
             addCriterionForJDBCDate("date not between", value1, value2, "date");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsprovinceIsNull() {
+            addCriterion("isProvince is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsprovinceIsNotNull() {
+            addCriterion("isProvince is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsprovinceEqualTo(Integer value) {
+            addCriterion("isProvince =", value, "isprovince");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsprovinceNotEqualTo(Integer value) {
+            addCriterion("isProvince <>", value, "isprovince");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsprovinceGreaterThan(Integer value) {
+            addCriterion("isProvince >", value, "isprovince");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsprovinceGreaterThanOrEqualTo(Integer value) {
+            addCriterion("isProvince >=", value, "isprovince");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsprovinceLessThan(Integer value) {
+            addCriterion("isProvince <", value, "isprovince");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsprovinceLessThanOrEqualTo(Integer value) {
+            addCriterion("isProvince <=", value, "isprovince");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsprovinceIn(List<Integer> values) {
+            addCriterion("isProvince in", values, "isprovince");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsprovinceNotIn(List<Integer> values) {
+            addCriterion("isProvince not in", values, "isprovince");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsprovinceBetween(Integer value1, Integer value2) {
+            addCriterion("isProvince between", value1, value2, "isprovince");
+            return (Criteria) this;
+        }
+
+        public Criteria andIsprovinceNotBetween(Integer value1, Integer value2) {
+            addCriterion("isProvince not between", value1, value2, "isprovince");
             return (Criteria) this;
         }
 
@@ -897,6 +957,38 @@ public class CovDataExample {
 
         private String typeHandler;
 
+        public String getCondition() {
+            return condition;
+        }
+
+        public Object getValue() {
+            return value;
+        }
+
+        public Object getSecondValue() {
+            return secondValue;
+        }
+
+        public boolean isNoValue() {
+            return noValue;
+        }
+
+        public boolean isSingleValue() {
+            return singleValue;
+        }
+
+        public boolean isBetweenValue() {
+            return betweenValue;
+        }
+
+        public boolean isListValue() {
+            return listValue;
+        }
+
+        public String getTypeHandler() {
+            return typeHandler;
+        }
+
         protected Criterion(String condition) {
             super();
             this.condition = condition;
@@ -931,38 +1023,6 @@ public class CovDataExample {
 
         protected Criterion(String condition, Object value, Object secondValue) {
             this(condition, value, secondValue, null);
-        }
-
-        public String getCondition() {
-            return condition;
-        }
-
-        public Object getValue() {
-            return value;
-        }
-
-        public Object getSecondValue() {
-            return secondValue;
-        }
-
-        public boolean isNoValue() {
-            return noValue;
-        }
-
-        public boolean isSingleValue() {
-            return singleValue;
-        }
-
-        public boolean isBetweenValue() {
-            return betweenValue;
-        }
-
-        public boolean isListValue() {
-            return listValue;
-        }
-
-        public String getTypeHandler() {
-            return typeHandler;
         }
     }
 }

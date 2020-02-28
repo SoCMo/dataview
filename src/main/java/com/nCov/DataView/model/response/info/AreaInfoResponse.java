@@ -13,7 +13,7 @@ import lombok.Data;
 public class AreaInfoResponse implements Comparable {
     private String provincename;
 
-    private String cityname;
+    private String areaname;
 
     private Integer totalconfirm;
 

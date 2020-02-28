@@ -7,9 +7,11 @@ public class CovData {
 
     private String provincename;
 
-    private String cityname;
+    private String areaname;
 
     private Date date;
+
+    private Integer isprovince;
 
     private Integer totalconfirm;
 
@@ -43,12 +45,12 @@ public class CovData {
         this.provincename = provincename == null ? null : provincename.trim();
     }
 
-    public String getCityname() {
-        return cityname;
+    public String getAreaname() {
+        return areaname;
     }
 
-    public void setCityname(String cityname) {
-        this.cityname = cityname == null ? null : cityname.trim();
+    public void setAreaname(String areaname) {
+        this.areaname = areaname == null ? null : areaname.trim();
     }
 
     public Date getDate() {
@@ -57,6 +59,14 @@ public class CovData {
 
     public void setDate(Date date) {
         this.date = date;
+    }
+
+    public Integer getIsprovince() {
+        return isprovince;
+    }
+
+    public void setIsprovince(Integer isprovince) {
+        this.isprovince = isprovince;
     }
 
     public Integer getTotalconfirm() {
