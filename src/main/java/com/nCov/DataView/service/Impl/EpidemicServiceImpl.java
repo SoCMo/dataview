@@ -316,21 +316,52 @@ public class EpidemicServiceImpl implements EpidemicService {
 
             covRankList.sort(Comparator.comparing(CovRank::getRemainConfirm).reversed());
             int number = 1;
-            for (CovRank covRank : covRankList) {
-                covRank.setRemainConfirmRank(number++);
+            double last = 0;
+            for (int i = 0; i < covRankList.size(); i++) {
+                if (i == 0) {
+                    last = covRankList.get(0).getRemainConfirm();
+                    covRankList.get(0).setRemainConfirmRank(number++);
+                } else if (last == covRankList.get(i).getRemainConfirm()) {
+                    covRankList.get(i).setRemainConfirmRank(covRankList.get(i - 1).getRemainConfirmRank());
+                    number++;
+                } else {
+                    last = covRankList.get(i).getRemainConfirm();
+                    covRankList.get(i).setRemainConfirmRank(number++);
+                }
             }
 
             covRankList.sort(Comparator.comparing(CovRank::getDead).reversed());
             number = 1;
-            for (CovRank covRank : covRankList) {
-                covRank.setDeadRank(number++);
+            last = 0;
+            for (int i = 0; i < covRankList.size(); i++) {
+                if (i == 0) {
+                    last = covRankList.get(0).getDead();
+                    covRankList.get(0).setDeadRank(number++);
+                } else if (last == covRankList.get(i).getDead()) {
+                    covRankList.get(i).setDeadRank(covRankList.get(i - 1).getDeadRank());
+                    number++;
+                } else {
+                    last = covRankList.get(i).getDead();
+                    covRankList.get(i).setDeadRank(number++);
+                }
             }
 
             covRankList.sort(Comparator.comparing(CovRank::getGrowth).reversed());
             number = 1;
-            for (CovRank covRank : covRankList) {
-                covRank.setGrowthRank(number++);
+            last = 0;
+            for (int i = 0; i < covRankList.size(); i++) {
+                if (i == 0) {
+                    last = covRankList.get(0).getGrowth();
+                    covRankList.get(0).setGrowthRank(number++);
+                } else if (last == covRankList.get(i).getGrowth()) {
+                    covRankList.get(i).setGrowthRank(covRankList.get(i - 1).getGrowthRank());
+                    number++;
+                } else {
+                    last = covRankList.get(i).getGrowth();
+                    covRankList.get(i).setGrowthRank(number++);
+                }
             }
+
 
             return ResultTool.success(covRankList.stream().map(covRank -> {
                 CovRankResponse covRankResponse = new CovRankResponse();
