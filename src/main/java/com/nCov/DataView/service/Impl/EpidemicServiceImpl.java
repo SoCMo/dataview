@@ -7,12 +7,16 @@ import com.nCov.DataView.exception.EmAllException;
 import com.nCov.DataView.model.entity.AreaDO;
 import com.nCov.DataView.model.entity.CovData;
 import com.nCov.DataView.model.entity.CovDataExample;
+import com.nCov.DataView.model.entity.CovRank;
 import com.nCov.DataView.model.request.AllAreaRequest;
 import com.nCov.DataView.model.request.AreaInfoRequest;
 import com.nCov.DataView.model.response.Result;
 import com.nCov.DataView.model.response.info.AreaInfoResponse;
+import com.nCov.DataView.model.response.info.CovRankResponse;
 import com.nCov.DataView.model.response.info.DateInfoResponse;
 import com.nCov.DataView.service.EpidemicService;
+import com.nCov.DataView.tools.FixTool;
+import com.nCov.DataView.tools.NumberTool;
 import com.nCov.DataView.tools.ResultTool;
 import com.nCov.DataView.tools.TimeTool;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +26,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.text.ParseException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * program: EpidemicImpl
@@ -37,6 +42,9 @@ public class EpidemicServiceImpl implements EpidemicService {
 
     @Resource
     private CovDataMapper covDataMapper;
+
+    @Resource
+    private FixTool fixTool;
 
     /**
      * @Description: 获取地区信息
@@ -229,6 +237,111 @@ public class EpidemicServiceImpl implements EpidemicService {
         } catch (ParseException e) {
             log.error(e.getMessage());
             return ResultTool.error(500, "日期处理有误.");
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return ResultTool.error(500, e.getMessage());
+        }
+    }
+
+    /**
+     * @Description: 各地疫情严重程度分析
+     * @Param: []
+     * @return: com.nCov.DataView.model.response.Result
+     * @Author: SoCMo
+     * @Date: 2020/3/16
+     */
+    @Override
+    public Result impDateInfo(String date) {
+        try {
+            Map<String, AreaDO> cityMap = areaDOMapper.getCityMap();
+            if (cityMap.isEmpty()) {
+                throw new AllException(EmAllException.DATABASE_ERROR, "地区数据为空");
+            }
+            Map<Integer, AreaDO> provinceMap = areaDOMapper.getProvinceMapInt();
+
+            //获取三天前的时间
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(TimeTool.stringToDay(date));
+            Map<String, CovData> covDataListNow = covDataMapper.getInfoByDate(TimeTool.timeToDaySy(calendar.getTime()));
+            if (covDataListNow.isEmpty()) {
+                throw new AllException(EmAllException.DATABASE_ERROR, "三天前的数据为空。");
+            }
+
+            calendar.add(Calendar.DATE, -3);
+            Map<String, CovData> covDataListThr = covDataMapper.getInfoByDate(TimeTool.timeToDaySy(calendar.getTime()));
+            if (covDataListThr.isEmpty()) {
+                throw new AllException(EmAllException.DATABASE_ERROR, "三天前的数据为空。");
+            }
+
+            List<CovRank> covRankList = new ArrayList<>();
+            for (AreaDO areaDO : cityMap.values()) {
+                CovRank covRank = new CovRank();
+                BeanUtils.copyProperties(areaDO, covRank);
+                covRank.setProvincename(provinceMap.get(areaDO.getParentid()).getName());
+
+                CovData covDataNow;
+                CovData covDataThr;
+                if ((covDataNow = covDataListNow.get(areaDO.getName())) == null) {
+                    List<CovData> listNow = covDataListNow.values()
+                            .stream()
+                            .filter(covData -> covData.getAreaname().contains(areaDO.getName()))
+                            .collect(Collectors.toList());
+                    if (listNow.isEmpty()) {
+                        if ((covDataNow = fixTool.fixCovDate(date, areaDO.getName())) == null) {
+                            continue;
+                        }
+                    } else {
+                        covDataNow = listNow.get(0);
+                    }
+                }
+
+                if ((covDataThr = covDataListNow.get(areaDO.getName())) == null) {
+                    List<CovData> listNow = covDataListThr.values()
+                            .stream()
+                            .filter(covData -> covData.getAreaname().contains(areaDO.getName()))
+                            .collect(Collectors.toList());
+                    if (listNow.size() != 1) {
+                        if ((covDataThr = fixTool.fixCovDate(TimeTool.timeToDaySy(calendar.getTime()), areaDO.getName())) == null) {
+                            continue;
+                        }
+                    } else {
+                        covDataThr = listNow.get(0);
+                    }
+                }
+                covRank.setRemainConfirm(NumberTool.intDivision(covDataNow.getTotalconfirm() - covDataNow.getTotaldead() - covDataNow.getTotalheal(), areaDO.getPopulation()) * 1000000);
+                covRank.setDead(NumberTool.intDivision(covDataNow.getTotaldead(), covDataNow.getTotalconfirm()));
+                covRank.setGrowth(NumberTool.intDivision(covDataNow.getTotalconfirm(), covDataThr.getTotalconfirm()));
+                covRankList.add(covRank);
+            }
+
+            covRankList.sort(Comparator.comparing(CovRank::getRemainConfirm).reversed());
+            int number = 1;
+            for (CovRank covRank : covRankList) {
+                covRank.setRemainConfirmRank(number++);
+            }
+
+            covRankList.sort(Comparator.comparing(CovRank::getDead).reversed());
+            number = 1;
+            for (CovRank covRank : covRankList) {
+                covRank.setDeadRank(number++);
+            }
+
+            covRankList.sort(Comparator.comparing(CovRank::getGrowth).reversed());
+            number = 1;
+            for (CovRank covRank : covRankList) {
+                covRank.setGrowthRank(number++);
+            }
+
+            return ResultTool.success(covRankList.stream().map(covRank -> {
+                CovRankResponse covRankResponse = new CovRankResponse();
+                BeanUtils.copyProperties(covRank, covRankResponse);
+                covRankResponse.setGrowth(NumberTool.doubleToString(covRank.getGrowth()));
+                covRankResponse.setDead(NumberTool.doubleToString(covRank.getDead()));
+                return covRankResponse;
+            }).collect(Collectors.toList()));
+        } catch (AllException e) {
+            log.error(e.getMsg());
+            return ResultTool.error(e.getErrCode(), e.getMsg());
         } catch (Exception e) {
             log.error(e.getMessage());
             return ResultTool.error(500, e.getMessage());

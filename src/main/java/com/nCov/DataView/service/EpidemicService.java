@@ -37,4 +37,13 @@ public interface EpidemicService {
      * @Date: 2020/2/24
      */
     public Result allDateInfo(String name);
+
+    /**
+     * @Description: 各地疫情严重程度分析
+     * @Param: []
+     * @return: com.nCov.DataView.model.response.Result
+     * @Author: SoCMo
+     * @Date: 2020/3/16
+     */
+    public Result impDateInfo(String date);
 }

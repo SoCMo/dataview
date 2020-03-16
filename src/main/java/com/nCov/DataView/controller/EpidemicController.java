@@ -62,4 +62,10 @@ public class EpidemicController {
     public Result dateInfo(@Param("name") String name) {
         return epidemicService.allDateInfo(name);
     }
+
+    @Cacheable(value = "impDateInfo", key = "#date")
+    @GetMapping("/impDateInfo")
+    public Result impDateInfo(@Param("date") String date) {
+        return epidemicService.impDateInfo(date);
+    }
 }
