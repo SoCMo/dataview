@@ -22,7 +22,7 @@ public class CovRankResponse {
 
     private int growthRank;
 
-    private double remainConfirm;
+    private String remainConfirm;
 
     private String dead;
 

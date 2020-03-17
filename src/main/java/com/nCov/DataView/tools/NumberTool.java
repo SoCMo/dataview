@@ -40,13 +40,13 @@ public class NumberTool {
      * @Date: 2020/3/17
      */
     public static int Score(Integer rank, Integer sum) {
-        double site = NumberTool.intDivision(rank, sum);
-        int maxRank = 32;
-        double[] score = {1, 2, 3, 4, 5, 6, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2, 2};
+        int site = (int) (NumberTool.intDivision(rank, sum) * 100 + 0.99);
+        int[] score = {1, 2, 3, 4, 10, 10, 10, 10, 10, 10, 10, 10, 4, 3, 2, 1};
         int number = 0;
-        while (site - score[number] / 100 > 0) {
-            site -= score[number++] / 100;
+        while (site - score[number] > 0) {
+            site -= score[number++];
         }
-        return number == maxRank ? 0 : 100 - (100 / maxRank) * number;
+
+        return number == score.length - 1 ? 0 : 100 - (100 / score.length) * number;
     }
 }

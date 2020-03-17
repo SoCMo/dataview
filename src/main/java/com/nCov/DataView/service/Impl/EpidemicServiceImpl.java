@@ -329,6 +329,10 @@ public class EpidemicServiceImpl implements EpidemicService {
                     covRankList.get(i).setRemainConfirmRank(number++);
                 }
             }
+            int lastRank = covRankList.get(covRankList.size() - 1).getRemainConfirmRank();
+            for (CovRank covRank : covRankList) {
+                covRank.setRemainScore(NumberTool.Score(covRank.getRemainConfirmRank(), lastRank));
+            }
 
             covRankList.sort(Comparator.comparing(CovRank::getDead).reversed());
             number = 1;
@@ -344,6 +348,9 @@ public class EpidemicServiceImpl implements EpidemicService {
                     last = covRankList.get(i).getDead();
                     covRankList.get(i).setDeadRank(number++);
                 }
+            }
+            for (CovRank covRank : covRankList) {
+                covRank.setDeadScore(NumberTool.Score(covRank.getDeadRank(), covRankList.get(covRankList.size() - 1).getDeadRank()));
             }
 
             covRankList.sort(Comparator.comparing(CovRank::getGrowth).reversed());
@@ -362,11 +369,8 @@ public class EpidemicServiceImpl implements EpidemicService {
                 }
             }
 
-
             for (CovRank covRank : covRankList) {
-                covRank.setRemainScore(NumberTool.Score(covRank.getRemainConfirmRank(), covRankList.size()));
-                covRank.setDeadScore(NumberTool.Score(covRank.getDeadRank(), covRankList.size()));
-                covRank.setGrowthScore(NumberTool.Score(covRank.getGrowthRank(), covRankList.size()));
+                covRank.setGrowthScore(NumberTool.Score(covRank.getGrowthRank(), covRankList.get(covRankList.size() - 1).getGrowthRank()));
                 covRank.setSumScore(covRank.getDeadScore() * 0.2 + covRank.getRemainScore() * 0.5 + covRank.getGrowthScore() * 0.3);
             }
 
@@ -391,6 +395,7 @@ public class EpidemicServiceImpl implements EpidemicService {
                 BeanUtils.copyProperties(covRank, covRankResponse);
                 covRankResponse.setGrowth(NumberTool.doubleToString(covRank.getGrowth()));
                 covRankResponse.setDead(NumberTool.doubleToString(covRank.getDead()));
+                covRankResponse.setRemainConfirm(String.format("%.4f", covRank.getRemainConfirm()));
                 covRankResponse.setSumScore(String.format("%.2f", covRank.getSumScore()));
                 return covRankResponse;
             }).collect(Collectors.toList()));
