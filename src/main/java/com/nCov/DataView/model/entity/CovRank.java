@@ -27,4 +27,14 @@ public class CovRank {
     private int deadRank;
 
     private int growthRank;
+
+    private int remainScore;
+
+    private int deadScore;
+
+    private int growthScore;
+
+    private double sumScore;
+
+    private int allRank;
 }

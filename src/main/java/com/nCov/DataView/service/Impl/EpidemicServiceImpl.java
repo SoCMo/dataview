@@ -295,17 +295,17 @@ public class EpidemicServiceImpl implements EpidemicService {
                     }
                 }
 
-                if ((covDataThr = covDataListNow.get(areaDO.getName())) == null) {
-                    List<CovData> listNow = covDataListThr.values()
+                if ((covDataThr = covDataListThr.get(areaDO.getName())) == null) {
+                    List<CovData> listThr = covDataListThr.values()
                             .stream()
                             .filter(covData -> covData.getAreaname().contains(areaDO.getName()))
                             .collect(Collectors.toList());
-                    if (listNow.size() != 1) {
+                    if (listThr.size() != 1) {
                         if ((covDataThr = fixTool.fixCovDate(TimeTool.timeToDaySy(calendar.getTime()), areaDO.getName())) == null) {
                             continue;
                         }
                     } else {
-                        covDataThr = listNow.get(0);
+                        covDataThr = listThr.get(0);
                     }
                 }
                 covRank.setRemainConfirm(NumberTool.intDivision(covDataNow.getTotalconfirm() - covDataNow.getTotaldead() - covDataNow.getTotalheal(), areaDO.getPopulation()) * 1000000);
@@ -363,11 +363,35 @@ public class EpidemicServiceImpl implements EpidemicService {
             }
 
 
+            for (CovRank covRank : covRankList) {
+                covRank.setRemainScore(NumberTool.Score(covRank.getRemainConfirmRank(), covRankList.size()));
+                covRank.setDeadScore(NumberTool.Score(covRank.getDeadRank(), covRankList.size()));
+                covRank.setGrowthScore(NumberTool.Score(covRank.getGrowthRank(), covRankList.size()));
+                covRank.setSumScore(covRank.getDeadScore() * 0.2 + covRank.getRemainScore() * 0.5 + covRank.getGrowthScore() * 0.3);
+            }
+
+            covRankList.sort(Comparator.comparing(CovRank::getSumScore).reversed());
+            number = 1;
+            last = 0;
+            for (int i = 0; i < covRankList.size(); i++) {
+                if (i == 0) {
+                    last = covRankList.get(0).getSumScore();
+                    covRankList.get(0).setAllRank(number++);
+                } else if (last == covRankList.get(i).getSumScore()) {
+                    covRankList.get(i).setAllRank(covRankList.get(i - 1).getAllRank());
+                    number++;
+                } else {
+                    last = covRankList.get(i).getSumScore();
+                    covRankList.get(i).setAllRank(number++);
+                }
+            }
+
             return ResultTool.success(covRankList.stream().map(covRank -> {
                 CovRankResponse covRankResponse = new CovRankResponse();
                 BeanUtils.copyProperties(covRank, covRankResponse);
                 covRankResponse.setGrowth(NumberTool.doubleToString(covRank.getGrowth()));
                 covRankResponse.setDead(NumberTool.doubleToString(covRank.getDead()));
+                covRankResponse.setSumScore(String.format("%.2f", covRank.getSumScore()));
                 return covRankResponse;
             }).collect(Collectors.toList()));
         } catch (AllException e) {

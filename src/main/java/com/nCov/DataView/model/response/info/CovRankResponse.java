@@ -27,4 +27,14 @@ public class CovRankResponse {
     private String dead;
 
     private String growth;
+
+    private int remainScore;
+
+    private int deadScore;
+
+    private int growthScore;
+
+    private String sumScore;
+
+    private int allRank;
 }
