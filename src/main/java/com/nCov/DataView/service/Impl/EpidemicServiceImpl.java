@@ -21,6 +21,7 @@ import com.nCov.DataView.tools.ResultTool;
 import com.nCov.DataView.tools.TimeTool;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -253,152 +254,7 @@ public class EpidemicServiceImpl implements EpidemicService {
     @Override
     public Result impDateInfo(String date) {
         try {
-            Map<String, AreaDO> cityMap = areaDOMapper.getCityMap();
-            if (cityMap.isEmpty()) {
-                throw new AllException(EmAllException.DATABASE_ERROR, "地区数据为空");
-            }
-            Map<Integer, AreaDO> provinceMap = areaDOMapper.getProvinceMapInt();
-
-            //获取三天前的时间
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTime(TimeTool.stringToDay(date));
-            Map<String, CovData> covDataListNow = covDataMapper.getInfoByDate(TimeTool.timeToDaySy(calendar.getTime()));
-            if (covDataListNow.isEmpty()) {
-                throw new AllException(EmAllException.DATABASE_ERROR, "三天前的数据为空。");
-            }
-
-            calendar.add(Calendar.DATE, -3);
-            Map<String, CovData> covDataListThr = covDataMapper.getInfoByDate(TimeTool.timeToDaySy(calendar.getTime()));
-            if (covDataListThr.isEmpty()) {
-                throw new AllException(EmAllException.DATABASE_ERROR, "三天前的数据为空。");
-            }
-
-            List<CovRank> covRankList = new ArrayList<>();
-            for (AreaDO areaDO : cityMap.values()) {
-                CovRank covRank = new CovRank();
-                BeanUtils.copyProperties(areaDO, covRank);
-                covRank.setProvincename(provinceMap.get(areaDO.getParentid()).getName());
-
-                CovData covDataNow;
-                CovData covDataThr;
-                if ((covDataNow = covDataListNow.get(areaDO.getName())) == null) {
-                    List<CovData> listNow = covDataListNow.values()
-                            .stream()
-                            .filter(covData -> covData.getAreaname().contains(areaDO.getName()))
-                            .collect(Collectors.toList());
-                    if (listNow.isEmpty()) {
-                        if ((covDataNow = fixTool.fixCovDate(date, areaDO.getName())) == null) {
-                            continue;
-                        }
-                    } else {
-                        covDataNow = listNow.get(0);
-                    }
-                }
-
-                if ((covDataThr = covDataListThr.get(areaDO.getName())) == null) {
-                    List<CovData> listThr = covDataListThr.values()
-                            .stream()
-                            .filter(covData -> covData.getAreaname().contains(areaDO.getName()))
-                            .collect(Collectors.toList());
-                    if (listThr.size() != 1) {
-                        if ((covDataThr = fixTool.fixCovDate(TimeTool.timeToDaySy(calendar.getTime()), areaDO.getName())) == null) {
-                            continue;
-                        }
-                    } else {
-                        covDataThr = listThr.get(0);
-                    }
-                }
-                covRank.setRemainConfirm(NumberTool.intDivision(covDataNow.getTotalconfirm() - covDataNow.getTotaldead() - covDataNow.getTotalheal(), areaDO.getPopulation()) * 1000000);
-                covRank.setDead(NumberTool.intDivision(covDataNow.getTotaldead(), covDataNow.getTotalconfirm()));
-                covRank.setGrowth(NumberTool.intDivision(covDataNow.getTotalconfirm(), covDataThr.getTotalconfirm()));
-                covRankList.add(covRank);
-            }
-
-            covRankList.sort(Comparator.comparing(CovRank::getRemainConfirm).reversed());
-            int number = 1;
-            double last = 0;
-            for (int i = 0; i < covRankList.size(); i++) {
-                if (i == 0) {
-                    last = covRankList.get(0).getRemainConfirm();
-                    covRankList.get(0).setRemainConfirmRank(number++);
-                } else if (last == covRankList.get(i).getRemainConfirm()) {
-                    covRankList.get(i).setRemainConfirmRank(covRankList.get(i - 1).getRemainConfirmRank());
-                    number++;
-                } else {
-                    last = covRankList.get(i).getRemainConfirm();
-                    covRankList.get(i).setRemainConfirmRank(number++);
-                }
-            }
-            int lastRank = covRankList.get(covRankList.size() - 1).getRemainConfirmRank();
-            for (CovRank covRank : covRankList) {
-                covRank.setRemainScore(NumberTool.Score(covRank.getRemainConfirmRank(), lastRank));
-            }
-
-            covRankList.sort(Comparator.comparing(CovRank::getDead).reversed());
-            number = 1;
-            last = 0;
-            for (int i = 0; i < covRankList.size(); i++) {
-                if (i == 0) {
-                    last = covRankList.get(0).getDead();
-                    covRankList.get(0).setDeadRank(number++);
-                } else if (last == covRankList.get(i).getDead()) {
-                    covRankList.get(i).setDeadRank(covRankList.get(i - 1).getDeadRank());
-                    number++;
-                } else {
-                    last = covRankList.get(i).getDead();
-                    covRankList.get(i).setDeadRank(number++);
-                }
-            }
-            for (CovRank covRank : covRankList) {
-                covRank.setDeadScore(NumberTool.Score(covRank.getDeadRank(), covRankList.get(covRankList.size() - 1).getDeadRank()));
-            }
-
-            covRankList.sort(Comparator.comparing(CovRank::getGrowth).reversed());
-            number = 1;
-            last = 0;
-            for (int i = 0; i < covRankList.size(); i++) {
-                if (i == 0) {
-                    last = covRankList.get(0).getGrowth();
-                    covRankList.get(0).setGrowthRank(number++);
-                } else if (last == covRankList.get(i).getGrowth()) {
-                    covRankList.get(i).setGrowthRank(covRankList.get(i - 1).getGrowthRank());
-                    number++;
-                } else {
-                    last = covRankList.get(i).getGrowth();
-                    covRankList.get(i).setGrowthRank(number++);
-                }
-            }
-
-            for (CovRank covRank : covRankList) {
-                covRank.setGrowthScore(NumberTool.Score(covRank.getGrowthRank(), covRankList.get(covRankList.size() - 1).getGrowthRank()));
-                covRank.setSumScore(covRank.getDeadScore() * 0.2 + covRank.getRemainScore() * 0.5 + covRank.getGrowthScore() * 0.3);
-            }
-
-            covRankList.sort(Comparator.comparing(CovRank::getSumScore).reversed());
-            number = 1;
-            last = 0;
-            for (int i = 0; i < covRankList.size(); i++) {
-                if (i == 0) {
-                    last = covRankList.get(0).getSumScore();
-                    covRankList.get(0).setAllRank(number++);
-                } else if (last == covRankList.get(i).getSumScore()) {
-                    covRankList.get(i).setAllRank(covRankList.get(i - 1).getAllRank());
-                    number++;
-                } else {
-                    last = covRankList.get(i).getSumScore();
-                    covRankList.get(i).setAllRank(number++);
-                }
-            }
-
-            return ResultTool.success(covRankList.stream().map(covRank -> {
-                CovRankResponse covRankResponse = new CovRankResponse();
-                BeanUtils.copyProperties(covRank, covRankResponse);
-                covRankResponse.setGrowth(NumberTool.doubleToString(covRank.getGrowth()));
-                covRankResponse.setDead(NumberTool.doubleToString(covRank.getDead()));
-                covRankResponse.setRemainConfirm(String.format("%.4f", covRank.getRemainConfirm()));
-                covRankResponse.setSumScore(String.format("%.2f", covRank.getSumScore()));
-                return covRankResponse;
-            }).collect(Collectors.toList()));
+            return ResultTool.success(allAreaCal(date));
         } catch (AllException e) {
             log.error(e.getMsg());
             return ResultTool.error(e.getErrCode(), e.getMsg());
@@ -406,5 +262,197 @@ public class EpidemicServiceImpl implements EpidemicService {
             log.error(e.getMessage());
             return ResultTool.error(500, e.getMessage());
         }
+    }
+
+    /**
+     * @Description: 某地疫情情况
+     * @Param: [area]
+     * @return: com.nCov.DataView.model.response.Result
+     * @Author: SoCMo
+     * @Date: 2020/3/18
+     */
+    @Override
+    public Result areaCal(String area) {
+        try {
+            List<CovRankResponse> covRankResponseList = allAreaCal(TimeTool.timeToDaySy(new Date()));
+            List<CovRankResponse> resultList = covRankResponseList.stream().filter(covRankResponse -> area.contains(covRankResponse.getName()))
+                    .collect(Collectors.toList());
+            if (resultList.isEmpty()) throw new AllException(EmAllException.DATABASE_ERROR, "不存在该地区数据");
+            if (resultList.size() > 1) {
+                resultList = covRankResponseList.stream().filter(covRankResponse -> fixTool.areaUni(area).contains(covRankResponse.getName()))
+                        .collect(Collectors.toList());
+                if (resultList.isEmpty()) throw new AllException(EmAllException.DATABASE_ERROR, "不存在该地区数据");
+                if (resultList.size() > 1) {
+                    resultList = resultList.stream().filter(covRankResponse -> fixTool.areaUni(area).equals(covRankResponse.getName()))
+                            .collect(Collectors.toList());
+                    if (resultList.isEmpty()) throw new AllException(EmAllException.DATABASE_ERROR, "不存在该地区数据");
+                }
+            }
+
+            return ResultTool.success(resultList.get(0));
+        } catch (AllException e) {
+            log.error(e.getMsg());
+            return ResultTool.error(e.getErrCode(), e.getMsg());
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return ResultTool.error(500, e.getMessage());
+        }
+    }
+
+    /**
+     * @Description: 所有地区评估
+     * @Param: [date]
+     * @return: java.util.List<com.nCov.DataView.model.response.info.CovRankResponse>
+     * @Author: SoCMo
+     * @Date: 2020/3/18
+     */
+    @Cacheable(value = "allAreaCal", key = "#date")
+    public List<CovRankResponse> allAreaCal(String date) throws AllException, ParseException {
+        Map<String, AreaDO> cityMap = areaDOMapper.getCityMap();
+        if (cityMap.isEmpty()) {
+            throw new AllException(EmAllException.DATABASE_ERROR, "地区数据为空");
+        }
+        Map<Integer, AreaDO> provinceMap = areaDOMapper.getProvinceMapInt();
+
+        //获取三天前的时间
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(TimeTool.stringToDay(date));
+        Map<String, CovData> covDataListNow = covDataMapper.getInfoByDate(TimeTool.timeToDaySy(calendar.getTime()));
+        if (covDataListNow.isEmpty()) {
+            throw new AllException(EmAllException.DATABASE_ERROR, "今日数据为空。");
+        }
+
+        calendar.add(Calendar.DATE, -3);
+        Map<String, CovData> covDataListThr = covDataMapper.getInfoByDate(TimeTool.timeToDaySy(calendar.getTime()));
+        if (covDataListThr.isEmpty()) {
+            throw new AllException(EmAllException.DATABASE_ERROR, "三天前的数据为空。");
+        }
+
+        List<CovRank> covRankList = new ArrayList<>();
+        for (AreaDO areaDO : cityMap.values()) {
+            CovRank covRank = new CovRank();
+            BeanUtils.copyProperties(areaDO, covRank);
+            covRank.setProvincename(provinceMap.get(areaDO.getParentid()).getName());
+
+            CovData covDataNow;
+            CovData covDataThr;
+            if ((covDataNow = covDataListNow.get(areaDO.getName())) == null) {
+                List<CovData> listNow = covDataListNow.values()
+                        .stream()
+                        .filter(covData -> covData.getAreaname().contains(areaDO.getName()))
+                        .collect(Collectors.toList());
+                if (listNow.isEmpty()) {
+                    if ((covDataNow = fixTool.fixCovDate(date, areaDO.getName())) == null) {
+                        continue;
+                    }
+                } else {
+                    covDataNow = listNow.get(0);
+                }
+            }
+
+            if ((covDataThr = covDataListThr.get(areaDO.getName())) == null) {
+                List<CovData> listThr = covDataListThr.values()
+                        .stream()
+                        .filter(covData -> covData.getAreaname().contains(areaDO.getName()))
+                        .collect(Collectors.toList());
+                if (listThr.size() != 1) {
+                    if ((covDataThr = fixTool.fixCovDate(TimeTool.timeToDaySy(calendar.getTime()), areaDO.getName())) == null) {
+                        continue;
+                    }
+                } else {
+                    covDataThr = listThr.get(0);
+                }
+            }
+            covRank.setRemainConfirm(NumberTool.intDivision(covDataNow.getTotalconfirm() - covDataNow.getTotaldead() - covDataNow.getTotalheal(), areaDO.getPopulation()) * 1000000);
+            covRank.setDead(NumberTool.intDivision(covDataNow.getTotaldead(), covDataNow.getTotalconfirm()));
+            covRank.setGrowth(NumberTool.intDivision(covDataNow.getTotalconfirm(), covDataThr.getTotalconfirm()));
+            covRankList.add(covRank);
+        }
+
+        covRankList.sort(Comparator.comparing(CovRank::getRemainConfirm).reversed());
+        int number = 1;
+        double last = 0;
+        for (int i = 0; i < covRankList.size(); i++) {
+            if (i == 0) {
+                last = covRankList.get(0).getRemainConfirm();
+                covRankList.get(0).setRemainConfirmRank(number++);
+            } else if (last == covRankList.get(i).getRemainConfirm()) {
+                covRankList.get(i).setRemainConfirmRank(covRankList.get(i - 1).getRemainConfirmRank());
+                number++;
+            } else {
+                last = covRankList.get(i).getRemainConfirm();
+                covRankList.get(i).setRemainConfirmRank(number++);
+            }
+        }
+        int lastRank = covRankList.get(covRankList.size() - 1).getRemainConfirmRank();
+        for (CovRank covRank : covRankList) {
+            covRank.setRemainScore(NumberTool.Score(covRank.getRemainConfirmRank(), lastRank));
+        }
+
+        covRankList.sort(Comparator.comparing(CovRank::getDead).reversed());
+        number = 1;
+        last = 0;
+        for (int i = 0; i < covRankList.size(); i++) {
+            if (i == 0) {
+                last = covRankList.get(0).getDead();
+                covRankList.get(0).setDeadRank(number++);
+            } else if (last == covRankList.get(i).getDead()) {
+                covRankList.get(i).setDeadRank(covRankList.get(i - 1).getDeadRank());
+                number++;
+            } else {
+                last = covRankList.get(i).getDead();
+                covRankList.get(i).setDeadRank(number++);
+            }
+        }
+        for (CovRank covRank : covRankList) {
+            covRank.setDeadScore(NumberTool.Score(covRank.getDeadRank(), covRankList.get(covRankList.size() - 1).getDeadRank()));
+        }
+
+        covRankList.sort(Comparator.comparing(CovRank::getGrowth).reversed());
+        number = 1;
+        last = 0;
+        for (int i = 0; i < covRankList.size(); i++) {
+            if (i == 0) {
+                last = covRankList.get(0).getGrowth();
+                covRankList.get(0).setGrowthRank(number++);
+            } else if (last == covRankList.get(i).getGrowth()) {
+                covRankList.get(i).setGrowthRank(covRankList.get(i - 1).getGrowthRank());
+                number++;
+            } else {
+                last = covRankList.get(i).getGrowth();
+                covRankList.get(i).setGrowthRank(number++);
+            }
+        }
+
+        for (CovRank covRank : covRankList) {
+            covRank.setGrowthScore(NumberTool.Score(covRank.getGrowthRank(), covRankList.get(covRankList.size() - 1).getGrowthRank()));
+            covRank.setSumScore(covRank.getDeadScore() * 0.2 + covRank.getRemainScore() * 0.5 + covRank.getGrowthScore() * 0.3);
+        }
+
+        covRankList.sort(Comparator.comparing(CovRank::getSumScore).reversed());
+        number = 1;
+        last = 0;
+        for (int i = 0; i < covRankList.size(); i++) {
+            if (i == 0) {
+                last = covRankList.get(0).getSumScore();
+                covRankList.get(0).setAllRank(number++);
+            } else if (last == covRankList.get(i).getSumScore()) {
+                covRankList.get(i).setAllRank(covRankList.get(i - 1).getAllRank());
+                number++;
+            } else {
+                last = covRankList.get(i).getSumScore();
+                covRankList.get(i).setAllRank(number++);
+            }
+        }
+
+        return covRankList.stream().map(covRank -> {
+            CovRankResponse covRankResponse = new CovRankResponse();
+            BeanUtils.copyProperties(covRank, covRankResponse);
+            covRankResponse.setGrowth(NumberTool.doubleToString(covRank.getGrowth()));
+            covRankResponse.setDead(NumberTool.doubleToString(covRank.getDead()));
+            covRankResponse.setRemainConfirm(String.format("%.4f", covRank.getRemainConfirm()));
+            covRankResponse.setSumScore(String.format("%.2f", covRank.getSumScore()));
+            return covRankResponse;
+        }).collect(Collectors.toList());
     }
 }

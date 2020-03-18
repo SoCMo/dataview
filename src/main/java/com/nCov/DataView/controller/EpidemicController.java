@@ -63,9 +63,30 @@ public class EpidemicController {
         return epidemicService.allDateInfo(name);
     }
 
+    /**
+     * @Description: 各地风险评估
+     * @Param: [date]
+     * @return: com.nCov.DataView.model.response.Result
+     * @Author: SoCMo
+     * @Date: 2020/3/18
+     */
     @Cacheable(value = "impDateInfo", key = "#date")
     @GetMapping("/impDateInfo")
     public Result impDateInfo(@Param("date") String date) {
         return epidemicService.impDateInfo(date);
     }
+
+    /**
+     * @Description: 某地疫情风险指数
+     * @Param: [area]
+     * @return: com.nCov.DataView.model.response.Result
+     * @Author: SoCMo
+     * @Date: 2020/3/18
+     */
+    @Cacheable(value = "areaCal", key = "#area")
+    @GetMapping("/areaCal")
+    public Result areaCal(@Param("area") String area) {
+        return epidemicService.areaCal(area);
+    }
+
 }

@@ -9,6 +9,8 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 import java.text.ParseException;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * program: FixTool
@@ -45,5 +47,32 @@ public class FixTool {
             covDataMapper.insertSelective(covData);
         }
         return covDataList.get(0);
+    }
+
+    /**
+     * @Description: 地级市名称统一，去除后缀工具
+     * @Param: [area]
+     * @return: java.lang.String
+     * @Author: SoCMo
+     * @Date: 2020/3/18
+     */
+    public String areaUni(String area) {
+        String regex = "(.+)[区市县]$";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(area);
+        if (matcher.find()) {
+            if (!area.equals("浦东新区") && !area.equals("滨海新区") && !area.contains("神农架林区")) {
+                return matcher.group(1);
+            }
+        }
+
+        regex = "(.+)自治州$";
+        pattern = Pattern.compile(regex);
+        matcher = pattern.matcher(area);
+        if (matcher.find()) {
+            return matcher.group(1);
+        }
+
+        return area;
     }
 }

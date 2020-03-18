@@ -46,4 +46,13 @@ public interface EpidemicService {
      * @Date: 2020/3/16
      */
     public Result impDateInfo(String date);
+
+    /**
+     * @Description: 某地风险评估
+     * @Param: [area]
+     * @return: com.nCov.DataView.model.response.Result
+     * @Author: SoCMo
+     * @Date: 2020/3/18
+     */
+    public Result areaCal(String area);
 }
