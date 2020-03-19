@@ -4,6 +4,8 @@ import com.nCov.DataView.model.request.AllAreaRequest;
 import com.nCov.DataView.model.request.AreaInfoRequest;
 import com.nCov.DataView.model.response.Result;
 
+import java.util.List;
+
 /**
  * program: EpidemicService
  * description: 疫情地图
@@ -54,5 +56,5 @@ public interface EpidemicService {
      * @Author: SoCMo
      * @Date: 2020/3/18
      */
-    public Result areaCal(String area);
+    public Result areaCal(List<String> areaList);
 }

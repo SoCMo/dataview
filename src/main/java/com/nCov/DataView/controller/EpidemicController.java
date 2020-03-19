@@ -2,6 +2,7 @@ package com.nCov.DataView.controller;
 
 import com.nCov.DataView.model.request.AllAreaRequest;
 import com.nCov.DataView.model.request.AreaInfoRequest;
+import com.nCov.DataView.model.request.AreaListRequest;
 import com.nCov.DataView.model.response.Result;
 import com.nCov.DataView.service.EpidemicService;
 import org.apache.ibatis.annotations.Param;
@@ -84,9 +85,9 @@ public class EpidemicController {
      * @Date: 2020/3/18
      */
     @Cacheable(value = "areaCal", key = "#area")
-    @GetMapping("/areaCal")
-    public Result areaCal(@Param("area") String area) {
-        return epidemicService.areaCal(area);
+    @PostMapping("/areaCal")
+    public Result areaCal(@Validated @RequestBody AreaListRequest areaListRequest) {
+        return epidemicService.areaCal(areaListRequest.getAreaList());
     }
 
 }

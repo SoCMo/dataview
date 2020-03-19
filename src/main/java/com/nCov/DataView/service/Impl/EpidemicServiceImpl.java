@@ -11,9 +11,7 @@ import com.nCov.DataView.model.entity.CovRank;
 import com.nCov.DataView.model.request.AllAreaRequest;
 import com.nCov.DataView.model.request.AreaInfoRequest;
 import com.nCov.DataView.model.response.Result;
-import com.nCov.DataView.model.response.info.AreaInfoResponse;
-import com.nCov.DataView.model.response.info.CovRankResponse;
-import com.nCov.DataView.model.response.info.DateInfoResponse;
+import com.nCov.DataView.model.response.info.*;
 import com.nCov.DataView.service.EpidemicService;
 import com.nCov.DataView.tools.FixTool;
 import com.nCov.DataView.tools.NumberTool;
@@ -272,24 +270,32 @@ public class EpidemicServiceImpl implements EpidemicService {
      * @Date: 2020/3/18
      */
     @Override
-    public Result areaCal(String area) {
+    public Result areaCal(List<String> areaList) {
         try {
-            List<CovRankResponse> covRankResponseList = allAreaCal(TimeTool.timeToDaySy(new Date()));
-            List<CovRankResponse> resultList = covRankResponseList.stream().filter(covRankResponse -> area.contains(covRankResponse.getName()))
-                    .collect(Collectors.toList());
-            if (resultList.isEmpty()) throw new AllException(EmAllException.DATABASE_ERROR, "不存在该地区数据");
-            if (resultList.size() > 1) {
-                resultList = covRankResponseList.stream().filter(covRankResponse -> fixTool.areaUni(area).contains(covRankResponse.getName()))
-                        .collect(Collectors.toList());
-                if (resultList.isEmpty()) throw new AllException(EmAllException.DATABASE_ERROR, "不存在该地区数据");
-                if (resultList.size() > 1) {
-                    resultList = resultList.stream().filter(covRankResponse -> fixTool.areaUni(area).equals(covRankResponse.getName()))
-                            .collect(Collectors.toList());
-                    if (resultList.isEmpty()) throw new AllException(EmAllException.DATABASE_ERROR, "不存在该地区数据");
+            //去重
+            double number = 0;
+            AreaCalResponse areaCalResponse = new AreaCalResponse();
+            areaCalResponse.setAreaList(new ArrayList<>());
+            areaList = new ArrayList<>(new HashSet<>(areaList));
+            Map<String, CovRankResponse> covRankResponseMap = allAreaCal(TimeTool.timeToDaySy(new Date())).stream()
+                    .collect(Collectors.toMap(CovRankResponse::getName, covRankResponse -> covRankResponse));
+            for (String area : areaList) {
+                CovRankResponse covRankResponse;
+                if ((covRankResponse = covRankResponseMap.get(fixTool.areaUni(area))) == null) {
+                    for (CovRankResponse cov : covRankResponseMap.values()) {
+                        if (cov.getName().contains(fixTool.areaUni(area))) {
+                            covRankResponse = cov;
+                        }
+                    }
+                    if (covRankResponse == null) {
+                        throw new AllException(EmAllException.DATABASE_ERROR, area + "信息无法找到");
+                    }
                 }
+                areaCalResponse.getAreaList().add(new AreaCalInfo(area, covRankResponse.getSumScore()));
+                number += Double.parseDouble(covRankResponse.getSumScore());
             }
-
-            return ResultTool.success(resultList.get(0));
+            areaCalResponse.setNumber(number);
+            return ResultTool.success(areaCalResponse);
         } catch (AllException e) {
             log.error(e.getMsg());
             return ResultTool.error(e.getErrCode(), e.getMsg());
