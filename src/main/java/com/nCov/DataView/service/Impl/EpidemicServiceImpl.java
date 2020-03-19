@@ -288,7 +288,7 @@ public class EpidemicServiceImpl implements EpidemicService {
                         }
                     }
                     if (covRankResponse == null) {
-                        throw new AllException(EmAllException.DATABASE_ERROR, area + "信息无法找到");
+                        continue;
                     }
                 }
                 areaCalResponse.getAreaList().add(new AreaCalInfo(area, covRankResponse.getSumScore()));
