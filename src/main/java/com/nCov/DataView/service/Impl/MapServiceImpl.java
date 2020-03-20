@@ -93,6 +93,7 @@ public class MapServiceImpl implements MapService {
                 calendarTraver.add(Calendar.DATE, 1);
             }
 
+            provinceInfoResponseList = null;
             return ResultTool.success(dayInfoResList);
         } catch (AllException e) {
             log.error(e.getMsg());
