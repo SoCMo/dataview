@@ -177,6 +177,9 @@ public class MapServiceImpl implements MapService {
                 dayInfoList.add(dayInfo);
             }
         }
+
+
+        provinceResMap = null;
         return provinceInfoResponseList;
     }
 }
