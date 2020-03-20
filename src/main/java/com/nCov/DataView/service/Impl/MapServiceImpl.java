@@ -3,9 +3,8 @@ package com.nCov.DataView.service.Impl;
 import com.nCov.DataView.dao.AreaDOMapper;
 import com.nCov.DataView.dao.CovDataMapper;
 import com.nCov.DataView.exception.AllException;
-import com.nCov.DataView.exception.EmAllException;
+import com.nCov.DataView.model.entity.AreaDO;
 import com.nCov.DataView.model.entity.CovData;
-import com.nCov.DataView.model.entity.CovDataExample;
 import com.nCov.DataView.model.response.Result;
 import com.nCov.DataView.model.response.info.DayInfo;
 import com.nCov.DataView.model.response.info.DayInfoResponse;
@@ -15,11 +14,13 @@ import com.nCov.DataView.service.MapService;
 import com.nCov.DataView.tools.ResultTool;
 import com.nCov.DataView.tools.TimeTool;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.text.ParseException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -93,7 +94,6 @@ public class MapServiceImpl implements MapService {
                 calendarTraver.add(Calendar.DATE, 1);
             }
 
-            provinceInfoResponseList = null;
             return ResultTool.success(dayInfoResList);
         } catch (AllException e) {
             log.error(e.getMsg());
@@ -105,26 +105,6 @@ public class MapServiceImpl implements MapService {
     }
 
     /**
-     * @Description: 时间补全
-     * @Param: [provinceDayInfoList, dateNeed]
-     * @return: void
-     * @Author: SoCMo
-     * @Date: 2020/2/28
-     */
-    private void addIn(List<DayInfo> dayInfoList, Date dateNeed) throws ParseException {
-        while (TimeTool.dayDiffStr(dayInfoList.get(dayInfoList.size() - 1).getDate(), TimeTool.timeToDaySy(dateNeed)) != 1) {
-            DayInfo dayInfo = new DayInfo();
-            Calendar calendar = new GregorianCalendar();
-            calendar.setTime(TimeTool.stringToDay(dayInfoList.get(dayInfoList.size() - 1).getDate()));
-            calendar.add(Calendar.DATE, 1);
-
-            dayInfo.setDate(TimeTool.timeToDaySy(calendar.getTime()));
-            dayInfo.setConfirm(dayInfoList.get(dayInfoList.size() - 1).getConfirm());
-            dayInfoList.add(dayInfo);
-        }
-    }
-
-    /**
      * @Description: 各个省每日疫情数据
      * @Param: []
      * @return: java.util.List<com.nCov.DataView.model.response.info.CNMapResponse>
@@ -132,55 +112,61 @@ public class MapServiceImpl implements MapService {
      * @Date: 2020/2/28
      */
     public List<ProvinceInfoResponse> epidemicInfo() throws ParseException, AllException {
-        CovDataExample covDataExample = new CovDataExample();
-        covDataExample.createCriteria().andIsprovinceEqualTo(1);
-        covDataExample.setOrderByClause("date ASC");
-        List<CovData> covDataList = covDataMapper.selectByExample(covDataExample);
-        if (covDataList.isEmpty()) {
-            throw new AllException(EmAllException.DATABASE_ERROR, "省信息不存在");
+        Map<String, AreaDO> ProvinceMap = areaDOMapper.getProvinceMapString();
+        List<CovData> covDataList = covDataMapper.getInfoProvince();
+        List<ProvinceInfoResponse> provinceInfoList = new ArrayList<>();
+        for (AreaDO areaDO : ProvinceMap.values()) {
+            Map<String, CovData> tempProList = covDataList.stream()
+                    .filter(covData -> covData.getAreaname().contains(areaDO.getName()))
+                    .collect(Collectors.toMap(covData -> TimeTool.timeToDaySy(covData.getDate()), covData -> covData));
+            Calendar calendar = Calendar.getInstance();
+            calendar.set(2020, Calendar.JANUARY, 24, 0, 0, 0);
+            CovData temp = null;
+            String areaName = null;
+            ProvinceInfoResponse provinceInfoResponse = new ProvinceInfoResponse();
+            provinceInfoResponse.setDayInfoList(new ArrayList<>());
+            while (calendar.getTime().before(new Date())) {
+                if (tempProList.get(TimeTool.timeToDaySy(calendar.getTime())) == null) {
+                    if (temp == null) {
+                        CovData covData = new CovData();
+                        covData.setDate(calendar.getTime());
+                        covData.setAreaname(areaDO.getName());
+                        covData.setProvincename(areaDO.getName());
+                        covData.setIsprovince(1);
+                        covData.setTotalconfirm(0);
+                        covDataMapper.insertSelective(covData);
+
+                        DayInfo dayInfo = new DayInfo();
+                        dayInfo.setDate(TimeTool.timeToDaySy(calendar.getTime()));
+                        dayInfo.setConfirm(covData.getTotalconfirm());
+                        provinceInfoResponse.getDayInfoList().add(dayInfo);
+                    } else {
+                        CovData covData = new CovData();
+                        BeanUtils.copyProperties(temp, covData);
+                        covData.setId(null);
+                        covData.setDate(calendar.getTime());
+                        covDataMapper.insertSelective(covData);
+
+                        DayInfo dayInfo = new DayInfo();
+                        dayInfo.setDate(TimeTool.timeToDaySy(calendar.getTime()));
+                        dayInfo.setConfirm(covData.getTotalconfirm());
+                        provinceInfoResponse.getDayInfoList().add(dayInfo);
+                    }
+                    calendar.add(Calendar.DATE, 1);
+                } else {
+                    DayInfo dayInfo = new DayInfo();
+                    dayInfo.setDate(TimeTool.timeToDaySy(calendar.getTime()));
+                    dayInfo.setConfirm(tempProList.get(TimeTool.timeToDaySy(calendar.getTime())).getTotalconfirm());
+                    provinceInfoResponse.getDayInfoList().add(dayInfo);
+                    temp = tempProList.get(TimeTool.timeToDaySy(calendar.getTime()));
+                    if (areaName == null) areaName = temp.getProvincename();
+                    calendar.add(Calendar.DATE, 1);
+                }
+            }
+            provinceInfoResponse.setName(areaName);
+            provinceInfoList.add(provinceInfoResponse);
         }
 
-        Map<String, ProvinceInfoResponse> provinceResMap = new HashMap<>();
-        for (CovData covData : covDataList) {
-            ProvinceInfoResponse provinceInfoResponse = provinceResMap.get(covData.getProvincename());
-            if (provinceInfoResponse == null) {
-                provinceResMap.put(covData.getProvincename(), new ProvinceInfoResponse());
-                provinceInfoResponse = provinceResMap.get(covData.getProvincename());
-                provinceInfoResponse.setName(covData.getProvincename());
-                provinceInfoResponse.setDayInfoList(new ArrayList<>());
-            }
-
-            if (!provinceInfoResponse.getDayInfoList().isEmpty()) {
-                List<DayInfo> dayInfoList = provinceInfoResponse.getDayInfoList();
-                addIn(dayInfoList, covData.getDate());
-
-                DayInfo dayInfo = new DayInfo();
-                dayInfo.setDate(TimeTool.timeToDaySy(covData.getDate()));
-                dayInfo.setConfirm(covData.getTotalconfirm());
-                dayInfoList.add(dayInfo);
-            } else {
-                DayInfo dayInfo = new DayInfo();
-                dayInfo.setConfirm(covData.getTotalconfirm());
-                dayInfo.setDate(TimeTool.timeToDaySy(covData.getDate()));
-                provinceInfoResponse.getDayInfoList().add(dayInfo);
-            }
-        }
-
-        List<ProvinceInfoResponse> provinceInfoResponseList = new ArrayList<>(provinceResMap.values());
-        for (ProvinceInfoResponse provinceInfoResponse : provinceInfoResponseList) {
-            List<DayInfo> dayInfoList = provinceInfoResponse.getDayInfoList();
-            DayInfo dayInfoLast = dayInfoList.get(dayInfoList.size() - 1);
-            if (TimeTool.dayDiffDate(TimeTool.stringToDay(dayInfoLast.getDate()), new Date()) != 0) {
-                addIn(dayInfoList, new Date());
-                DayInfo dayInfo = new DayInfo();
-                dayInfo.setDate(TimeTool.timeToDaySy(new Date()));
-                dayInfo.setConfirm(dayInfoLast.getConfirm());
-                dayInfoList.add(dayInfo);
-            }
-        }
-
-
-        provinceResMap = null;
-        return provinceInfoResponseList;
+        return provinceInfoList;
     }
 }

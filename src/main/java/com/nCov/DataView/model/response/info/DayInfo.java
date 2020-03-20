@@ -12,5 +12,17 @@ import lombok.Data;
 public class DayInfo {
     private String date;
 
-    private Integer confirm;
+    private int confirm;
+
+    public DayInfo(String time, int confirm) {
+        this.date = time;
+
+        this.confirm = confirm;
+    }
+
+    public DayInfo() {
+        this.date = null;
+
+        this.confirm = 0;
+    }
 }

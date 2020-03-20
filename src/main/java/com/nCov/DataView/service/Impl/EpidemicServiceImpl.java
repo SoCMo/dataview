@@ -272,7 +272,6 @@ public class EpidemicServiceImpl implements EpidemicService {
     @Override
     public Result areaCal(List<String> areaList) {
         try {
-            //去重
             double number = 0;
             AreaCalResponse areaCalResponse = new AreaCalResponse();
             areaCalResponse.setAreaList(new ArrayList<>());

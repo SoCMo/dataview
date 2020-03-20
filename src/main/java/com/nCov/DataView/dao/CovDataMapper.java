@@ -5,7 +5,6 @@ import com.nCov.DataView.model.entity.CovDataExample;
 import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
-import org.springframework.cache.annotation.Cacheable;
 
 import java.util.List;
 import java.util.Map;
@@ -33,7 +32,6 @@ public interface CovDataMapper {
 
     int updateByPrimaryKey(CovData record);
 
-    @Cacheable(value = "getInfoByDate", key = "#date")
     @MapKey("areaname")
     @Select({"<script>",
             "SELECT * FROM dataFromTencent_dev",
@@ -41,4 +39,11 @@ public interface CovDataMapper {
             "GROUP BY id",
             "</script>"})
     Map<String, CovData> getInfoByDate(@Param("date") String date);
+
+    @Select({"<script>",
+            "SELECT * FROM dataFromTencent_dev",
+            "WHERE provinceName = areaName",
+            "Order By date ASC",
+            "</script>"})
+    List<CovData> getInfoProvince();
 }

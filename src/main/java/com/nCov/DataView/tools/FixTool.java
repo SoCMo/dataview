@@ -31,6 +31,7 @@ public class FixTool {
      * @Date: 2020/3/16
      */
     public CovData fixCovDate(String date, String name) throws ParseException {
+        //TODO 需要修改，存在日期前
         CovDataExample covDataExample = new CovDataExample();
         covDataExample.createCriteria()
                 .andAreanameLike(name + "%")
