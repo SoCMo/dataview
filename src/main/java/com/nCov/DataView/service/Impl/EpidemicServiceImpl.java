@@ -319,18 +319,46 @@ public class EpidemicServiceImpl implements EpidemicService {
         }
         Map<Integer, AreaDO> provinceMap = areaDOMapper.getProvinceMapInt();
 
-        //获取三天前的时间
+        //获取今日数据
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(TimeTool.stringToDay(date));
-        Map<String, CovData> covDataListNow = covDataMapper.getInfoByDate(TimeTool.timeToDaySy(calendar.getTime()));
-        if (covDataListNow.isEmpty()) {
-            throw new AllException(EmAllException.DATABASE_ERROR, "今日数据为空。");
+        Calendar calendarTemp = Calendar.getInstance();
+        calendarTemp.setTime(calendar.getTime());
+
+        Map<String, CovData> covDataMapNow = covDataMapper.getInfoByDate(TimeTool.timeToDaySy(calendar.getTime()));
+        //找到有数据的那天，添加
+        if (covDataMapNow.isEmpty()) {
+            while (covDataMapNow.isEmpty() && !calendarTemp.getTime().before(TimeTool.stringToDay("2020-01-24"))) {
+                calendarTemp.add(Calendar.DATE, -1);
+                covDataMapNow = covDataMapper.getInfoByDate(TimeTool.timeToDaySy(calendarTemp.getTime()));
+            }
+            if (calendarTemp.getTime().before(TimeTool.stringToDay("2020-01-24"))) {
+                throw new AllException(EmAllException.DATABASE_ERROR, "暂无疫情数据");
+            }
+            for (CovData covData : covDataMapNow.values()) {
+                covData.setId(null);
+                covData.setDate(calendar.getTime());
+            }
+            covDataMapper.insertList(new ArrayList<>(covDataMapNow.values()));
         }
 
         calendar.add(Calendar.DATE, -3);
-        Map<String, CovData> covDataListThr = covDataMapper.getInfoByDate(TimeTool.timeToDaySy(calendar.getTime()));
-        if (covDataListThr.isEmpty()) {
-            throw new AllException(EmAllException.DATABASE_ERROR, "三天前的数据为空。");
+        calendarTemp.setTime(calendar.getTime());
+        Map<String, CovData> covDataMapThr = covDataMapper.getInfoByDate(TimeTool.timeToDaySy(calendar.getTime()));
+        //找到有数据的那天，添加
+        if (covDataMapThr.isEmpty()) {
+            while (covDataMapThr.isEmpty() && !calendarTemp.getTime().before(TimeTool.stringToDay("2020-01-24"))) {
+                calendarTemp.add(Calendar.DATE, -1);
+                covDataMapThr = covDataMapper.getInfoByDate(TimeTool.timeToDaySy(calendarTemp.getTime()));
+            }
+            if (calendarTemp.getTime().before(TimeTool.stringToDay("2020-01-24"))) {
+                throw new AllException(EmAllException.DATABASE_ERROR, "暂无疫情数据");
+            }
+            for (CovData covData : covDataMapThr.values()) {
+                covData.setId(null);
+                covData.setDate(calendar.getTime());
+            }
+            covDataMapper.insertList(new ArrayList<>(covDataMapThr.values()));
         }
 
         List<CovRank> covRankList = new ArrayList<>();
@@ -341,8 +369,8 @@ public class EpidemicServiceImpl implements EpidemicService {
 
             CovData covDataNow;
             CovData covDataThr;
-            if ((covDataNow = covDataListNow.get(areaDO.getName())) == null) {
-                List<CovData> listNow = covDataListNow.values()
+            if ((covDataNow = covDataMapNow.get(areaDO.getName())) == null) {
+                List<CovData> listNow = covDataMapNow.values()
                         .stream()
                         .filter(covData -> covData.getAreaname().contains(areaDO.getName()))
                         .collect(Collectors.toList());
@@ -355,8 +383,8 @@ public class EpidemicServiceImpl implements EpidemicService {
                 }
             }
 
-            if ((covDataThr = covDataListThr.get(areaDO.getName())) == null) {
-                List<CovData> listThr = covDataListThr.values()
+            if ((covDataThr = covDataMapThr.get(areaDO.getName())) == null) {
+                List<CovData> listThr = covDataMapThr.values()
                         .stream()
                         .filter(covData -> covData.getAreaname().contains(areaDO.getName()))
                         .collect(Collectors.toList());

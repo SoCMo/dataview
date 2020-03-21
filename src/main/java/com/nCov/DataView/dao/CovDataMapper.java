@@ -46,4 +46,6 @@ public interface CovDataMapper {
             "Order By date ASC",
             "</script>"})
     List<CovData> getInfoProvince();
+
+    void insertList(List<CovData> covDataList);
 }

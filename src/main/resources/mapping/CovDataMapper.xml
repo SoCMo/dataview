@@ -112,6 +112,24 @@
             <include refid="Example_Where_Clause"/>
         </if>
     </delete>
+    <insert id="insertList" parameterType="java.util.List">
+        insert into dataFromTencent_dev (provinceName, areaName,
+        date, isProvince, totalConfirm,
+        totalSuspect, totalDead, totalHeal)
+        values
+        <foreach collection="list" item="covData" index="index" separator=",">
+            (
+            #{covData.provinceName},
+            #{covData.areaName},
+            #{covData.date},
+            #{covData.isProvince},
+            #{covData.totalConfirm},
+            #{covData.totalSuspect},
+            #{covData.totalDead},
+            #{covData.totalHeal},
+            )
+        </foreach>
+    </insert>
     <insert id="insert" parameterType="com.nCov.DataView.model.entity.CovData">
         insert into dataFromTencent_dev (Id, provinceName, areaName,
         date, isProvince, totalConfirm,
