@@ -119,14 +119,14 @@
         values
         <foreach collection="list" item="covData" index="index" separator=",">
             (
-            #{covData.provinceName},
-            #{covData.areaName},
+            #{covData.provincename},
+            #{covData.areaname},
             #{covData.date},
-            #{covData.isProvince},
-            #{covData.totalConfirm},
-            #{covData.totalSuspect},
-            #{covData.totalDead},
-            #{covData.totalHeal},
+            #{covData.isprovince},
+            #{covData.totalconfirm},
+            #{covData.totalsuspect},
+            #{covData.totaldead},
+            #{covData.totalheal}
             )
         </foreach>
     </insert>
