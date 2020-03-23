@@ -319,6 +319,10 @@ public class EpidemicServiceImpl implements EpidemicService {
         }
         Map<Integer, AreaDO> provinceMap = areaDOMapper.getProvinceMapInt();
 
+        if (TimeTool.stringToDay(date).before(TimeTool.stringToDay("2020-01-24"))) {
+            throw new AllException(EmAllException.DATABASE_ERROR, "无法提供早于1月24日的评估");
+        }
+
         //获取今日数据
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(TimeTool.stringToDay(date));
@@ -342,7 +346,12 @@ public class EpidemicServiceImpl implements EpidemicService {
             covDataMapper.insertList(new ArrayList<>(covDataMapNow.values()));
         }
 
-        calendar.add(Calendar.DATE, -3);
+        calendar.add(Calendar.DATE, -13);
+        //防止日期在1月24日前
+        while (calendar.getTime().before(TimeTool.stringToDay("2020-01-24"))) {
+            calendar.add(Calendar.DATE, 1);
+        }
+
         calendarTemp.setTime(calendar.getTime());
         Map<String, CovData> covDataMapThr = covDataMapper.getInfoByDate(TimeTool.timeToDaySy(calendar.getTime()));
         //找到有数据的那天，添加
@@ -397,8 +406,10 @@ public class EpidemicServiceImpl implements EpidemicService {
                 }
             }
             covRank.setRemainConfirm(NumberTool.intDivision(covDataNow.getTotalconfirm() - covDataNow.getTotaldead() - covDataNow.getTotalheal(), areaDO.getPopulation()) * 1000000);
-            covRank.setDead(NumberTool.intDivision(covDataNow.getTotaldead(), covDataNow.getTotalconfirm()));
-            covRank.setGrowth(NumberTool.intDivision(covDataNow.getTotalconfirm(), covDataThr.getTotalconfirm()));
+            int count = covDataNow.getTotalconfirm() - covDataNow.getTotalheal() - covDataNow.getTotaldead();
+            covRank.setRemainCount(Math.max(count, 0));
+            int growth = covDataNow.getTotalconfirm() - covDataThr.getTotalconfirm();
+            covRank.setGrowth(Math.max(growth, 0));
             covRankList.add(covRank);
         }
 
@@ -422,23 +433,23 @@ public class EpidemicServiceImpl implements EpidemicService {
             covRank.setRemainScore(NumberTool.Score(covRank.getRemainConfirmRank(), lastRank));
         }
 
-        covRankList.sort(Comparator.comparing(CovRank::getDead).reversed());
+        covRankList.sort(Comparator.comparing(CovRank::getRemainCount).reversed());
         number = 1;
         last = 0;
         for (int i = 0; i < covRankList.size(); i++) {
             if (i == 0) {
-                last = covRankList.get(0).getDead();
-                covRankList.get(0).setDeadRank(number++);
-            } else if (last == covRankList.get(i).getDead()) {
-                covRankList.get(i).setDeadRank(covRankList.get(i - 1).getDeadRank());
+                last = covRankList.get(0).getRemainCount();
+                covRankList.get(0).setRemainCountRank(number++);
+            } else if (last == covRankList.get(i).getRemainCount()) {
+                covRankList.get(i).setRemainCountRank(covRankList.get(i - 1).getRemainCountRank());
                 number++;
             } else {
-                last = covRankList.get(i).getDead();
-                covRankList.get(i).setDeadRank(number++);
+                last = covRankList.get(i).getRemainCount();
+                covRankList.get(i).setRemainCountRank(number++);
             }
         }
         for (CovRank covRank : covRankList) {
-            covRank.setDeadScore(NumberTool.Score(covRank.getDeadRank(), covRankList.get(covRankList.size() - 1).getDeadRank()));
+            covRank.setRemainCountScore(NumberTool.Score(covRank.getRemainCountRank(), covRankList.get(covRankList.size() - 1).getRemainCountRank()));
         }
 
         covRankList.sort(Comparator.comparing(CovRank::getGrowth).reversed());
@@ -459,7 +470,7 @@ public class EpidemicServiceImpl implements EpidemicService {
 
         for (CovRank covRank : covRankList) {
             covRank.setGrowthScore(NumberTool.Score(covRank.getGrowthRank(), covRankList.get(covRankList.size() - 1).getGrowthRank()));
-            covRank.setSumScore(covRank.getDeadScore() * 0.2 + covRank.getRemainScore() * 0.5 + covRank.getGrowthScore() * 0.3);
+            covRank.setSumScore(covRank.getRemainCountScore() * 0.3 + covRank.getRemainScore() * 0.3 + covRank.getGrowthScore() * 0.4);
         }
 
         covRankList.sort(Comparator.comparing(CovRank::getSumScore).reversed());
@@ -481,8 +492,6 @@ public class EpidemicServiceImpl implements EpidemicService {
         return covRankList.stream().map(covRank -> {
             CovRankResponse covRankResponse = new CovRankResponse();
             BeanUtils.copyProperties(covRank, covRankResponse);
-            covRankResponse.setGrowth(NumberTool.doubleToString(covRank.getGrowth()));
-            covRankResponse.setDead(NumberTool.doubleToString(covRank.getDead()));
             covRankResponse.setRemainConfirm(String.format("%.4f", covRank.getRemainConfirm()));
             covRankResponse.setSumScore(String.format("%.2f", covRank.getSumScore()));
             return covRankResponse;

@@ -18,19 +18,19 @@ public class CovRank {
 
     private double remainConfirm;
 
-    private double dead;
+    private int remainCount;
 
-    private double growth;
+    private int growth;
 
     private int remainConfirmRank;
 
-    private int deadRank;
+    private int remainCountRank;
 
     private int growthRank;
 
     private int remainScore;
 
-    private int deadScore;
+    private int remainCountScore;
 
     private int growthScore;
 
