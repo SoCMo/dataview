@@ -12,7 +12,12 @@ public enum EmAllException implements CommonError {
 
     INSERT_ERROR(500, "插入数据失败"),
 
-    DATABASE_ERROR(500, "数据库异常或数据有误");
+    DATABASE_ERROR(500, "数据库异常或数据有误"),
+
+    UNIFY_ERROR(400,"请保证Excel表格正确无误"),
+
+    BAD_FILE_TYPE(400, "文件格式错误");
+
 
     // 错误码
     private Integer code;

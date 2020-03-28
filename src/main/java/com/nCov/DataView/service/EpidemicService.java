@@ -1,10 +1,13 @@
 package com.nCov.DataView.service;
 
+import com.nCov.DataView.exception.AllException;
 import com.nCov.DataView.model.request.AllAreaRequest;
 import com.nCov.DataView.model.request.AreaInfoRequest;
 import com.nCov.DataView.model.request.RouteCalRequest;
 import com.nCov.DataView.model.response.Result;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -57,5 +60,18 @@ public interface EpidemicService {
      * @Author: SoCMo
      * @Date: 2020/3/26
      */
+
+    public Result areaCal(List<String> areaList);
+
+    /**
+     * @Description: 使用excel表格导入学生信息
+     * @Param: [file]
+     * @return: com.nCov.DataView.model.response.Result
+     * @Author: pongshy
+     * @Date: 2020/3/28
+     */
+    public Result excelIn(MultipartFile file) throws AllException, IOException;
+
     public Result routeCal(List<RouteCalRequest> routeCalRequestList);
+
 }
