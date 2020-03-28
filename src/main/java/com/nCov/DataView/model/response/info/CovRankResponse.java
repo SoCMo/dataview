@@ -22,7 +22,7 @@ public class CovRankResponse {
 
     private int growthRank;
 
-    private String remainConfirm;
+    private double remainConfirm;
 
     private int remainCount;
 
@@ -34,7 +34,7 @@ public class CovRankResponse {
 
     private int growthScore;
 
-    private String sumScore;
+    private double sumScore;
 
     private int allRank;
 }

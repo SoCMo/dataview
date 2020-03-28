@@ -16,10 +16,20 @@ public class NumberTool {
      * @Author: SoCMo
      * @Date: 2020/2/23
      */
-    public static String doubleToString(Double number) {
+    public static String doubleToStringWithH(Double number) {
         return String.format("%.2f", number * 100) + "%";
     }
 
+    /**
+     * @Description: 浮点数保留两位小数
+     * @Param: [number]
+     * @return: java.lang.String
+     * @Author: SoCMo
+     * @Date: 2020/2/23
+     */
+    public static String doubleToStringWotH(Double number) {
+        return String.format("%.2f", number);
+    }
 
     /**
      * @Description: 整数除法转浮点数

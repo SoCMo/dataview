@@ -21,14 +21,6 @@ public class CovData {
 
     private Integer totalheal;
 
-    private Integer todayconfirm;
-
-    private Integer todaysuspect;
-
-    private Integer todaydead;
-
-    private Integer todayheal;
-
     public Integer getId() {
         return id;
     }
@@ -99,37 +91,5 @@ public class CovData {
 
     public void setTotalheal(Integer totalheal) {
         this.totalheal = totalheal;
-    }
-
-    public Integer getTodayconfirm() {
-        return todayconfirm;
-    }
-
-    public void setTodayconfirm(Integer todayconfirm) {
-        this.todayconfirm = todayconfirm;
-    }
-
-    public Integer getTodaysuspect() {
-        return todaysuspect;
-    }
-
-    public void setTodaysuspect(Integer todaysuspect) {
-        this.todaysuspect = todaysuspect;
-    }
-
-    public Integer getTodaydead() {
-        return todaydead;
-    }
-
-    public void setTodaydead(Integer todaydead) {
-        this.todaydead = todaydead;
-    }
-
-    public Integer getTodayheal() {
-        return todayheal;
-    }
-
-    public void setTodayheal(Integer todayheal) {
-        this.todayheal = todayheal;
     }
 }

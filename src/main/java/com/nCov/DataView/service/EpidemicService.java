@@ -2,6 +2,7 @@ package com.nCov.DataView.service;
 
 import com.nCov.DataView.model.request.AllAreaRequest;
 import com.nCov.DataView.model.request.AreaInfoRequest;
+import com.nCov.DataView.model.request.RouteCalRequest;
 import com.nCov.DataView.model.response.Result;
 
 import java.util.List;
@@ -50,11 +51,11 @@ public interface EpidemicService {
     public Result impDateInfo(String date);
 
     /**
-     * @Description: 某地风险评估
-     * @Param: [area]
+     * @Description: 路程评估
+     * @Param: [routeCalRequestList]
      * @return: com.nCov.DataView.model.response.Result
      * @Author: SoCMo
-     * @Date: 2020/3/18
+     * @Date: 2020/3/26
      */
-    public Result areaCal(List<String> areaList);
+    public Result routeCal(List<RouteCalRequest> routeCalRequestList);
 }

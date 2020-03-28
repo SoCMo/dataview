@@ -6,9 +6,9 @@ import com.nCov.DataView.exception.AllException;
 import com.nCov.DataView.model.entity.AreaDO;
 import com.nCov.DataView.model.entity.CovData;
 import com.nCov.DataView.model.response.Result;
+import com.nCov.DataView.model.response.info.AreaInfo;
 import com.nCov.DataView.model.response.info.DayInfo;
 import com.nCov.DataView.model.response.info.DayInfoResponse;
-import com.nCov.DataView.model.response.info.ProvinceInfo;
 import com.nCov.DataView.model.response.info.ProvinceInfoResponse;
 import com.nCov.DataView.service.MapService;
 import com.nCov.DataView.tools.ResultTool;
@@ -71,7 +71,7 @@ public class MapServiceImpl implements MapService {
             while (!calendarTraver.after(calendarNow)) {
                 DayInfoResponse dayInfoResponse = new DayInfoResponse();
                 dayInfoResponse.setDate(TimeTool.timeToDaySy(calendarTraver.getTime()));
-                dayInfoResponse.setProvinceInfoList(new ArrayList<>());
+                dayInfoResponse.setAreaInfoList(new ArrayList<>());
 
                 for (ProvinceInfoResponse provinceInfoResponse : provinceInfoResponseList) {
                     DayInfo dayInfoNeed = new DayInfo();
@@ -85,10 +85,10 @@ public class MapServiceImpl implements MapService {
                             dayInfoNeed = dayInfo;
                         }
                     }
-                    ProvinceInfo provinceInfo = new ProvinceInfo();
-                    provinceInfo.setConfirm(dayInfoNeed.getConfirm());
-                    provinceInfo.setName(provinceInfoResponse.getName());
-                    dayInfoResponse.getProvinceInfoList().add(provinceInfo);
+                    AreaInfo areaInfo = new AreaInfo();
+                    areaInfo.setConfirm(dayInfoNeed.getConfirm());
+                    areaInfo.setName(provinceInfoResponse.getName());
+                    dayInfoResponse.getAreaInfoList().add(areaInfo);
                 }
                 dayInfoResList.add(dayInfoResponse);
                 calendarTraver.add(Calendar.DATE, 1);
