@@ -14,5 +14,5 @@ import java.util.List;
 public class DayInfoResponse {
     private String date;
 
-    private List<AreaInfo> areaInfoList;
+    private List<AreaInfo> provinceInfoList;
 }

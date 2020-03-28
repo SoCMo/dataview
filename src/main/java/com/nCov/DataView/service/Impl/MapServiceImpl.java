@@ -71,7 +71,7 @@ public class MapServiceImpl implements MapService {
             while (!calendarTraver.after(calendarNow)) {
                 DayInfoResponse dayInfoResponse = new DayInfoResponse();
                 dayInfoResponse.setDate(TimeTool.timeToDaySy(calendarTraver.getTime()));
-                dayInfoResponse.setAreaInfoList(new ArrayList<>());
+                dayInfoResponse.setProvinceInfoList(new ArrayList<>());
 
                 for (ProvinceInfoResponse provinceInfoResponse : provinceInfoResponseList) {
                     DayInfo dayInfoNeed = new DayInfo();
@@ -88,7 +88,7 @@ public class MapServiceImpl implements MapService {
                     AreaInfo areaInfo = new AreaInfo();
                     areaInfo.setConfirm(dayInfoNeed.getConfirm());
                     areaInfo.setName(provinceInfoResponse.getName());
-                    dayInfoResponse.getAreaInfoList().add(areaInfo);
+                    dayInfoResponse.getProvinceInfoList().add(areaInfo);
                 }
                 dayInfoResList.add(dayInfoResponse);
                 calendarTraver.add(Calendar.DATE, 1);
