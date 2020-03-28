@@ -54,16 +54,6 @@ public interface EpidemicService {
     public Result impDateInfo(String date);
 
     /**
-     * @Description: 路程评估
-     * @Param: [routeCalRequestList]
-     * @return: com.nCov.DataView.model.response.Result
-     * @Author: SoCMo
-     * @Date: 2020/3/26
-     */
-
-    public Result areaCal(List<String> areaList);
-
-    /**
      * @Description: 使用excel表格导入学生信息
      * @Param: [file]
      * @return: com.nCov.DataView.model.response.Result
@@ -72,6 +62,12 @@ public interface EpidemicService {
      */
     public Result excelIn(MultipartFile file) throws AllException, IOException;
 
+    /**
+     * @Description: 路程评估
+     * @Param: [routeCalRequestList]
+     * @return: com.nCov.DataView.model.response.Result
+     * @Author: SoCMo
+     * @Date: 2020/3/28
+     */
     public Result routeCal(List<RouteCalRequest> routeCalRequestList);
-
 }

@@ -21,7 +21,7 @@ import javax.annotation.Resource;
 @RequestMapping("/map")
 public class MapController {
     @Resource
-    MapService mapService;
+    private MapService mapService;
 
     /**
      * @Description: 各个省每日疫情数据
