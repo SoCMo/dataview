@@ -2,27 +2,28 @@ package com.nCov.DataView.service.Impl;
 
 import com.nCov.DataView.dao.AreaDOMapper;
 import com.nCov.DataView.dao.CovDataMapper;
+import com.nCov.DataView.dao.StudentInformationDOMapper;
 import com.nCov.DataView.exception.AllException;
 import com.nCov.DataView.exception.EmAllException;
-import com.nCov.DataView.model.entity.AreaDO;
-import com.nCov.DataView.model.entity.CovData;
-import com.nCov.DataView.model.entity.CovDataExample;
-import com.nCov.DataView.model.entity.CovRank;
+import com.nCov.DataView.model.entity.*;
 import com.nCov.DataView.model.request.AllAreaRequest;
 import com.nCov.DataView.model.request.AreaInfoRequest;
 import com.nCov.DataView.model.response.Result;
 import com.nCov.DataView.model.response.info.*;
 import com.nCov.DataView.service.EpidemicService;
-import com.nCov.DataView.tools.FixTool;
-import com.nCov.DataView.tools.NumberTool;
-import com.nCov.DataView.tools.ResultTool;
-import com.nCov.DataView.tools.TimeTool;
+import com.nCov.DataView.tools.*;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.BeanUtils;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import java.io.IOException;
+import java.io.InputStream;
 import java.text.ParseException;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -41,6 +42,9 @@ public class EpidemicServiceImpl implements EpidemicService {
 
     @Resource
     private CovDataMapper covDataMapper;
+
+    @Resource
+    private StudentInformationDOMapper studentInformationDOMapper;
 
     @Resource
     private FixTool fixTool;
@@ -302,6 +306,53 @@ public class EpidemicServiceImpl implements EpidemicService {
             log.error(e.getMessage());
             return ResultTool.error(500, e.getMessage());
         }
+    }
+
+    /**
+     * @Description: 使用excel表格导入学生信息
+     * @Param: [file]
+     * @return:
+     * @Author: pongshy
+     * @Date: 2020/3/28
+     */
+    @Override
+    public Result excelIn(MultipartFile file) throws AllException, IOException {
+        if (file == null) {
+            return ResultTool.error(400, "上传文件为空");
+        }
+
+        System.out.println(file.getOriginalFilename());
+
+        InputStream in = file.getInputStream();
+        Sheet sheet = ImportExcel.getBankListByExcel(in, file.getOriginalFilename());
+
+        for (int i = 1; i <= sheet.getLastRowNum(); ++i) {
+            Row row =sheet.getRow(i);
+
+            InformationInfo info = new InformationInfo();
+            info.setCountry(row.getCell(9).getStringCellValue());
+            info.setProvince(row.getCell(10).getStringCellValue());
+            info.setCity(row.getCell(11).getStringCellValue());
+            info.setArea(row.getCell(12).getStringCellValue());
+            info.setAddress(row.getCell(13).getStringCellValue());
+            info.setTransportion(row.getCell(30).getStringCellValue());
+
+            StudentInformationDO studentInformation = new StudentInformationDO();
+            BeanUtils.copyProperties(info, studentInformation);
+            studentInformation.setId(i);
+
+            try {
+                if (studentInformationDOMapper.insertSelective(studentInformation) != 1) {
+                    return ResultTool.error(500);
+                }
+            }
+            catch (Exception e) {
+                throw new AllException(EmAllException.DATABASE_ERROR);
+            }
+
+        }
+
+        return ResultTool.success();
     }
 
     /**

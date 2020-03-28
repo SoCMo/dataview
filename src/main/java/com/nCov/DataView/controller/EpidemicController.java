@@ -1,5 +1,6 @@
 package com.nCov.DataView.controller;
 
+import com.nCov.DataView.exception.AllException;
 import com.nCov.DataView.model.request.AllAreaRequest;
 import com.nCov.DataView.model.request.AreaInfoRequest;
 import com.nCov.DataView.model.request.AreaListRequest;
@@ -9,8 +10,11 @@ import org.apache.ibatis.annotations.Param;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import javax.validation.constraints.NotEmpty;
+import java.io.IOException;
 
 /**
  * program: AreaInfoController
@@ -89,5 +93,19 @@ public class EpidemicController {
     public Result areaCal(@Validated @RequestBody AreaListRequest areaListRequest) {
         return epidemicService.areaCal(areaListRequest.getAreaList());
     }
+
+    /**
+     * @Description: 使用excel表格导入学生信息
+     * @Param: [file]
+     * @return: com.nCov.DataView.model.response.Result
+     * @Author: pongshy
+     * @Date: 2020/3/28
+     */
+    @PostMapping("/informationByExcel")
+    public Result InformationByExcel(@RequestBody MultipartFile file) throws AllException, IOException {
+
+        return epidemicService.excelIn(file);
+    }
+
 
 }

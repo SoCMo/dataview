@@ -1,4 +1,4 @@
-package com.nCov.DataView;
+package com.nCov.DataView.config;
 
 import org.springframework.boot.web.servlet.MultipartConfigFactory;
 import org.springframework.context.annotation.Bean;
@@ -19,8 +19,8 @@ public class FileConfig {
     @Bean
     public MultipartConfigElement multipartConfigElement() {
         MultipartConfigFactory factory = new MultipartConfigFactory();
-        factory.setMaxFileSize(DataSize.parse("10MB"));
-        factory.setMaxRequestSize(DataSize.parse("20MB"));
+        factory.setMaxFileSize(DataSize.parse("25MB"));
+        factory.setMaxRequestSize(DataSize.parse("35MB"));
 //        factory.setLocation("/home/ubuntu/tmp");
         return factory.createMultipartConfig();
     }
