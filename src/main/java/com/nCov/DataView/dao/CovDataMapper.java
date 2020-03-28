@@ -42,7 +42,7 @@ public interface CovDataMapper {
 
     @Select({"<script>",
             "SELECT * FROM dataFromTencent_dev",
-            "WHERE provinceName = areaName",
+            "WHERE isProvince = 1",
             "Order By date ASC",
             "</script>"})
     List<CovData> getInfoProvince();

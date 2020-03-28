@@ -1,0 +1,406 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.nCov.DataView.dao.ImpAreaDOMapper">
+    <resultMap id="BaseResultMap" type="com.nCov.DataView.model.entity.ImpAreaDO">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="province_name" property="provinceName" jdbcType="VARCHAR"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="remain_confirm_rank" property="remainConfirmRank" jdbcType="INTEGER"/>
+        <result column="remain_count_rank" property="remainCountRank" jdbcType="INTEGER"/>
+        <result column="growth_rank" property="growthRank" jdbcType="INTEGER"/>
+        <result column="remain_confirm" property="remainConfirm" jdbcType="DOUBLE"/>
+        <result column="remain_count" property="remainCount" jdbcType="INTEGER"/>
+        <result column="growth" property="growth" jdbcType="INTEGER"/>
+        <result column="remain_score" property="remainScore" jdbcType="INTEGER"/>
+        <result column="remain_count_score" property="remainCountScore" jdbcType="INTEGER"/>
+        <result column="growth_score" property="growthScore" jdbcType="INTEGER"/>
+        <result column="sum_score" property="sumScore" jdbcType="DOUBLE"/>
+        <result column="allRank" property="allrank" jdbcType="INTEGER"/>
+        <result column="date" property="date" jdbcType="TIMESTAMP"/>
+    </resultMap>
+    <sql id="Example_Where_Clause">
+        <where>
+            <foreach collection="oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" suffix=")" prefixOverrides="and">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach collection="criterion.value" item="listItem" open="(" close=")"
+                                             separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+    <sql id="Update_By_Example_Where_Clause">
+        <where>
+            <foreach collection="example.oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" suffix=")" prefixOverrides="and">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach collection="criterion.value" item="listItem" open="(" close=")"
+                                             separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+    <sql id="Base_Column_List">
+        id, province_name, name, remain_confirm_rank, remain_count_rank, growth_rank, remain_confirm,
+        remain_count, growth, remain_score, remain_count_score, growth_score, sum_score,
+        allRank, date
+    </sql>
+    <select id="selectByExample" resultMap="BaseResultMap"
+            parameterType="com.nCov.DataView.model.entity.ImpAreaDOExample">
+        select
+        <if test="distinct">
+            distinct
+        </if>
+        'true' as QUERYID,
+        <include refid="Base_Column_List"/>
+        from impArea
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+        <if test="orderByClause != null">
+            order by ${orderByClause}
+        </if>
+    </select>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+        select
+        <include refid="Base_Column_List"/>
+        from impArea
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        delete from impArea
+        where id = #{id,jdbcType=INTEGER}
+    </delete>
+    <delete id="deleteByExample" parameterType="com.nCov.DataView.model.entity.ImpAreaDOExample">
+        delete from impArea
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+    </delete>
+    <insert id="insertList" parameterType="java.util.List">
+        <selectKey resultType="java.lang.Integer" keyProperty="id"
+                   order="AFTER">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        insert into impArea (id, province_name, name,
+        remain_confirm_rank, remain_count_rank, growth_rank,
+        remain_confirm, remain_count, growth,
+        remain_score, remain_count_score, growth_score,
+        sum_score, allRank, date
+        ) values
+        <foreach collection="list" item="ImpAreaDO" index="index" separator=",">
+            (#{ImpAreaDO.id},
+            #{ImpAreaDO.provinceName},
+            #{ImpAreaDO.name},
+            #{ImpAreaDO.remainConfirmRank},
+            #{ImpAreaDO.remainCountRank},
+            #{ImpAreaDO.growthRank},
+            #{ImpAreaDO.remainConfirm},
+            #{ImpAreaDO.remainCount},
+            #{ImpAreaDO.growth},
+            #{ImpAreaDO.remainScore},
+            #{ImpAreaDO.remainCountScore},
+            #{ImpAreaDO.growthScore},
+            #{ImpAreaDO.sumScore},
+            #{ImpAreaDO.allrank},
+            #{ImpAreaDO.date}
+            )
+        </foreach>
+    </insert>
+    <insert id="insert" parameterType="com.nCov.DataView.model.entity.ImpAreaDO">
+        insert into impArea (id, province_name, name,
+        remain_confirm_rank, remain_count_rank, growth_rank,
+        remain_confirm, remain_count, growth,
+        remain_score, remain_count_score, growth_score,
+        sum_score, allRank, date
+        )
+        values (#{id,jdbcType=INTEGER}, #{provinceName,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR},
+        #{remainConfirmRank,jdbcType=INTEGER}, #{remainCountRank,jdbcType=INTEGER}, #{growthRank,jdbcType=INTEGER},
+        #{remainConfirm,jdbcType=DOUBLE}, #{remainCount,jdbcType=INTEGER}, #{growth,jdbcType=INTEGER},
+        #{remainScore,jdbcType=INTEGER}, #{remainCountScore,jdbcType=INTEGER}, #{growthScore,jdbcType=INTEGER},
+        #{sumScore,jdbcType=DOUBLE}, #{allrank,jdbcType=INTEGER}, #{date,jdbcType=TIMESTAMP}
+        )
+    </insert>
+    <insert id="insertSelective" parameterType="com.nCov.DataView.model.entity.ImpAreaDO">
+        insert into impArea
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="provinceName != null">
+                province_name,
+            </if>
+            <if test="name != null">
+                name,
+            </if>
+            <if test="remainConfirmRank != null">
+                remain_confirm_rank,
+            </if>
+            <if test="remainCountRank != null">
+                remain_count_rank,
+            </if>
+            <if test="growthRank != null">
+                growth_rank,
+            </if>
+            <if test="remainConfirm != null">
+                remain_confirm,
+            </if>
+            <if test="remainCount != null">
+                remain_count,
+            </if>
+            <if test="growth != null">
+                growth,
+            </if>
+            <if test="remainScore != null">
+                remain_score,
+            </if>
+            <if test="remainCountScore != null">
+                remain_count_score,
+            </if>
+            <if test="growthScore != null">
+                growth_score,
+            </if>
+            <if test="sumScore != null">
+                sum_score,
+            </if>
+            <if test="allrank != null">
+                allRank,
+            </if>
+            <if test="date != null">
+                date,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="provinceName != null">
+                #{provinceName,jdbcType=VARCHAR},
+            </if>
+            <if test="name != null">
+                #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="remainConfirmRank != null">
+                #{remainConfirmRank,jdbcType=INTEGER},
+            </if>
+            <if test="remainCountRank != null">
+                #{remainCountRank,jdbcType=INTEGER},
+            </if>
+            <if test="growthRank != null">
+                #{growthRank,jdbcType=INTEGER},
+            </if>
+            <if test="remainConfirm != null">
+                #{remainConfirm,jdbcType=DOUBLE},
+            </if>
+            <if test="remainCount != null">
+                #{remainCount,jdbcType=INTEGER},
+            </if>
+            <if test="growth != null">
+                #{growth,jdbcType=INTEGER},
+            </if>
+            <if test="remainScore != null">
+                #{remainScore,jdbcType=INTEGER},
+            </if>
+            <if test="remainCountScore != null">
+                #{remainCountScore,jdbcType=INTEGER},
+            </if>
+            <if test="growthScore != null">
+                #{growthScore,jdbcType=INTEGER},
+            </if>
+            <if test="sumScore != null">
+                #{sumScore,jdbcType=DOUBLE},
+            </if>
+            <if test="allrank != null">
+                #{allrank,jdbcType=INTEGER},
+            </if>
+            <if test="date != null">
+                #{date,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+    </insert>
+    <select id="countByExample" parameterType="com.nCov.DataView.model.entity.ImpAreaDOExample"
+            resultType="java.lang.Integer">
+        select count(*) from impArea
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+    </select>
+    <update id="updateByExampleSelective" parameterType="map">
+        update impArea
+        <set>
+            <if test="record.id != null">
+                id = #{record.id,jdbcType=INTEGER},
+            </if>
+            <if test="record.provinceName != null">
+                province_name = #{record.provinceName,jdbcType=VARCHAR},
+            </if>
+            <if test="record.name != null">
+                name = #{record.name,jdbcType=VARCHAR},
+            </if>
+            <if test="record.remainConfirmRank != null">
+                remain_confirm_rank = #{record.remainConfirmRank,jdbcType=INTEGER},
+            </if>
+            <if test="record.remainCountRank != null">
+                remain_count_rank = #{record.remainCountRank,jdbcType=INTEGER},
+            </if>
+            <if test="record.growthRank != null">
+                growth_rank = #{record.growthRank,jdbcType=INTEGER},
+            </if>
+            <if test="record.remainConfirm != null">
+                remain_confirm = #{record.remainConfirm,jdbcType=DOUBLE},
+            </if>
+            <if test="record.remainCount != null">
+                remain_count = #{record.remainCount,jdbcType=INTEGER},
+            </if>
+            <if test="record.growth != null">
+                growth = #{record.growth,jdbcType=INTEGER},
+            </if>
+            <if test="record.remainScore != null">
+                remain_score = #{record.remainScore,jdbcType=INTEGER},
+            </if>
+            <if test="record.remainCountScore != null">
+                remain_count_score = #{record.remainCountScore,jdbcType=INTEGER},
+            </if>
+            <if test="record.growthScore != null">
+                growth_score = #{record.growthScore,jdbcType=INTEGER},
+            </if>
+            <if test="record.sumScore != null">
+                sum_score = #{record.sumScore,jdbcType=DOUBLE},
+            </if>
+            <if test="record.allrank != null">
+                allRank = #{record.allrank,jdbcType=INTEGER},
+            </if>
+            <if test="record.date != null">
+                date = #{record.date,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause"/>
+        </if>
+    </update>
+    <update id="updateByExample" parameterType="map">
+        update impArea
+        set id = #{record.id,jdbcType=INTEGER},
+        province_name = #{record.provinceName,jdbcType=VARCHAR},
+        name = #{record.name,jdbcType=VARCHAR},
+        remain_confirm_rank = #{record.remainConfirmRank,jdbcType=INTEGER},
+        remain_count_rank = #{record.remainCountRank,jdbcType=INTEGER},
+        growth_rank = #{record.growthRank,jdbcType=INTEGER},
+        remain_confirm = #{record.remainConfirm,jdbcType=DOUBLE},
+        remain_count = #{record.remainCount,jdbcType=INTEGER},
+        growth = #{record.growth,jdbcType=INTEGER},
+        remain_score = #{record.remainScore,jdbcType=INTEGER},
+        remain_count_score = #{record.remainCountScore,jdbcType=INTEGER},
+        growth_score = #{record.growthScore,jdbcType=INTEGER},
+        sum_score = #{record.sumScore,jdbcType=DOUBLE},
+        allRank = #{record.allrank,jdbcType=INTEGER},
+        date = #{record.date,jdbcType=TIMESTAMP}
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause"/>
+        </if>
+    </update>
+    <update id="updateByPrimaryKeySelective" parameterType="com.nCov.DataView.model.entity.ImpAreaDO">
+        update impArea
+        <set>
+            <if test="provinceName != null">
+                province_name = #{provinceName,jdbcType=VARCHAR},
+            </if>
+            <if test="name != null">
+                name = #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="remainConfirmRank != null">
+                remain_confirm_rank = #{remainConfirmRank,jdbcType=INTEGER},
+            </if>
+            <if test="remainCountRank != null">
+                remain_count_rank = #{remainCountRank,jdbcType=INTEGER},
+            </if>
+            <if test="growthRank != null">
+                growth_rank = #{growthRank,jdbcType=INTEGER},
+            </if>
+            <if test="remainConfirm != null">
+                remain_confirm = #{remainConfirm,jdbcType=DOUBLE},
+            </if>
+            <if test="remainCount != null">
+                remain_count = #{remainCount,jdbcType=INTEGER},
+            </if>
+            <if test="growth != null">
+                growth = #{growth,jdbcType=INTEGER},
+            </if>
+            <if test="remainScore != null">
+                remain_score = #{remainScore,jdbcType=INTEGER},
+            </if>
+            <if test="remainCountScore != null">
+                remain_count_score = #{remainCountScore,jdbcType=INTEGER},
+            </if>
+            <if test="growthScore != null">
+                growth_score = #{growthScore,jdbcType=INTEGER},
+            </if>
+            <if test="sumScore != null">
+                sum_score = #{sumScore,jdbcType=DOUBLE},
+            </if>
+            <if test="allrank != null">
+                allRank = #{allrank,jdbcType=INTEGER},
+            </if>
+            <if test="date != null">
+                date = #{date,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.nCov.DataView.model.entity.ImpAreaDO">
+        update impArea
+        set province_name = #{provinceName,jdbcType=VARCHAR},
+        name = #{name,jdbcType=VARCHAR},
+        remain_confirm_rank = #{remainConfirmRank,jdbcType=INTEGER},
+        remain_count_rank = #{remainCountRank,jdbcType=INTEGER},
+        growth_rank = #{growthRank,jdbcType=INTEGER},
+        remain_confirm = #{remainConfirm,jdbcType=DOUBLE},
+        remain_count = #{remainCount,jdbcType=INTEGER},
+        growth = #{growth,jdbcType=INTEGER},
+        remain_score = #{remainScore,jdbcType=INTEGER},
+        remain_count_score = #{remainCountScore,jdbcType=INTEGER},
+        growth_score = #{growthScore,jdbcType=INTEGER},
+        sum_score = #{sumScore,jdbcType=DOUBLE},
+        allRank = #{allrank,jdbcType=INTEGER},
+        date = #{date,jdbcType=TIMESTAMP}
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+</mapper>

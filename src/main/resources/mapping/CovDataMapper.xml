@@ -11,10 +11,6 @@
         <result column="totalSuspect" property="totalsuspect" jdbcType="INTEGER"/>
         <result column="totalDead" property="totaldead" jdbcType="INTEGER"/>
         <result column="totalHeal" property="totalheal" jdbcType="INTEGER"/>
-        <result column="todayConfirm" property="todayconfirm" jdbcType="INTEGER"/>
-        <result column="todaySuspect" property="todaysuspect" jdbcType="INTEGER"/>
-        <result column="todayDead" property="todaydead" jdbcType="INTEGER"/>
-        <result column="todayHeal" property="todayheal" jdbcType="INTEGER"/>
     </resultMap>
     <sql id="Example_Where_Clause">
         <where>
@@ -78,7 +74,7 @@
     </sql>
     <sql id="Base_Column_List">
         Id, provinceName, areaName, date, isProvince, totalConfirm, totalSuspect, totalDead,
-        totalHeal, todayConfirm, todaySuspect, todayDead, todayHeal
+        totalHeal
     </sql>
     <select id="selectByExample" resultMap="BaseResultMap"
             parameterType="com.nCov.DataView.model.entity.CovDataExample">
@@ -133,14 +129,12 @@
     <insert id="insert" parameterType="com.nCov.DataView.model.entity.CovData">
         insert into dataFromTencent_dev (Id, provinceName, areaName,
         date, isProvince, totalConfirm,
-        totalSuspect, totalDead, totalHeal,
-        todayConfirm, todaySuspect, todayDead,
-        todayHeal)
+        totalSuspect, totalDead, totalHeal
+        )
         values (#{id,jdbcType=INTEGER}, #{provincename,jdbcType=VARCHAR}, #{areaname,jdbcType=VARCHAR},
         #{date,jdbcType=DATE}, #{isprovince,jdbcType=INTEGER}, #{totalconfirm,jdbcType=INTEGER},
-        #{totalsuspect,jdbcType=INTEGER}, #{totaldead,jdbcType=INTEGER}, #{totalheal,jdbcType=INTEGER},
-        #{todayconfirm,jdbcType=INTEGER}, #{todaysuspect,jdbcType=INTEGER}, #{todaydead,jdbcType=INTEGER},
-        #{todayheal,jdbcType=INTEGER})
+        #{totalsuspect,jdbcType=INTEGER}, #{totaldead,jdbcType=INTEGER}, #{totalheal,jdbcType=INTEGER}
+        )
     </insert>
     <insert id="insertSelective" parameterType="com.nCov.DataView.model.entity.CovData">
         insert into dataFromTencent_dev
@@ -172,18 +166,6 @@
             <if test="totalheal != null">
                 totalHeal,
             </if>
-            <if test="todayconfirm != null">
-                todayConfirm,
-            </if>
-            <if test="todaysuspect != null">
-                todaySuspect,
-            </if>
-            <if test="todaydead != null">
-                todayDead,
-            </if>
-            <if test="todayheal != null">
-                todayHeal,
-            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">
@@ -212,18 +194,6 @@
             </if>
             <if test="totalheal != null">
                 #{totalheal,jdbcType=INTEGER},
-            </if>
-            <if test="todayconfirm != null">
-                #{todayconfirm,jdbcType=INTEGER},
-            </if>
-            <if test="todaysuspect != null">
-                #{todaysuspect,jdbcType=INTEGER},
-            </if>
-            <if test="todaydead != null">
-                #{todaydead,jdbcType=INTEGER},
-            </if>
-            <if test="todayheal != null">
-                #{todayheal,jdbcType=INTEGER},
             </if>
         </trim>
     </insert>
@@ -264,18 +234,6 @@
             <if test="record.totalheal != null">
                 totalHeal = #{record.totalheal,jdbcType=INTEGER},
             </if>
-            <if test="record.todayconfirm != null">
-                todayConfirm = #{record.todayconfirm,jdbcType=INTEGER},
-            </if>
-            <if test="record.todaysuspect != null">
-                todaySuspect = #{record.todaysuspect,jdbcType=INTEGER},
-            </if>
-            <if test="record.todaydead != null">
-                todayDead = #{record.todaydead,jdbcType=INTEGER},
-            </if>
-            <if test="record.todayheal != null">
-                todayHeal = #{record.todayheal,jdbcType=INTEGER},
-            </if>
         </set>
         <if test="_parameter != null">
             <include refid="Update_By_Example_Where_Clause"/>
@@ -291,11 +249,7 @@
         totalConfirm = #{record.totalconfirm,jdbcType=INTEGER},
         totalSuspect = #{record.totalsuspect,jdbcType=INTEGER},
         totalDead = #{record.totaldead,jdbcType=INTEGER},
-        totalHeal = #{record.totalheal,jdbcType=INTEGER},
-        todayConfirm = #{record.todayconfirm,jdbcType=INTEGER},
-        todaySuspect = #{record.todaysuspect,jdbcType=INTEGER},
-        todayDead = #{record.todaydead,jdbcType=INTEGER},
-        todayHeal = #{record.todayheal,jdbcType=INTEGER}
+        totalHeal = #{record.totalheal,jdbcType=INTEGER}
         <if test="_parameter != null">
             <include refid="Update_By_Example_Where_Clause"/>
         </if>
@@ -327,18 +281,6 @@
             <if test="totalheal != null">
                 totalHeal = #{totalheal,jdbcType=INTEGER},
             </if>
-            <if test="todayconfirm != null">
-                todayConfirm = #{todayconfirm,jdbcType=INTEGER},
-            </if>
-            <if test="todaysuspect != null">
-                todaySuspect = #{todaysuspect,jdbcType=INTEGER},
-            </if>
-            <if test="todaydead != null">
-                todayDead = #{todaydead,jdbcType=INTEGER},
-            </if>
-            <if test="todayheal != null">
-                todayHeal = #{todayheal,jdbcType=INTEGER},
-            </if>
         </set>
         where Id = #{id,jdbcType=INTEGER}
     </update>
@@ -351,11 +293,7 @@
         totalConfirm = #{totalconfirm,jdbcType=INTEGER},
         totalSuspect = #{totalsuspect,jdbcType=INTEGER},
         totalDead = #{totaldead,jdbcType=INTEGER},
-        totalHeal = #{totalheal,jdbcType=INTEGER},
-        todayConfirm = #{todayconfirm,jdbcType=INTEGER},
-        todaySuspect = #{todaysuspect,jdbcType=INTEGER},
-        todayDead = #{todaydead,jdbcType=INTEGER},
-        todayHeal = #{todayheal,jdbcType=INTEGER}
+        totalHeal = #{totalheal,jdbcType=INTEGER}
         where Id = #{id,jdbcType=INTEGER}
     </update>
 </mapper>

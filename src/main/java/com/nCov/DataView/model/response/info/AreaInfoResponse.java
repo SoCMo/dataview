@@ -47,12 +47,12 @@ public class AreaInfoResponse implements Comparable {
         if (this.totalheal == 0) {
             return this.cureRate = "0%";
         }
-        return this.cureRate = NumberTool.doubleToString(NumberTool.intDivision(this.totalheal, this.totalconfirm));
+        return this.cureRate = NumberTool.doubleToStringWithH(NumberTool.intDivision(this.totalheal, this.totalconfirm));
     }
 
     public String mortalityCalculation() {
         if (this.totalconfirm == 0) return this.mortality = "0%";
-        return this.mortality = NumberTool.doubleToString(NumberTool.intDivision(this.totaldead, this.totalconfirm));
+        return this.mortality = NumberTool.doubleToStringWithH(NumberTool.intDivision(this.totaldead, this.totalconfirm));
     }
 
     public Integer remainCalculation() {

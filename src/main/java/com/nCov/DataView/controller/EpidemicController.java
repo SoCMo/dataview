@@ -3,7 +3,7 @@ package com.nCov.DataView.controller;
 import com.nCov.DataView.exception.AllException;
 import com.nCov.DataView.model.request.AllAreaRequest;
 import com.nCov.DataView.model.request.AreaInfoRequest;
-import com.nCov.DataView.model.request.AreaListRequest;
+import com.nCov.DataView.model.request.RouteListRequest;
 import com.nCov.DataView.model.response.Result;
 import com.nCov.DataView.service.EpidemicService;
 import org.apache.ibatis.annotations.Param;
@@ -82,17 +82,17 @@ public class EpidemicController {
     }
 
     /**
-     * @Description: 某地疫情风险指数
-     * @Param: [area]
+     * @Description: 回校评估
+     * @Param: [routeCalRequestList]
      * @return: com.nCov.DataView.model.response.Result
      * @Author: SoCMo
-     * @Date: 2020/3/18
+     * @Date: 2020/3/28
      */
-    @Cacheable(value = "areaCal", key = "#area")
-    @PostMapping("/areaCal")
-    public Result areaCal(@Validated @RequestBody AreaListRequest areaListRequest) {
-        return epidemicService.areaCal(areaListRequest.getAreaList());
+    @PostMapping("/routeCal")
+    public Result routeCal(@Validated @RequestBody RouteListRequest RouteListRequest) {
+        return epidemicService.routeCal(RouteListRequest.getRouteCalRequestList());
     }
+
 
     /**
      * @Description: 使用excel表格导入学生信息
@@ -106,6 +106,5 @@ public class EpidemicController {
 
         return epidemicService.excelIn(file);
     }
-
-
+  
 }

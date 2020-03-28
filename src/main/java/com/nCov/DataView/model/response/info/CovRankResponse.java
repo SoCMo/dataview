@@ -18,23 +18,23 @@ public class CovRankResponse {
 
     private int remainConfirmRank;
 
-    private int deadRank;
+    private int remainCountRank;
 
     private int growthRank;
 
-    private String remainConfirm;
+    private double remainConfirm;
 
-    private String dead;
+    private int remainCount;
 
-    private String growth;
+    private int growth;
 
     private int remainScore;
 
-    private int deadScore;
+    private int remainCountScore;
 
     private int growthScore;
 
-    private String sumScore;
+    private double sumScore;
 
     private int allRank;
 }

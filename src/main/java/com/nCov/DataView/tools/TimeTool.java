@@ -2,6 +2,7 @@ package com.nCov.DataView.tools;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
 
@@ -89,5 +90,25 @@ public class TimeTool {
     public static int dayDiffDate(Date begin, Date end) throws ParseException {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         return TimeTool.dayDiffStr(dateFormat.format(begin), dateFormat.format(end));
+    }
+
+    /**
+     * @Description: 返回今日日期, 不包含小时、分钟、秒
+     * @Param: []
+     * @return: java.util.Calendar
+     * @Author: SoCMo
+     * @Date: 2020/3/26
+     */
+    public static Calendar todayCreate() {
+        Calendar calendarNow = Calendar.getInstance();
+        calendarNow.set(calendarNow.get(Calendar.YEAR), calendarNow.get(Calendar.MONTH), calendarNow.get(Calendar.DATE), 0, 0, 0);
+        return calendarNow;
+    }
+
+    public static String timeSlotToString(double hour) {
+        return "" + (int) hour +
+                "时" +
+                (int) ((hour - (int) hour) * 60) +
+                "分";
     }
 }

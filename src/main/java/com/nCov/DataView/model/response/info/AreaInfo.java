@@ -9,7 +9,7 @@ import lombok.Data;
  * create: 2020/2/28
  */
 @Data
-public class ProvinceInfo {
+public class AreaInfo {
     private String name;
 
     private Integer confirm;

@@ -3,6 +3,7 @@ package com.nCov.DataView.service;
 import com.nCov.DataView.exception.AllException;
 import com.nCov.DataView.model.request.AllAreaRequest;
 import com.nCov.DataView.model.request.AreaInfoRequest;
+import com.nCov.DataView.model.request.RouteCalRequest;
 import com.nCov.DataView.model.response.Result;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -53,12 +54,13 @@ public interface EpidemicService {
     public Result impDateInfo(String date);
 
     /**
-     * @Description: 某地风险评估
-     * @Param: [area]
+     * @Description: 路程评估
+     * @Param: [routeCalRequestList]
      * @return: com.nCov.DataView.model.response.Result
      * @Author: SoCMo
-     * @Date: 2020/3/18
+     * @Date: 2020/3/26
      */
+
     public Result areaCal(List<String> areaList);
 
     /**
@@ -69,4 +71,7 @@ public interface EpidemicService {
      * @Date: 2020/3/28
      */
     public Result excelIn(MultipartFile file) throws AllException, IOException;
+
+    public Result routeCal(List<RouteCalRequest> routeCalRequestList);
+
 }

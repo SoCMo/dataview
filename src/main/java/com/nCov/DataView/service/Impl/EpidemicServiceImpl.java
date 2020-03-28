@@ -2,12 +2,19 @@ package com.nCov.DataView.service.Impl;
 
 import com.nCov.DataView.dao.AreaDOMapper;
 import com.nCov.DataView.dao.CovDataMapper;
+
 import com.nCov.DataView.dao.StudentInformationDOMapper;
+
+import com.nCov.DataView.dao.ImpAreaDOMapper;
+import com.nCov.DataView.dao.RouteCalDOMapper;
+
 import com.nCov.DataView.exception.AllException;
 import com.nCov.DataView.exception.EmAllException;
 import com.nCov.DataView.model.entity.*;
 import com.nCov.DataView.model.request.AllAreaRequest;
 import com.nCov.DataView.model.request.AreaInfoRequest;
+import com.nCov.DataView.model.request.RouteCalRequest;
+import com.nCov.DataView.model.response.ConstCorrespond;
 import com.nCov.DataView.model.response.Result;
 import com.nCov.DataView.model.response.info.*;
 import com.nCov.DataView.service.EpidemicService;
@@ -19,7 +26,11 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.BeanUtils;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+
 import org.springframework.web.multipart.MultipartFile;
+
+import org.springframework.transaction.annotation.Transactional;
+
 
 import javax.annotation.Resource;
 import java.io.IOException;
@@ -44,7 +55,14 @@ public class EpidemicServiceImpl implements EpidemicService {
     private CovDataMapper covDataMapper;
 
     @Resource
+
     private StudentInformationDOMapper studentInformationDOMapper;
+
+    private RouteCalDOMapper routeCalDOMapper;
+
+    @Resource
+    private ImpAreaDOMapper impAreaDOMapper;
+
 
     @Resource
     private FixTool fixTool;
@@ -267,38 +285,114 @@ public class EpidemicServiceImpl implements EpidemicService {
     }
 
     /**
-     * @Description: 某地疫情情况
-     * @Param: [area]
+     * @Description: 路程评估
+     * @Param: [routeCalRequestList]
      * @return: com.nCov.DataView.model.response.Result
      * @Author: SoCMo
-     * @Date: 2020/3/18
+     * @Date: 2020/3/26
      */
     @Override
-    public Result areaCal(List<String> areaList) {
+    public Result routeCal(List<RouteCalRequest> routeCalRequestList) {
+        if (routeCalRequestList.isEmpty()) {
+            return ResultTool.error(500, "参数不能为空");
+        }
         try {
-            double number = 0;
-            AreaCalResponse areaCalResponse = new AreaCalResponse();
-            areaCalResponse.setAreaList(new ArrayList<>());
-            areaList = new ArrayList<>(new HashSet<>(areaList));
-            Map<String, CovRankResponse> covRankResponseMap = allAreaCal(TimeTool.timeToDaySy(new Date())).stream()
-                    .collect(Collectors.toMap(CovRankResponse::getName, covRankResponse -> covRankResponse));
-            for (String area : areaList) {
-                CovRankResponse covRankResponse;
-                if ((covRankResponse = covRankResponseMap.get(fixTool.areaUni(area))) == null) {
-                    for (CovRankResponse cov : covRankResponseMap.values()) {
-                        if (cov.getName().contains(fixTool.areaUni(area))) {
-                            covRankResponse = cov;
-                        }
-                    }
-                    if (covRankResponse == null) {
-                        continue;
-                    }
-                }
-                areaCalResponse.getAreaList().add(new AreaCalInfo(area, covRankResponse.getSumScore()));
-                number += Double.parseDouble(covRankResponse.getSumScore());
+            List<RouteCalReponse> resultList = new ArrayList<>();
+            List<RouteCalDO> routeCalDOList = new ArrayList<>();
+            List<CovRankResponse> allAreaRequestList = allAreaCal(TimeTool.timeToDaySy(new Date()));
+            if (allAreaRequestList.isEmpty()) {
+                throw new AllException(EmAllException.DATABASE_ERROR, "无地区评估数据");
             }
-            areaCalResponse.setNumber(number);
-            return ResultTool.success(areaCalResponse);
+
+            for (RouteCalRequest routeCalRequest : routeCalRequestList) {
+                RouteCalDOExample routeCalDataExample = new RouteCalDOExample();
+                Calendar calendarToday = TimeTool.todayCreate();
+                routeCalDataExample.createCriteria()
+                        .andTypeEqualTo(routeCalRequest.getType())
+                        .andStartEqualTo(routeCalRequest.getStart())
+                        .andEndEqualTo(routeCalRequest.getEnd());
+
+                List<RouteCalDO> routeCalDataList = routeCalDOMapper.selectByExample(routeCalDataExample);
+                if (routeCalDataList.size() > 1) {
+                    throw new AllException(EmAllException.DATABASE_ERROR, routeCalRequest.getStart() + "至" + routeCalRequest.getEnd() + ",交通方式为:" + ConstCorrespond.TRAN_TYPE[routeCalRequest.getType()] + ",时间为" + calendarToday.getTime());
+                }
+
+                //得到城市分数列表
+                List<String> cityRequestList = new ArrayList<>(new HashSet<String>(routeCalRequest.getCitys()));
+                List<CityCal> cityCalList = allAreaRequestList.stream()
+                        .filter(covRankResponse -> {
+                            for (String areaName : cityRequestList) {
+                                if (areaName.contains(covRankResponse.getName()))
+                                    return true;
+                            }
+                            return false;
+                        })
+                        .map(covRankResponse -> {
+                            CityCal cityCal = new CityCal();
+                            cityCal.setCityname(covRankResponse.getName());
+                            cityCal.setCityscore((int) covRankResponse.getSumScore());
+                            return cityCal;
+                        }).collect(Collectors.toList());
+
+                //有城市未找到信息，进行错误处理
+                if (cityCalList.size() < cityRequestList.size()) {
+                    StringBuilder stringBuilder = new StringBuilder("以下城市信息未找到");
+                    for (String str : cityRequestList) {
+                        int flag = 0;
+                        for (CityCal cityCal : cityCalList) {
+                            if (cityCal.getCityname().contains(fixTool.areaUni(str))) {
+                                flag = 1;
+                                break;
+                            }
+                        }
+                        if (flag == 0) stringBuilder.append(str).append(",");
+                    }
+                    throw new AllException(EmAllException.DATABASE_ERROR,
+                            stringBuilder.substring(0, stringBuilder.length() - 1));
+                }
+
+                //找到当前城市信息
+                if (routeCalDataList.size() == 1) {
+                    RouteCalReponse routeCalReponse = new RouteCalReponse();
+                    BeanUtils.copyProperties(routeCalRequest, routeCalReponse);
+                    routeCalReponse.setTime(routeCalDataList.get(0).getTime());
+                    routeCalReponse.setFinalscore(routeCalDataList.get(0).getScore());
+                    routeCalReponse.setCity(cityCalList);
+                    resultList.add(routeCalReponse);
+                } else if (routeCalDataList.isEmpty()) {
+                    RouteCalReponse routeCalReponse = new RouteCalReponse();
+                    RouteCalDO routeCalDO = new RouteCalDO();
+                    BeanUtils.copyProperties(routeCalRequest, routeCalReponse);
+                    BeanUtils.copyProperties(routeCalRequest, routeCalDO);
+                    DoubleSummaryStatistics sum = cityCalList.stream().mapToDouble(CityCal::getCityscore).summaryStatistics();
+
+                    //准备插入数据库的数据
+                    double time = routeCalRequest.getDistance() / 1000.0 / ConstCorrespond.SPEED[routeCalRequest.getType()];
+                    routeCalDO.setTime(TimeTool.timeSlotToString(time));
+                    routeCalDO.setDate(new Date());
+                    routeCalDO.setScore(
+                            (ConstCorrespond.ROUTE_WEIGHT[0] * ConstCorrespond.CROWD[routeCalRequest.getType()]
+                                    + ConstCorrespond.ROUTE_WEIGHT[1] * (time >= 24 ? 100 : (time / 24.0 * 100))
+                                    + ConstCorrespond.ROUTE_WEIGHT[2] * ConstCorrespond.CLEAN_SCORE[routeCalRequest.getType()]
+                                    + ConstCorrespond.ROUTE_WEIGHT[3] * sum.getAverage()) / 20.0
+                    );
+                    routeCalDO.setId(null);
+
+                    routeCalDOList.add(routeCalDO);
+                    routeCalReponse.setTime(routeCalDO.getTime());
+                    routeCalReponse.setFinalscore(routeCalDO.getScore());
+                    routeCalReponse.setCity(cityCalList);
+                    resultList.add(routeCalReponse);
+                }
+            }
+            if (!routeCalDOList.isEmpty()) {
+                routeCalDOMapper.insertList(routeCalDOList);
+            }
+
+            SumCalResponse sumCalResponse = new SumCalResponse();
+            sumCalResponse.setResultList(resultList);
+            sumCalResponse.setSumScore(NumberTool.doubleToStringWotH(resultList.stream().mapToDouble(RouteCalReponse::getFinalscore).average().getAsDouble()));
+            return ResultTool.success(sumCalResponse);
         } catch (AllException e) {
             log.error(e.getMsg());
             return ResultTool.error(e.getErrCode(), e.getMsg());
@@ -362,13 +456,31 @@ public class EpidemicServiceImpl implements EpidemicService {
      * @Author: SoCMo
      * @Date: 2020/3/18
      */
+    @Transactional
     @Cacheable(value = "allAreaCal", key = "#date")
     public List<CovRankResponse> allAreaCal(String date) throws AllException, ParseException {
+        ImpAreaDOExample impAreaDOExample = new ImpAreaDOExample();
+        impAreaDOExample.createCriteria().andDateEqualTo(TimeTool.stringToDay(date));
+        List<ImpAreaDO> impAreaDOList = impAreaDOMapper.selectByExample(impAreaDOExample);
+        if (!impAreaDOList.isEmpty()) {
+            return impAreaDOList.stream().map(impAreaDO -> {
+                CovRankResponse covRankResponse = new CovRankResponse();
+                BeanUtils.copyProperties(impAreaDO, covRankResponse);
+                covRankResponse.setProvincename(impAreaDO.getProvinceName());
+                covRankResponse.setAllRank(impAreaDO.getAllrank());
+                return covRankResponse;
+            }).collect(Collectors.toList());
+        }
+
         Map<String, AreaDO> cityMap = areaDOMapper.getCityMap();
         if (cityMap.isEmpty()) {
             throw new AllException(EmAllException.DATABASE_ERROR, "地区数据为空");
         }
         Map<Integer, AreaDO> provinceMap = areaDOMapper.getProvinceMapInt();
+
+        if (TimeTool.stringToDay(date).before(TimeTool.stringToDay("2020-01-24"))) {
+            throw new AllException(EmAllException.DATABASE_ERROR, "无法提供早于1月24日的评估");
+        }
 
         //获取今日数据
         Calendar calendar = Calendar.getInstance();
@@ -393,7 +505,12 @@ public class EpidemicServiceImpl implements EpidemicService {
             covDataMapper.insertList(new ArrayList<>(covDataMapNow.values()));
         }
 
-        calendar.add(Calendar.DATE, -3);
+        calendar.add(Calendar.DATE, -13);
+        //防止日期在1月24日前
+        while (calendar.getTime().before(TimeTool.stringToDay("2020-01-24"))) {
+            calendar.add(Calendar.DATE, 1);
+        }
+
         calendarTemp.setTime(calendar.getTime());
         Map<String, CovData> covDataMapThr = covDataMapper.getInfoByDate(TimeTool.timeToDaySy(calendar.getTime()));
         //找到有数据的那天，添加
@@ -412,11 +529,10 @@ public class EpidemicServiceImpl implements EpidemicService {
             covDataMapper.insertList(new ArrayList<>(covDataMapThr.values()));
         }
 
-        List<CovRank> covRankList = new ArrayList<>();
         for (AreaDO areaDO : cityMap.values()) {
-            CovRank covRank = new CovRank();
-            BeanUtils.copyProperties(areaDO, covRank);
-            covRank.setProvincename(provinceMap.get(areaDO.getParentid()).getName());
+            ImpAreaDO impAreaDO = new ImpAreaDO();
+            BeanUtils.copyProperties(areaDO, impAreaDO);
+            impAreaDO.setProvinceName(provinceMap.get(areaDO.getParentid()).getName());
 
             CovData covDataNow;
             CovData covDataThr;
@@ -447,95 +563,101 @@ public class EpidemicServiceImpl implements EpidemicService {
                     covDataThr = listThr.get(0);
                 }
             }
-            covRank.setRemainConfirm(NumberTool.intDivision(covDataNow.getTotalconfirm() - covDataNow.getTotaldead() - covDataNow.getTotalheal(), areaDO.getPopulation()) * 1000000);
-            covRank.setDead(NumberTool.intDivision(covDataNow.getTotaldead(), covDataNow.getTotalconfirm()));
-            covRank.setGrowth(NumberTool.intDivision(covDataNow.getTotalconfirm(), covDataThr.getTotalconfirm()));
-            covRankList.add(covRank);
+            double RemainConfirm = Double.parseDouble(NumberTool.doubleToStringWotH(NumberTool.intDivision(covDataNow.getTotalconfirm() - covDataNow.getTotaldead() - covDataNow.getTotalheal(), areaDO.getPopulation()) * 1000000));
+            impAreaDO.setRemainConfirm(Math.max(RemainConfirm, 0));
+            int count = covDataNow.getTotalconfirm() - covDataNow.getTotalheal() - covDataNow.getTotaldead();
+            impAreaDO.setRemainCount(Math.max(count, 0));
+            int growth = covDataNow.getTotalconfirm() - covDataThr.getTotalconfirm();
+            impAreaDO.setGrowth(Math.max(growth, 0));
+            impAreaDOList.add(impAreaDO);
         }
 
-        covRankList.sort(Comparator.comparing(CovRank::getRemainConfirm).reversed());
+        impAreaDOList.sort(Comparator.comparing(ImpAreaDO::getRemainConfirm).reversed());
         int number = 1;
         double last = 0;
-        for (int i = 0; i < covRankList.size(); i++) {
+        for (int i = 0; i < impAreaDOList.size(); i++) {
             if (i == 0) {
-                last = covRankList.get(0).getRemainConfirm();
-                covRankList.get(0).setRemainConfirmRank(number++);
-            } else if (last == covRankList.get(i).getRemainConfirm()) {
-                covRankList.get(i).setRemainConfirmRank(covRankList.get(i - 1).getRemainConfirmRank());
+                last = impAreaDOList.get(0).getRemainConfirm();
+                impAreaDOList.get(0).setRemainConfirmRank(number++);
+            } else if (last == impAreaDOList.get(i).getRemainConfirm()) {
+                impAreaDOList.get(i).setRemainConfirmRank(impAreaDOList.get(i - 1).getRemainConfirmRank());
                 number++;
             } else {
-                last = covRankList.get(i).getRemainConfirm();
-                covRankList.get(i).setRemainConfirmRank(number++);
+                last = impAreaDOList.get(i).getRemainConfirm();
+                impAreaDOList.get(i).setRemainConfirmRank(number++);
             }
         }
-        int lastRank = covRankList.get(covRankList.size() - 1).getRemainConfirmRank();
-        for (CovRank covRank : covRankList) {
+        int lastRank = impAreaDOList.get(impAreaDOList.size() - 1).getRemainConfirmRank();
+        for (ImpAreaDO covRank : impAreaDOList) {
             covRank.setRemainScore(NumberTool.Score(covRank.getRemainConfirmRank(), lastRank));
         }
 
-        covRankList.sort(Comparator.comparing(CovRank::getDead).reversed());
+        impAreaDOList.sort(Comparator.comparing(ImpAreaDO::getRemainCount).reversed());
         number = 1;
         last = 0;
-        for (int i = 0; i < covRankList.size(); i++) {
+        for (int i = 0; i < impAreaDOList.size(); i++) {
             if (i == 0) {
-                last = covRankList.get(0).getDead();
-                covRankList.get(0).setDeadRank(number++);
-            } else if (last == covRankList.get(i).getDead()) {
-                covRankList.get(i).setDeadRank(covRankList.get(i - 1).getDeadRank());
+                last = impAreaDOList.get(0).getRemainCount();
+                impAreaDOList.get(0).setRemainCountRank(number++);
+            } else if (last == impAreaDOList.get(i).getRemainCount()) {
+                impAreaDOList.get(i).setRemainCountRank(impAreaDOList.get(i - 1).getRemainCountRank());
                 number++;
             } else {
-                last = covRankList.get(i).getDead();
-                covRankList.get(i).setDeadRank(number++);
+                last = impAreaDOList.get(i).getRemainCount();
+                impAreaDOList.get(i).setRemainCountRank(number++);
             }
         }
-        for (CovRank covRank : covRankList) {
-            covRank.setDeadScore(NumberTool.Score(covRank.getDeadRank(), covRankList.get(covRankList.size() - 1).getDeadRank()));
+        for (ImpAreaDO impAreaDO : impAreaDOList) {
+            impAreaDO.setRemainCountScore(NumberTool.Score(impAreaDO.getRemainCountRank(), impAreaDOList.get(impAreaDOList.size() - 1).getRemainCountRank()));
         }
 
-        covRankList.sort(Comparator.comparing(CovRank::getGrowth).reversed());
+        impAreaDOList.sort(Comparator.comparing(ImpAreaDO::getGrowth).reversed());
         number = 1;
         last = 0;
-        for (int i = 0; i < covRankList.size(); i++) {
+        for (int i = 0; i < impAreaDOList.size(); i++) {
             if (i == 0) {
-                last = covRankList.get(0).getGrowth();
-                covRankList.get(0).setGrowthRank(number++);
-            } else if (last == covRankList.get(i).getGrowth()) {
-                covRankList.get(i).setGrowthRank(covRankList.get(i - 1).getGrowthRank());
+                last = impAreaDOList.get(0).getGrowth();
+                impAreaDOList.get(0).setGrowthRank(number++);
+            } else if (last == impAreaDOList.get(i).getGrowth()) {
+                impAreaDOList.get(i).setGrowthRank(impAreaDOList.get(i - 1).getGrowthRank());
                 number++;
             } else {
-                last = covRankList.get(i).getGrowth();
-                covRankList.get(i).setGrowthRank(number++);
-            }
-        }
-
-        for (CovRank covRank : covRankList) {
-            covRank.setGrowthScore(NumberTool.Score(covRank.getGrowthRank(), covRankList.get(covRankList.size() - 1).getGrowthRank()));
-            covRank.setSumScore(covRank.getDeadScore() * 0.2 + covRank.getRemainScore() * 0.5 + covRank.getGrowthScore() * 0.3);
-        }
-
-        covRankList.sort(Comparator.comparing(CovRank::getSumScore).reversed());
-        number = 1;
-        last = 0;
-        for (int i = 0; i < covRankList.size(); i++) {
-            if (i == 0) {
-                last = covRankList.get(0).getSumScore();
-                covRankList.get(0).setAllRank(number++);
-            } else if (last == covRankList.get(i).getSumScore()) {
-                covRankList.get(i).setAllRank(covRankList.get(i - 1).getAllRank());
-                number++;
-            } else {
-                last = covRankList.get(i).getSumScore();
-                covRankList.get(i).setAllRank(number++);
+                last = impAreaDOList.get(i).getGrowth();
+                impAreaDOList.get(i).setGrowthRank(number++);
             }
         }
 
-        return covRankList.stream().map(covRank -> {
+        for (ImpAreaDO impAreaDO : impAreaDOList) {
+            impAreaDO.setGrowthScore(NumberTool.Score(impAreaDO.getGrowthRank(), impAreaDOList.get(impAreaDOList.size() - 1).getGrowthRank()));
+            impAreaDO.setSumScore(impAreaDO.getRemainCountScore() * 0.3 + impAreaDO.getRemainScore() * 0.3 + impAreaDO.getGrowthScore() * 0.4);
+        }
+
+        impAreaDOList.sort(Comparator.comparing(ImpAreaDO::getSumScore).reversed());
+        number = 1;
+        last = 0;
+        for (int i = 0; i < impAreaDOList.size(); i++) {
+            if (i == 0) {
+                last = impAreaDOList.get(0).getSumScore();
+                impAreaDOList.get(0).setAllrank(number++);
+            } else if (last == impAreaDOList.get(i).getSumScore()) {
+                impAreaDOList.get(i).setAllrank(impAreaDOList.get(i - 1).getAllrank());
+                number++;
+            } else {
+                last = impAreaDOList.get(i).getSumScore();
+                impAreaDOList.get(i).setAllrank(number++);
+            }
+        }
+        for (ImpAreaDO impAreaDO : impAreaDOList) {
+            impAreaDO.setId(null);
+            impAreaDO.setDate(TimeTool.stringToDay(date));
+        }
+        impAreaDOMapper.insertList(impAreaDOList);
+
+        return impAreaDOList.stream().map(impAreaDO -> {
             CovRankResponse covRankResponse = new CovRankResponse();
-            BeanUtils.copyProperties(covRank, covRankResponse);
-            covRankResponse.setGrowth(NumberTool.doubleToString(covRank.getGrowth()));
-            covRankResponse.setDead(NumberTool.doubleToString(covRank.getDead()));
-            covRankResponse.setRemainConfirm(String.format("%.4f", covRank.getRemainConfirm()));
-            covRankResponse.setSumScore(String.format("%.2f", covRank.getSumScore()));
+            BeanUtils.copyProperties(impAreaDO, covRankResponse);
+            covRankResponse.setProvincename(impAreaDO.getProvinceName());
+            covRankResponse.setAllRank(impAreaDO.getAllrank());
             return covRankResponse;
         }).collect(Collectors.toList());
     }
