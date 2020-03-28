@@ -304,9 +304,10 @@ public class EpidemicServiceImpl implements EpidemicService {
                 }
 
                 //得到城市分数列表
+                List<String> cityRequestList = new ArrayList<>(new HashSet<String>(routeCalRequest.getCitys()));
                 List<CityCal> cityCalList = allAreaRequestList.stream()
                         .filter(covRankResponse -> {
-                            for (String areaName : routeCalRequest.getCitys()) {
+                            for (String areaName : cityRequestList) {
                                 if (areaName.contains(covRankResponse.getName()))
                                     return true;
                             }
@@ -320,9 +321,9 @@ public class EpidemicServiceImpl implements EpidemicService {
                         }).collect(Collectors.toList());
 
                 //有城市未找到信息，进行错误处理
-                if (cityCalList.size() < routeCalRequest.getCitys().size()) {
+                if (cityCalList.size() < cityRequestList.size()) {
                     StringBuilder stringBuilder = new StringBuilder("以下城市信息未找到");
-                    for (String str : routeCalRequest.getCitys()) {
+                    for (String str : cityRequestList) {
                         int flag = 0;
                         for (CityCal cityCal : cityCalList) {
                             if (cityCal.getCityname().contains(fixTool.areaUni(str))) {
@@ -341,7 +342,7 @@ public class EpidemicServiceImpl implements EpidemicService {
                     RouteCalReponse routeCalReponse = new RouteCalReponse();
                     BeanUtils.copyProperties(routeCalRequest, routeCalReponse);
                     routeCalReponse.setTime(routeCalDataList.get(0).getTime());
-                    routeCalReponse.setFinalscore(NumberTool.doubleToStringWotH(routeCalDataList.get(0).getScore()));
+                    routeCalReponse.setFinalscore(routeCalDataList.get(0).getScore());
                     routeCalReponse.setCity(cityCalList);
                     resultList.add(routeCalReponse);
                 } else if (routeCalDataList.isEmpty()) {
@@ -365,7 +366,7 @@ public class EpidemicServiceImpl implements EpidemicService {
 
                     routeCalDOList.add(routeCalDO);
                     routeCalReponse.setTime(routeCalDO.getTime());
-                    routeCalReponse.setFinalscore(NumberTool.doubleToStringWotH(routeCalDO.getScore()));
+                    routeCalReponse.setFinalscore(routeCalDO.getScore());
                     routeCalReponse.setCity(cityCalList);
                     resultList.add(routeCalReponse);
                 }
@@ -373,7 +374,11 @@ public class EpidemicServiceImpl implements EpidemicService {
             if (!routeCalDOList.isEmpty()) {
                 routeCalDOMapper.insertList(routeCalDOList);
             }
-            return ResultTool.success(resultList);
+
+            SumCalResponse sumCalResponse = new SumCalResponse();
+            sumCalResponse.setResultList(resultList);
+            sumCalResponse.setSumScore(NumberTool.doubleToStringWotH(resultList.stream().mapToDouble(RouteCalReponse::getFinalscore).average().getAsDouble()));
+            return ResultTool.success(sumCalResponse);
         } catch (AllException e) {
             log.error(e.getMsg());
             return ResultTool.error(e.getErrCode(), e.getMsg());
@@ -497,7 +502,8 @@ public class EpidemicServiceImpl implements EpidemicService {
                     covDataThr = listThr.get(0);
                 }
             }
-            impAreaDO.setRemainConfirm(NumberTool.intDivision(covDataNow.getTotalconfirm() - covDataNow.getTotaldead() - covDataNow.getTotalheal(), areaDO.getPopulation()) * 1000000);
+            double RemainConfirm = Double.parseDouble(NumberTool.doubleToStringWotH(NumberTool.intDivision(covDataNow.getTotalconfirm() - covDataNow.getTotaldead() - covDataNow.getTotalheal(), areaDO.getPopulation()) * 1000000));
+            impAreaDO.setRemainConfirm(Math.max(RemainConfirm, 0));
             int count = covDataNow.getTotalconfirm() - covDataNow.getTotalheal() - covDataNow.getTotaldead();
             impAreaDO.setRemainCount(Math.max(count, 0));
             int growth = covDataNow.getTotalconfirm() - covDataThr.getTotalconfirm();

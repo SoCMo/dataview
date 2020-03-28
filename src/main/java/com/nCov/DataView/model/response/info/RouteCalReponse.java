@@ -24,5 +24,5 @@ public class RouteCalReponse {
 
     List<CityCal> city;
 
-    String finalscore;
+    double finalscore;
 }
