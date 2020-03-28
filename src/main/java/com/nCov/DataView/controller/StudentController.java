@@ -21,7 +21,7 @@ public class StudentController {
     private StudentService studentService;
 
     @GetMapping("/studentInfo")
-    public Result studentInfo(@Min(value = 0, message = "偏移量最小为0") int minIndex, int maxIndex) {
-        return studentService.studentInfo(minIndex, maxIndex);
+    public Result studentInfo(@Min(value = 0, message = "偏移量最小为0") int index, int max) {
+        return studentService.studentInfo(index, max);
     }
 }

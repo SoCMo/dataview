@@ -35,9 +35,9 @@ public class StudentServiceImpl implements StudentService {
      * @Author: SoCMo
      * @Date: 2020/3/28
      */
-    public Result studentInfo(int minIndex, int maxIndex) {
+    public Result studentInfo(int index, int max) {
         StudentInformationDOExample studentInformationDOExample = new StudentInformationDOExample();
-        studentInformationDOExample.setOrderByClause("id limit " + minIndex + "," + maxIndex);
+        studentInformationDOExample.setOrderByClause("id limit " + index + "," + max);
         List<StudentInformationDO> studentInformationDOList = studentInformationDOMapper.selectByExample(studentInformationDOExample);
         return ResultTool.success(studentInformationDOList.stream().map(studentInformationDO -> {
             StudentInfoResponse studentInfoResponse = new StudentInfoResponse();
