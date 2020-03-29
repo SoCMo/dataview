@@ -516,7 +516,9 @@ public class EpidemicServiceImpl implements EpidemicService {
                 pathResponse.getSumCalResponseList().add(sumCalResponse);
             }
 
-            passInfoDOMapper.insertList(passInfoDOList);
+            if (!passInfoDOList.isEmpty()) {
+                passInfoDOMapper.insertList(passInfoDOList);
+            }
             return ResultTool.success(pathResponse);
         } catch (AllException e) {
             log.error(e.getMsg());
