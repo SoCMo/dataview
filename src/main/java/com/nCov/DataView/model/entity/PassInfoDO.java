@@ -13,6 +13,12 @@ public class PassInfoDO {
 
     private Integer distance;
 
+    private String start;
+
+    private String end;
+
+    private Integer title;
+
     public Integer getId() {
         return id;
     }
@@ -59,5 +65,29 @@ public class PassInfoDO {
 
     public void setDistance(Integer distance) {
         this.distance = distance;
+    }
+
+    public String getStart() {
+        return start;
+    }
+
+    public void setStart(String start) {
+        this.start = start == null ? null : start.trim();
+    }
+
+    public String getEnd() {
+        return end;
+    }
+
+    public void setEnd(String end) {
+        this.end = end == null ? null : end.trim();
+    }
+
+    public Integer getTitle() {
+        return title;
+    }
+
+    public void setTitle(Integer title) {
+        this.title = title;
     }
 }

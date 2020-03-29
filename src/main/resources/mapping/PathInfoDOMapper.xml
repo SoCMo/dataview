@@ -101,7 +101,8 @@
             <include refid="Example_Where_Clause"/>
         </if>
     </delete>
-    <insert id="insert" parameterType="com.nCov.DataView.model.entity.PathInfoDO">
+    <insert id="insert" parameterType="com.nCov.DataView.model.entity.PathInfoDO" useGeneratedKeys="true"
+            keyProperty="id">
         insert into pathInfo (id, start, end
         )
         values (#{id,jdbcType=INTEGER}, #{start,jdbcType=VARCHAR}, #{end,jdbcType=VARCHAR}

@@ -473,6 +473,206 @@ public class PassInfoDOExample {
             addCriterion("distance not between", value1, value2, "distance");
             return (Criteria) this;
         }
+
+        public Criteria andStartIsNull() {
+            addCriterion("start is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andStartIsNotNull() {
+            addCriterion("start is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andStartEqualTo(String value) {
+            addCriterion("start =", value, "start");
+            return (Criteria) this;
+        }
+
+        public Criteria andStartNotEqualTo(String value) {
+            addCriterion("start <>", value, "start");
+            return (Criteria) this;
+        }
+
+        public Criteria andStartGreaterThan(String value) {
+            addCriterion("start >", value, "start");
+            return (Criteria) this;
+        }
+
+        public Criteria andStartGreaterThanOrEqualTo(String value) {
+            addCriterion("start >=", value, "start");
+            return (Criteria) this;
+        }
+
+        public Criteria andStartLessThan(String value) {
+            addCriterion("start <", value, "start");
+            return (Criteria) this;
+        }
+
+        public Criteria andStartLessThanOrEqualTo(String value) {
+            addCriterion("start <=", value, "start");
+            return (Criteria) this;
+        }
+
+        public Criteria andStartLike(String value) {
+            addCriterion("start like", value, "start");
+            return (Criteria) this;
+        }
+
+        public Criteria andStartNotLike(String value) {
+            addCriterion("start not like", value, "start");
+            return (Criteria) this;
+        }
+
+        public Criteria andStartIn(List<String> values) {
+            addCriterion("start in", values, "start");
+            return (Criteria) this;
+        }
+
+        public Criteria andStartNotIn(List<String> values) {
+            addCriterion("start not in", values, "start");
+            return (Criteria) this;
+        }
+
+        public Criteria andStartBetween(String value1, String value2) {
+            addCriterion("start between", value1, value2, "start");
+            return (Criteria) this;
+        }
+
+        public Criteria andStartNotBetween(String value1, String value2) {
+            addCriterion("start not between", value1, value2, "start");
+            return (Criteria) this;
+        }
+
+        public Criteria andEndIsNull() {
+            addCriterion("end is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andEndIsNotNull() {
+            addCriterion("end is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andEndEqualTo(String value) {
+            addCriterion("end =", value, "end");
+            return (Criteria) this;
+        }
+
+        public Criteria andEndNotEqualTo(String value) {
+            addCriterion("end <>", value, "end");
+            return (Criteria) this;
+        }
+
+        public Criteria andEndGreaterThan(String value) {
+            addCriterion("end >", value, "end");
+            return (Criteria) this;
+        }
+
+        public Criteria andEndGreaterThanOrEqualTo(String value) {
+            addCriterion("end >=", value, "end");
+            return (Criteria) this;
+        }
+
+        public Criteria andEndLessThan(String value) {
+            addCriterion("end <", value, "end");
+            return (Criteria) this;
+        }
+
+        public Criteria andEndLessThanOrEqualTo(String value) {
+            addCriterion("end <=", value, "end");
+            return (Criteria) this;
+        }
+
+        public Criteria andEndLike(String value) {
+            addCriterion("end like", value, "end");
+            return (Criteria) this;
+        }
+
+        public Criteria andEndNotLike(String value) {
+            addCriterion("end not like", value, "end");
+            return (Criteria) this;
+        }
+
+        public Criteria andEndIn(List<String> values) {
+            addCriterion("end in", values, "end");
+            return (Criteria) this;
+        }
+
+        public Criteria andEndNotIn(List<String> values) {
+            addCriterion("end not in", values, "end");
+            return (Criteria) this;
+        }
+
+        public Criteria andEndBetween(String value1, String value2) {
+            addCriterion("end between", value1, value2, "end");
+            return (Criteria) this;
+        }
+
+        public Criteria andEndNotBetween(String value1, String value2) {
+            addCriterion("end not between", value1, value2, "end");
+            return (Criteria) this;
+        }
+
+        public Criteria andTitleIsNull() {
+            addCriterion("title is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andTitleIsNotNull() {
+            addCriterion("title is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andTitleEqualTo(Integer value) {
+            addCriterion("title =", value, "title");
+            return (Criteria) this;
+        }
+
+        public Criteria andTitleNotEqualTo(Integer value) {
+            addCriterion("title <>", value, "title");
+            return (Criteria) this;
+        }
+
+        public Criteria andTitleGreaterThan(Integer value) {
+            addCriterion("title >", value, "title");
+            return (Criteria) this;
+        }
+
+        public Criteria andTitleGreaterThanOrEqualTo(Integer value) {
+            addCriterion("title >=", value, "title");
+            return (Criteria) this;
+        }
+
+        public Criteria andTitleLessThan(Integer value) {
+            addCriterion("title <", value, "title");
+            return (Criteria) this;
+        }
+
+        public Criteria andTitleLessThanOrEqualTo(Integer value) {
+            addCriterion("title <=", value, "title");
+            return (Criteria) this;
+        }
+
+        public Criteria andTitleIn(List<Integer> values) {
+            addCriterion("title in", values, "title");
+            return (Criteria) this;
+        }
+
+        public Criteria andTitleNotIn(List<Integer> values) {
+            addCriterion("title not in", values, "title");
+            return (Criteria) this;
+        }
+
+        public Criteria andTitleBetween(Integer value1, Integer value2) {
+            addCriterion("title between", value1, value2, "title");
+            return (Criteria) this;
+        }
+
+        public Criteria andTitleNotBetween(Integer value1, Integer value2) {
+            addCriterion("title not between", value1, value2, "title");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

@@ -28,4 +28,6 @@ public interface PassInfoDOMapper {
     int updateByPrimaryKeySelective(PassInfoDO record);
 
     int updateByPrimaryKey(PassInfoDO record);
+
+    void insertList(List<PassInfoDO> passInfoDOList);
 }

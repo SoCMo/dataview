@@ -5,10 +5,7 @@ import com.nCov.DataView.exception.AllException;
 import com.nCov.DataView.exception.EmAllException;
 import com.nCov.DataView.model.ConstCorrespond;
 import com.nCov.DataView.model.entity.*;
-import com.nCov.DataView.model.request.AllAreaRequest;
-import com.nCov.DataView.model.request.AreaInfoRequest;
-import com.nCov.DataView.model.request.RouteCalRequest;
-import com.nCov.DataView.model.request.RouteStoreInfo;
+import com.nCov.DataView.model.request.*;
 import com.nCov.DataView.model.response.Result;
 import com.nCov.DataView.model.response.info.*;
 import com.nCov.DataView.service.EpidemicService;
@@ -407,20 +404,86 @@ public class EpidemicServiceImpl implements EpidemicService {
     @Override
     public Result routeStore(RouteStoreInfo routeStoreInfo) {
         try {
+            //待返回的数据
             PathResponse pathResponse = new PathResponse();
             pathResponse.setSumCalResponseList(new ArrayList<>());
 
-            List<PathInfoDO> pathInfoDOList = new ArrayList<>();
+            List<CovRankResponse> covRankResponseList = allAreaCal(TimeTool.timeToDaySy(new Date()));
+
+            //待插入的途径地区
             List<PassInfoDO> passInfoDOList = new ArrayList<>();
+            for (RouteListRequest routeListRequest : routeStoreInfo.getPathList()) {
+                SumCalResponse sumCalResponse = new SumCalResponse();
+                sumCalResponse.setResultList(new ArrayList<>());
+
+                PathInfoDO pathInfoDO = new PathInfoDO();
+                pathInfoDO.setStart(routeListRequest.getRouteCalRequestList().get(0).getStart());
+                pathInfoDO.setEnd(routeListRequest.getRouteCalRequestList().get(0).getEnd());
+                pathInfoDOMapper.insertSelective(pathInfoDO);
+                int number = 0;
+                for (RouteCalRequest routeCalRequest : routeListRequest.getRouteCalRequestList()) {
+                    RouteCalReponse routeCalReponse = new RouteCalReponse();
+
+                    //算出总分
+                    //得到城市分数列表
+                    List<String> cityRequestList = new ArrayList<>(new HashSet<String>(routeCalRequest.getCitys()));
+                    List<CityCal> cityCalList = covRankResponseList.stream()
+                            .filter(covRankResponse -> {
+                                for (String areaName : cityRequestList) {
+                                    if (areaName.contains(covRankResponse.getName()))
+                                        return true;
+                                }
+                                return false;
+                            })
+                            .map(covRankResponse -> {
+                                CityCal cityCal = new CityCal();
+                                cityCal.setCityname(covRankResponse.getName());
+                                cityCal.setCityscore((int) covRankResponse.getSumScore());
+                                return cityCal;
+                            }).collect(Collectors.toList());
+
+                    //有城市未找到信息，进行错误处理
+                    if (cityCalList.size() < cityRequestList.size()) {
+                        StringBuilder stringBuilder = new StringBuilder("以下城市信息未找到");
+                        for (String str : cityRequestList) {
+                            int flag = 0;
+                            for (CityCal cityCal : cityCalList) {
+                                if (cityCal.getCityname().contains(fixTool.areaUni(str))) {
+                                    flag = 1;
+                                    break;
+                                }
+                            }
+                            if (flag == 0) stringBuilder.append(str).append(",");
+                        }
+                        throw new AllException(EmAllException.DATABASE_ERROR,
+                                stringBuilder.substring(0, stringBuilder.length() - 1));
+                    }
+                    //赋值与计算
+                    double time = routeCalRequest.getDistance() / 1000.0 / ConstCorrespond.SPEED[routeCalRequest.getType()];
+                    routeCalReponse.setTime(TimeTool.timeSlotToString(time));
+//                    NumberTool.routeCal(routeCalReponse, time);
+                    BeanUtils.copyProperties(routeCalRequest, routeCalReponse);
 
 
+                    //准备插入数据
+                    for (String area : routeCalRequest.getCitys()) {
+                        PassInfoDO passInfoDO = new PassInfoDO();
+                        passInfoDO.setPathId(pathInfoDO.getId());
+                        passInfoDO.setArea(area);
+                        passInfoDO.setOrder(number);
+                        passInfoDO.setDistance((int) routeCalRequest.getDistance());
+                        passInfoDOList.add(passInfoDO);
+                    }
+                    number++;
+                }
+            }
+
+            passInfoDOMapper.insertList(passInfoDOList);
             return ResultTool.success(pathResponse);
-        }
-//        catch (AllException e) {
-//            log.error(e.getMsg());
-//            return ResultTool.error(e.getErrCode(), e.getMsg());
-//        }
-        catch (Exception e) {
+        } catch (AllException e) {
+            log.error(e.getMsg());
+            return ResultTool.error(e.getErrCode(), e.getMsg());
+        } catch (Exception e) {
             log.error(e.getMessage());
             return ResultTool.error(500, e.getMessage());
         }
