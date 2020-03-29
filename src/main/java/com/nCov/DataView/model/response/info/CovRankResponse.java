@@ -10,8 +10,6 @@ import lombok.Data;
  */
 @Data
 public class CovRankResponse {
-    private int id;
-
     private String provincename;
 
     private String name;
