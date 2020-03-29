@@ -405,7 +405,7 @@ public class EpidemicServiceImpl implements EpidemicService {
      */
     @Override
     public Result getAllRouteCal() {
-        List<SumCalResponse> responseList = new ArrayList<>();
+        List<SumAllCalResponse> responseList = new ArrayList<>();
 
         List<PathInfoDO> pathInfoDOList = pathInfoDOMapper.selectByExample(null);
         if (pathInfoDOList.size() == 0) {
@@ -444,9 +444,19 @@ public class EpidemicServiceImpl implements EpidemicService {
 
                 routeCalRequestList.add(routeCalRequest);
             }
+            if (routeCalRequestList.isEmpty()) {
+                continue;
+            }
 
             SumCalResponse sumCalResponse = getRouteCal(routeCalRequestList);
-            responseList.add(sumCalResponse);
+
+            SumAllCalResponse sumAllCalResponse = new SumAllCalResponse();
+            sumAllCalResponse.setSumScore(sumCalResponse.getSumScore());
+            sumAllCalResponse.setResultList(sumCalResponse.getResultList());
+            sumAllCalResponse.setStartAddress(pathInfoDO.getStart());
+            sumAllCalResponse.setEndAddress(pathInfoDO.getEnd());
+
+            responseList.add(sumAllCalResponse);
 
             passInfoDOExample.clear();
         }
