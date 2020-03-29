@@ -415,15 +415,12 @@ public class EpidemicServiceImpl implements EpidemicService {
         PassInfoDOExample passInfoDOExample = new PassInfoDOExample();
         for (PathInfoDO pathInfoDO : pathInfoDOList) {
             Integer pathId = pathInfoDO.getId();
-
-            //根据order字段进行去重
-            //List<PassInfoDO> passInfoDOS = passInfoDOMapper.selectByPathId(pathId);
             List<PassInfoDO> orderList = passInfoDOMapper.selectByPathId(pathId);
 
             List<RouteCalRequest> routeCalRequestList = new ArrayList<>();
             for (PassInfoDO temp : orderList) {
                 PassInfoDOExample passInfoDOExample1 = new PassInfoDOExample();
-                passInfoDOExample1.createCriteria().andPathIdEqualTo(pathId).andOrderEqualTo(temp.getOrder());
+                passInfoDOExample1.createCriteria().andPathIdEqualTo(pathId).andOrderIdEqualTo(temp.getOrderId());
                 List<PassInfoDO> passInfoDOS = passInfoDOMapper.selectByExample(passInfoDOExample1);
                 passInfoDOExample1.clear();
 
@@ -440,10 +437,10 @@ public class EpidemicServiceImpl implements EpidemicService {
                 }
                 routeCalRequest.setCitys(citys);
                 routeCalRequest.setDistance(passInfoDO.getDistance());
-                routeCalRequest.setType(passInfoDO.getType());
+                routeCalRequest.setType(passInfoDO.getTypeNum());
                 routeCalRequest.setTitle(passInfoDO.getTitle());
-                routeCalRequest.setStart(passInfoDO.getStart());
-                routeCalRequest.setEnd(passInfoDO.getEnd());
+                routeCalRequest.setStart(passInfoDO.getStartAddress());
+                routeCalRequest.setEnd(passInfoDO.getEndAddress());
 
                 routeCalRequestList.add(routeCalRequest);
             }

@@ -203,7 +203,7 @@
     </if>
   </select>
     <select id="selectByPathId" resultMap="BaseResultMap" parameterType="java.lang.Integer">
-      select distinct `order` from passInfo where path_id = #{pathId,jdbcType=INTEGER}
+      select distinct order_id from passInfo where path_id = #{pathId,jdbcType=INTEGER}
     </select>
     <update id="updateByExampleSelective" parameterType="map">
     update passInfo
