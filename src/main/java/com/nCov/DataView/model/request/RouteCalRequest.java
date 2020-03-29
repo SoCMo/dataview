@@ -17,20 +17,23 @@ import java.util.List;
 @Data
 public class RouteCalRequest {
     @Size(min = 1, message = "城市不得少于一个")
-    List<String> citys;
+    private List<String> citys;
 
-    @Range(min = 0, max = 4, message = "交通类型错误")
-    int type;
+    @Range(min = -1, max = 4, message = "交通类型错误")
+    private int type;
 
     @NotBlank(message = "名称不能为空")
-    String title;
+    private String title;
 
     @NotBlank(message = "出发站不能为空")
-    String start;
+    private String start;
 
     @NotBlank(message = "终点站不能为空")
-    String end;
+    private String end;
 
     @NotNull(message = "距离不能为空")
-    double distance;
+    private double distance;
+
+    @NotBlank
+    private String startAdressZone;
 }
