@@ -7,15 +7,15 @@ public class PassInfoDO {
 
     private String area;
 
-    private Integer type;
+    private Integer typeNum;
 
-    private Integer order;
+    private Integer orderId;
 
     private Integer distance;
 
-    private String start;
+    private String startAddress;
 
-    private String end;
+    private String endAddress;
 
     private String title;
 
@@ -43,20 +43,20 @@ public class PassInfoDO {
         this.area = area == null ? null : area.trim();
     }
 
-    public Integer getType() {
-        return type;
+    public Integer getTypeNum() {
+        return typeNum;
     }
 
-    public void setType(Integer type) {
-        this.type = type;
+    public void setTypeNum(Integer typeNum) {
+        this.typeNum = typeNum;
     }
 
-    public Integer getOrder() {
-        return order;
+    public Integer getOrderId() {
+        return orderId;
     }
 
-    public void setOrder(Integer order) {
-        this.order = order;
+    public void setOrderId(Integer orderId) {
+        this.orderId = orderId;
     }
 
     public Integer getDistance() {
@@ -67,20 +67,20 @@ public class PassInfoDO {
         this.distance = distance;
     }
 
-    public String getStart() {
-        return start;
+    public String getStartAddress() {
+        return startAddress;
     }
 
-    public void setStart(String start) {
-        this.start = start == null ? null : start.trim();
+    public void setStartAddress(String startAddress) {
+        this.startAddress = startAddress == null ? null : startAddress.trim();
     }
 
-    public String getEnd() {
-        return end;
+    public String getEndAddress() {
+        return endAddress;
     }
 
-    public void setEnd(String end) {
-        this.end = end == null ? null : end.trim();
+    public void setEndAddress(String endAddress) {
+        this.endAddress = endAddress == null ? null : endAddress.trim();
     }
 
     public String getTitle() {

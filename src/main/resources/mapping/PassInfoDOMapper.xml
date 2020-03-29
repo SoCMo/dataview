@@ -5,11 +5,11 @@
     <id column="id" property="id" jdbcType="INTEGER"/>
     <result column="path_id" property="pathId" jdbcType="INTEGER"/>
     <result column="area" property="area" jdbcType="VARCHAR"/>
-    <result column="type" property="type" jdbcType="INTEGER"/>
-    <result column="order" property="order" jdbcType="INTEGER"/>
+    <result column="type_num" property="typeNum" jdbcType="INTEGER"/>
+    <result column="order_id" property="orderId" jdbcType="INTEGER"/>
     <result column="distance" property="distance" jdbcType="INTEGER"/>
-    <result column="start" property="start" jdbcType="VARCHAR"/>
-    <result column="end" property="end" jdbcType="VARCHAR"/>
+    <result column="start_address" property="startAddress" jdbcType="VARCHAR"/>
+    <result column="end_address" property="endAddress" jdbcType="VARCHAR"/>
     <result column="title" property="title" jdbcType="VARCHAR"/>
   </resultMap>
   <sql id="Example_Where_Clause">
@@ -71,7 +71,7 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, path_id, area, `type`, `order`, distance, `start`, `end`, title
+    id, path_id, area, type_num, order_id, distance, start_address, end_address, title
   </sql>
   <select id="selectByExample" resultMap="BaseResultMap"
           parameterType="com.nCov.DataView.model.entity.PassInfoDOExample">
@@ -107,29 +107,32 @@
   </delete>
   <insert id="insertList" parameterType="java.util.List">
     insert into passInfo (path_id, area,
-    type, `order`, distance,
-    `start`, `end`, title)
+    type_num, order_id, distance,
+    start_address, end_address, title
+    )
     values
     <foreach collection="list" item="PassInfoDO" index="index" separator=",">
       (
       #{PassInfoDO.pathId},
       #{PassInfoDO.area},
-      #{PassInfoDO.type},
-      #{PassInfoDO.order},
+      #{PassInfoDO.typeNum},
+      #{PassInfoDO.orderId},
       #{PassInfoDO.distance},
-      #{PassInfoDO.start},
-      #{PassInfoDO.end},
+      #{PassInfoDO.startAddress},
+      #{PassInfoDO.endAddress},
       #{PassInfoDO.title}
       )
     </foreach>
   </insert>
   <insert id="insert" parameterType="com.nCov.DataView.model.entity.PassInfoDO">
     insert into passInfo (id, path_id, area,
-    type, order, distance,
-    start, end, title)
+    type_num, order_id, distance,
+    start_address, end_address, title
+    )
     values (#{id,jdbcType=INTEGER}, #{pathId,jdbcType=INTEGER}, #{area,jdbcType=VARCHAR},
-    #{type,jdbcType=INTEGER}, #{order,jdbcType=INTEGER}, #{distance,jdbcType=INTEGER},
-    #{start,jdbcType=VARCHAR}, #{end,jdbcType=VARCHAR}, #{title,jdbcType=VARCHAR})
+    #{typeNum,jdbcType=INTEGER}, #{orderId,jdbcType=INTEGER}, #{distance,jdbcType=INTEGER},
+    #{startAddress,jdbcType=VARCHAR}, #{endAddress,jdbcType=VARCHAR}, #{title,jdbcType=VARCHAR}
+    )
   </insert>
   <insert id="insertSelective" parameterType="com.nCov.DataView.model.entity.PassInfoDO">
     insert into passInfo
@@ -143,20 +146,20 @@
       <if test="area != null">
         area,
       </if>
-      <if test="type != null">
-        type,
+      <if test="typeNum != null">
+        type_num,
       </if>
-      <if test="order != null">
-        order,
+      <if test="orderId != null">
+        order_id,
       </if>
       <if test="distance != null">
         distance,
       </if>
-      <if test="start != null">
-        start,
+      <if test="startAddress != null">
+        start_address,
       </if>
-      <if test="end != null">
-        end,
+      <if test="endAddress != null">
+        end_address,
       </if>
       <if test="title != null">
         title,
@@ -172,20 +175,20 @@
       <if test="area != null">
         #{area,jdbcType=VARCHAR},
       </if>
-      <if test="type != null">
-        #{type,jdbcType=INTEGER},
+      <if test="typeNum != null">
+        #{typeNum,jdbcType=INTEGER},
       </if>
-      <if test="order != null">
-        #{order,jdbcType=INTEGER},
+      <if test="orderId != null">
+        #{orderId,jdbcType=INTEGER},
       </if>
       <if test="distance != null">
         #{distance,jdbcType=INTEGER},
       </if>
-      <if test="start != null">
-        #{start,jdbcType=VARCHAR},
+      <if test="startAddress != null">
+        #{startAddress,jdbcType=VARCHAR},
       </if>
-      <if test="end != null">
-        #{end,jdbcType=VARCHAR},
+      <if test="endAddress != null">
+        #{endAddress,jdbcType=VARCHAR},
       </if>
       <if test="title != null">
         #{title,jdbcType=VARCHAR},
@@ -214,20 +217,20 @@
       <if test="record.area != null">
         area = #{record.area,jdbcType=VARCHAR},
       </if>
-      <if test="record.type != null">
-        type = #{record.type,jdbcType=INTEGER},
+      <if test="record.typeNum != null">
+        type_num = #{record.typeNum,jdbcType=INTEGER},
       </if>
-      <if test="record.order != null">
-        order = #{record.order,jdbcType=INTEGER},
+      <if test="record.orderId != null">
+        order_id = #{record.orderId,jdbcType=INTEGER},
       </if>
       <if test="record.distance != null">
         distance = #{record.distance,jdbcType=INTEGER},
       </if>
-      <if test="record.start != null">
-        start = #{record.start,jdbcType=VARCHAR},
+      <if test="record.startAddress != null">
+        start_address = #{record.startAddress,jdbcType=VARCHAR},
       </if>
-      <if test="record.end != null">
-        end = #{record.end,jdbcType=VARCHAR},
+      <if test="record.endAddress != null">
+        end_address = #{record.endAddress,jdbcType=VARCHAR},
       </if>
       <if test="record.title != null">
         title = #{record.title,jdbcType=VARCHAR},
@@ -242,11 +245,11 @@
     set id = #{record.id,jdbcType=INTEGER},
     path_id = #{record.pathId,jdbcType=INTEGER},
     area = #{record.area,jdbcType=VARCHAR},
-    type = #{record.type,jdbcType=INTEGER},
-    order = #{record.order,jdbcType=INTEGER},
+    type_num = #{record.typeNum,jdbcType=INTEGER},
+    order_id = #{record.orderId,jdbcType=INTEGER},
     distance = #{record.distance,jdbcType=INTEGER},
-    start = #{record.start,jdbcType=VARCHAR},
-    end = #{record.end,jdbcType=VARCHAR},
+    start_address = #{record.startAddress,jdbcType=VARCHAR},
+    end_address = #{record.endAddress,jdbcType=VARCHAR},
     title = #{record.title,jdbcType=VARCHAR}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause"/>
@@ -261,20 +264,20 @@
       <if test="area != null">
         area = #{area,jdbcType=VARCHAR},
       </if>
-      <if test="type != null">
-        type = #{type,jdbcType=INTEGER},
+      <if test="typeNum != null">
+        type_num = #{typeNum,jdbcType=INTEGER},
       </if>
-      <if test="order != null">
-        order = #{order,jdbcType=INTEGER},
+      <if test="orderId != null">
+        order_id = #{orderId,jdbcType=INTEGER},
       </if>
       <if test="distance != null">
         distance = #{distance,jdbcType=INTEGER},
       </if>
-      <if test="start != null">
-        start = #{start,jdbcType=VARCHAR},
+      <if test="startAddress != null">
+        start_address = #{startAddress,jdbcType=VARCHAR},
       </if>
-      <if test="end != null">
-        end = #{end,jdbcType=VARCHAR},
+      <if test="endAddress != null">
+        end_address = #{endAddress,jdbcType=VARCHAR},
       </if>
       <if test="title != null">
         title = #{title,jdbcType=VARCHAR},
@@ -286,11 +289,11 @@
     update passInfo
     set path_id = #{pathId,jdbcType=INTEGER},
     area = #{area,jdbcType=VARCHAR},
-    type = #{type,jdbcType=INTEGER},
-    order = #{order,jdbcType=INTEGER},
+    type_num = #{typeNum,jdbcType=INTEGER},
+    order_id = #{orderId,jdbcType=INTEGER},
     distance = #{distance,jdbcType=INTEGER},
-    start = #{start,jdbcType=VARCHAR},
-    end = #{end,jdbcType=VARCHAR},
+    start_address = #{startAddress,jdbcType=VARCHAR},
+    end_address = #{endAddress,jdbcType=VARCHAR},
     title = #{title,jdbcType=VARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>

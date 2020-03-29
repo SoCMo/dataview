@@ -663,11 +663,11 @@ public class EpidemicServiceImpl implements EpidemicService {
                             PassInfoDO passInfoDO = new PassInfoDO();
                             passInfoDO.setPathId(pathInfoDO.getId());
                             passInfoDO.setArea(area);
-                            passInfoDO.setType(routeCalRequest.getType());
-                            passInfoDO.setStart(routeCalRequest.getStart());
-                            passInfoDO.setEnd(routeCalRequest.getEnd());
+                            passInfoDO.setTypeNum(routeCalRequest.getType());
+                            passInfoDO.setStartAddress(routeCalRequest.getStart());
+                            passInfoDO.setEndAddress(routeCalRequest.getEnd());
                             passInfoDO.setTitle(routeCalReponse.getTitle());
-                            passInfoDO.setOrder(number);
+                            passInfoDO.setOrderId(number);
                             passInfoDO.setDistance((int) routeCalRequest.getDistance());
                             passInfoDOList.add(passInfoDO);
                         }

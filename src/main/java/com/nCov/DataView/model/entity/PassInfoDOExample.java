@@ -294,123 +294,123 @@ public class PassInfoDOExample {
             return (Criteria) this;
         }
 
-        public Criteria andTypeIsNull() {
-            addCriterion("type is null");
+        public Criteria andTypeNumIsNull() {
+            addCriterion("type_num is null");
             return (Criteria) this;
         }
 
-        public Criteria andTypeIsNotNull() {
-            addCriterion("type is not null");
+        public Criteria andTypeNumIsNotNull() {
+            addCriterion("type_num is not null");
             return (Criteria) this;
         }
 
-        public Criteria andTypeEqualTo(Integer value) {
-            addCriterion("type =", value, "type");
+        public Criteria andTypeNumEqualTo(Integer value) {
+            addCriterion("type_num =", value, "typeNum");
             return (Criteria) this;
         }
 
-        public Criteria andTypeNotEqualTo(Integer value) {
-            addCriterion("type <>", value, "type");
+        public Criteria andTypeNumNotEqualTo(Integer value) {
+            addCriterion("type_num <>", value, "typeNum");
             return (Criteria) this;
         }
 
-        public Criteria andTypeGreaterThan(Integer value) {
-            addCriterion("type >", value, "type");
+        public Criteria andTypeNumGreaterThan(Integer value) {
+            addCriterion("type_num >", value, "typeNum");
             return (Criteria) this;
         }
 
-        public Criteria andTypeGreaterThanOrEqualTo(Integer value) {
-            addCriterion("type >=", value, "type");
+        public Criteria andTypeNumGreaterThanOrEqualTo(Integer value) {
+            addCriterion("type_num >=", value, "typeNum");
             return (Criteria) this;
         }
 
-        public Criteria andTypeLessThan(Integer value) {
-            addCriterion("type <", value, "type");
+        public Criteria andTypeNumLessThan(Integer value) {
+            addCriterion("type_num <", value, "typeNum");
             return (Criteria) this;
         }
 
-        public Criteria andTypeLessThanOrEqualTo(Integer value) {
-            addCriterion("type <=", value, "type");
+        public Criteria andTypeNumLessThanOrEqualTo(Integer value) {
+            addCriterion("type_num <=", value, "typeNum");
             return (Criteria) this;
         }
 
-        public Criteria andTypeIn(List<Integer> values) {
-            addCriterion("type in", values, "type");
+        public Criteria andTypeNumIn(List<Integer> values) {
+            addCriterion("type_num in", values, "typeNum");
             return (Criteria) this;
         }
 
-        public Criteria andTypeNotIn(List<Integer> values) {
-            addCriterion("type not in", values, "type");
+        public Criteria andTypeNumNotIn(List<Integer> values) {
+            addCriterion("type_num not in", values, "typeNum");
             return (Criteria) this;
         }
 
-        public Criteria andTypeBetween(Integer value1, Integer value2) {
-            addCriterion("type between", value1, value2, "type");
+        public Criteria andTypeNumBetween(Integer value1, Integer value2) {
+            addCriterion("type_num between", value1, value2, "typeNum");
             return (Criteria) this;
         }
 
-        public Criteria andTypeNotBetween(Integer value1, Integer value2) {
-            addCriterion("type not between", value1, value2, "type");
+        public Criteria andTypeNumNotBetween(Integer value1, Integer value2) {
+            addCriterion("type_num not between", value1, value2, "typeNum");
             return (Criteria) this;
         }
 
-        public Criteria andOrderIsNull() {
-            addCriterion("order is null");
+        public Criteria andOrderIdIsNull() {
+            addCriterion("order_id is null");
             return (Criteria) this;
         }
 
-        public Criteria andOrderIsNotNull() {
-            addCriterion("order is not null");
+        public Criteria andOrderIdIsNotNull() {
+            addCriterion("order_id is not null");
             return (Criteria) this;
         }
 
-        public Criteria andOrderEqualTo(Integer value) {
-            addCriterion("order =", value, "order");
+        public Criteria andOrderIdEqualTo(Integer value) {
+            addCriterion("order_id =", value, "orderId");
             return (Criteria) this;
         }
 
-        public Criteria andOrderNotEqualTo(Integer value) {
-            addCriterion("order <>", value, "order");
+        public Criteria andOrderIdNotEqualTo(Integer value) {
+            addCriterion("order_id <>", value, "orderId");
             return (Criteria) this;
         }
 
-        public Criteria andOrderGreaterThan(Integer value) {
-            addCriterion("order >", value, "order");
+        public Criteria andOrderIdGreaterThan(Integer value) {
+            addCriterion("order_id >", value, "orderId");
             return (Criteria) this;
         }
 
-        public Criteria andOrderGreaterThanOrEqualTo(Integer value) {
-            addCriterion("order >=", value, "order");
+        public Criteria andOrderIdGreaterThanOrEqualTo(Integer value) {
+            addCriterion("order_id >=", value, "orderId");
             return (Criteria) this;
         }
 
-        public Criteria andOrderLessThan(Integer value) {
-            addCriterion("order <", value, "order");
+        public Criteria andOrderIdLessThan(Integer value) {
+            addCriterion("order_id <", value, "orderId");
             return (Criteria) this;
         }
 
-        public Criteria andOrderLessThanOrEqualTo(Integer value) {
-            addCriterion("order <=", value, "order");
+        public Criteria andOrderIdLessThanOrEqualTo(Integer value) {
+            addCriterion("order_id <=", value, "orderId");
             return (Criteria) this;
         }
 
-        public Criteria andOrderIn(List<Integer> values) {
-            addCriterion("order in", values, "order");
+        public Criteria andOrderIdIn(List<Integer> values) {
+            addCriterion("order_id in", values, "orderId");
             return (Criteria) this;
         }
 
-        public Criteria andOrderNotIn(List<Integer> values) {
-            addCriterion("order not in", values, "order");
+        public Criteria andOrderIdNotIn(List<Integer> values) {
+            addCriterion("order_id not in", values, "orderId");
             return (Criteria) this;
         }
 
-        public Criteria andOrderBetween(Integer value1, Integer value2) {
-            addCriterion("order between", value1, value2, "order");
+        public Criteria andOrderIdBetween(Integer value1, Integer value2) {
+            addCriterion("order_id between", value1, value2, "orderId");
             return (Criteria) this;
         }
 
-        public Criteria andOrderNotBetween(Integer value1, Integer value2) {
-            addCriterion("order not between", value1, value2, "order");
+        public Criteria andOrderIdNotBetween(Integer value1, Integer value2) {
+            addCriterion("order_id not between", value1, value2, "orderId");
             return (Criteria) this;
         }
 
@@ -474,143 +474,143 @@ public class PassInfoDOExample {
             return (Criteria) this;
         }
 
-        public Criteria andStartIsNull() {
-            addCriterion("start is null");
+        public Criteria andStartAddressIsNull() {
+            addCriterion("start_address is null");
             return (Criteria) this;
         }
 
-        public Criteria andStartIsNotNull() {
-            addCriterion("start is not null");
+        public Criteria andStartAddressIsNotNull() {
+            addCriterion("start_address is not null");
             return (Criteria) this;
         }
 
-        public Criteria andStartEqualTo(String value) {
-            addCriterion("start =", value, "start");
+        public Criteria andStartAddressEqualTo(String value) {
+            addCriterion("start_address =", value, "startAddress");
             return (Criteria) this;
         }
 
-        public Criteria andStartNotEqualTo(String value) {
-            addCriterion("start <>", value, "start");
+        public Criteria andStartAddressNotEqualTo(String value) {
+            addCriterion("start_address <>", value, "startAddress");
             return (Criteria) this;
         }
 
-        public Criteria andStartGreaterThan(String value) {
-            addCriterion("start >", value, "start");
+        public Criteria andStartAddressGreaterThan(String value) {
+            addCriterion("start_address >", value, "startAddress");
             return (Criteria) this;
         }
 
-        public Criteria andStartGreaterThanOrEqualTo(String value) {
-            addCriterion("start >=", value, "start");
+        public Criteria andStartAddressGreaterThanOrEqualTo(String value) {
+            addCriterion("start_address >=", value, "startAddress");
             return (Criteria) this;
         }
 
-        public Criteria andStartLessThan(String value) {
-            addCriterion("start <", value, "start");
+        public Criteria andStartAddressLessThan(String value) {
+            addCriterion("start_address <", value, "startAddress");
             return (Criteria) this;
         }
 
-        public Criteria andStartLessThanOrEqualTo(String value) {
-            addCriterion("start <=", value, "start");
+        public Criteria andStartAddressLessThanOrEqualTo(String value) {
+            addCriterion("start_address <=", value, "startAddress");
             return (Criteria) this;
         }
 
-        public Criteria andStartLike(String value) {
-            addCriterion("start like", value, "start");
+        public Criteria andStartAddressLike(String value) {
+            addCriterion("start_address like", value, "startAddress");
             return (Criteria) this;
         }
 
-        public Criteria andStartNotLike(String value) {
-            addCriterion("start not like", value, "start");
+        public Criteria andStartAddressNotLike(String value) {
+            addCriterion("start_address not like", value, "startAddress");
             return (Criteria) this;
         }
 
-        public Criteria andStartIn(List<String> values) {
-            addCriterion("start in", values, "start");
+        public Criteria andStartAddressIn(List<String> values) {
+            addCriterion("start_address in", values, "startAddress");
             return (Criteria) this;
         }
 
-        public Criteria andStartNotIn(List<String> values) {
-            addCriterion("start not in", values, "start");
+        public Criteria andStartAddressNotIn(List<String> values) {
+            addCriterion("start_address not in", values, "startAddress");
             return (Criteria) this;
         }
 
-        public Criteria andStartBetween(String value1, String value2) {
-            addCriterion("start between", value1, value2, "start");
+        public Criteria andStartAddressBetween(String value1, String value2) {
+            addCriterion("start_address between", value1, value2, "startAddress");
             return (Criteria) this;
         }
 
-        public Criteria andStartNotBetween(String value1, String value2) {
-            addCriterion("start not between", value1, value2, "start");
+        public Criteria andStartAddressNotBetween(String value1, String value2) {
+            addCriterion("start_address not between", value1, value2, "startAddress");
             return (Criteria) this;
         }
 
-        public Criteria andEndIsNull() {
-            addCriterion("end is null");
+        public Criteria andEndAddressIsNull() {
+            addCriterion("end_address is null");
             return (Criteria) this;
         }
 
-        public Criteria andEndIsNotNull() {
-            addCriterion("end is not null");
+        public Criteria andEndAddressIsNotNull() {
+            addCriterion("end_address is not null");
             return (Criteria) this;
         }
 
-        public Criteria andEndEqualTo(String value) {
-            addCriterion("end =", value, "end");
+        public Criteria andEndAddressEqualTo(String value) {
+            addCriterion("end_address =", value, "endAddress");
             return (Criteria) this;
         }
 
-        public Criteria andEndNotEqualTo(String value) {
-            addCriterion("end <>", value, "end");
+        public Criteria andEndAddressNotEqualTo(String value) {
+            addCriterion("end_address <>", value, "endAddress");
             return (Criteria) this;
         }
 
-        public Criteria andEndGreaterThan(String value) {
-            addCriterion("end >", value, "end");
+        public Criteria andEndAddressGreaterThan(String value) {
+            addCriterion("end_address >", value, "endAddress");
             return (Criteria) this;
         }
 
-        public Criteria andEndGreaterThanOrEqualTo(String value) {
-            addCriterion("end >=", value, "end");
+        public Criteria andEndAddressGreaterThanOrEqualTo(String value) {
+            addCriterion("end_address >=", value, "endAddress");
             return (Criteria) this;
         }
 
-        public Criteria andEndLessThan(String value) {
-            addCriterion("end <", value, "end");
+        public Criteria andEndAddressLessThan(String value) {
+            addCriterion("end_address <", value, "endAddress");
             return (Criteria) this;
         }
 
-        public Criteria andEndLessThanOrEqualTo(String value) {
-            addCriterion("end <=", value, "end");
+        public Criteria andEndAddressLessThanOrEqualTo(String value) {
+            addCriterion("end_address <=", value, "endAddress");
             return (Criteria) this;
         }
 
-        public Criteria andEndLike(String value) {
-            addCriterion("end like", value, "end");
+        public Criteria andEndAddressLike(String value) {
+            addCriterion("end_address like", value, "endAddress");
             return (Criteria) this;
         }
 
-        public Criteria andEndNotLike(String value) {
-            addCriterion("end not like", value, "end");
+        public Criteria andEndAddressNotLike(String value) {
+            addCriterion("end_address not like", value, "endAddress");
             return (Criteria) this;
         }
 
-        public Criteria andEndIn(List<String> values) {
-            addCriterion("end in", values, "end");
+        public Criteria andEndAddressIn(List<String> values) {
+            addCriterion("end_address in", values, "endAddress");
             return (Criteria) this;
         }
 
-        public Criteria andEndNotIn(List<String> values) {
-            addCriterion("end not in", values, "end");
+        public Criteria andEndAddressNotIn(List<String> values) {
+            addCriterion("end_address not in", values, "endAddress");
             return (Criteria) this;
         }
 
-        public Criteria andEndBetween(String value1, String value2) {
-            addCriterion("end between", value1, value2, "end");
+        public Criteria andEndAddressBetween(String value1, String value2) {
+            addCriterion("end_address between", value1, value2, "endAddress");
             return (Criteria) this;
         }
 
-        public Criteria andEndNotBetween(String value1, String value2) {
-            addCriterion("end not between", value1, value2, "end");
+        public Criteria andEndAddressNotBetween(String value1, String value2) {
+            addCriterion("end_address not between", value1, value2, "endAddress");
             return (Criteria) this;
         }
 
