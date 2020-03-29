@@ -2,6 +2,7 @@ package com.nCov.DataView.tools;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.nCov.DataView.dao.CovDataMapper;
 import com.nCov.DataView.model.entity.CovData;
 import com.nCov.DataView.model.entity.CovDataExample;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -107,8 +109,17 @@ public class FixTool {
             response = httpClient.execute(httpGet);
             HttpEntity responseEntity = response.getEntity();
             JSONArray jsonArray = JSON.parseArray(EntityUtils.toString(responseEntity));
+
+            List<CovData> covDataList = new ArrayList<>();
             for (int i = 0; i < jsonArray.size(); i++) {
-                jsonArray.getJSONObject(i);
+                JSONObject jsonObject = jsonArray.getJSONObject(i);
+                JSONArray cityArray = jsonObject.getJSONArray("citys");
+                if (jsonObject.getString("countryName").equals("中国") && !cityArray.isEmpty() && TimeTool.timeToDaySy(jsonObject.getDate("updateTime")).equals(TimeTool.timeToDaySy(TimeTool.todayCreate().getTime()))) {
+                    for (int j = 0; j < jsonArray.size(); j++) {
+                        JSONObject city = cityArray.getJSONObject(j);
+
+                    }
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();

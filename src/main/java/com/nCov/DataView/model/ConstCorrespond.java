@@ -39,7 +39,6 @@ public class ConstCorrespond {
     public final static double[] ROUTE_WEIGHT = {
             0.1,
             0.35,
-            0,
             0.2,
             0.35
     };
