@@ -7,6 +7,8 @@ public class PathInfoDO {
 
     private String end;
 
+    private Integer mainType;
+
     public Integer getId() {
         return id;
     }
@@ -29,5 +31,13 @@ public class PathInfoDO {
 
     public void setEnd(String end) {
         this.end = end == null ? null : end.trim();
+    }
+
+    public Integer getMainType() {
+        return mainType;
+    }
+
+    public void setMainType(Integer mainType) {
+        this.mainType = mainType;
     }
 }

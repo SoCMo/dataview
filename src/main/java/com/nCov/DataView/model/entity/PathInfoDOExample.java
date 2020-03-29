@@ -14,20 +14,20 @@ public class PathInfoDOExample {
         oredCriteria = new ArrayList<Criteria>();
     }
 
-    public String getOrderByClause() {
-        return orderByClause;
-    }
-
     public void setOrderByClause(String orderByClause) {
         this.orderByClause = orderByClause;
     }
 
-    public boolean isDistinct() {
-        return distinct;
+    public String getOrderByClause() {
+        return orderByClause;
     }
 
     public void setDistinct(boolean distinct) {
         this.distinct = distinct;
+    }
+
+    public boolean isDistinct() {
+        return distinct;
     }
 
     public List<Criteria> getOredCriteria() {
@@ -303,6 +303,66 @@ public class PathInfoDOExample {
             addCriterion("end not between", value1, value2, "end");
             return (Criteria) this;
         }
+
+        public Criteria andMainTypeIsNull() {
+            addCriterion("main_Type is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andMainTypeIsNotNull() {
+            addCriterion("main_Type is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andMainTypeEqualTo(Integer value) {
+            addCriterion("main_Type =", value, "mainType");
+            return (Criteria) this;
+        }
+
+        public Criteria andMainTypeNotEqualTo(Integer value) {
+            addCriterion("main_Type <>", value, "mainType");
+            return (Criteria) this;
+        }
+
+        public Criteria andMainTypeGreaterThan(Integer value) {
+            addCriterion("main_Type >", value, "mainType");
+            return (Criteria) this;
+        }
+
+        public Criteria andMainTypeGreaterThanOrEqualTo(Integer value) {
+            addCriterion("main_Type >=", value, "mainType");
+            return (Criteria) this;
+        }
+
+        public Criteria andMainTypeLessThan(Integer value) {
+            addCriterion("main_Type <", value, "mainType");
+            return (Criteria) this;
+        }
+
+        public Criteria andMainTypeLessThanOrEqualTo(Integer value) {
+            addCriterion("main_Type <=", value, "mainType");
+            return (Criteria) this;
+        }
+
+        public Criteria andMainTypeIn(List<Integer> values) {
+            addCriterion("main_Type in", values, "mainType");
+            return (Criteria) this;
+        }
+
+        public Criteria andMainTypeNotIn(List<Integer> values) {
+            addCriterion("main_Type not in", values, "mainType");
+            return (Criteria) this;
+        }
+
+        public Criteria andMainTypeBetween(Integer value1, Integer value2) {
+            addCriterion("main_Type between", value1, value2, "mainType");
+            return (Criteria) this;
+        }
+
+        public Criteria andMainTypeNotBetween(Integer value1, Integer value2) {
+            addCriterion("main_Type not between", value1, value2, "mainType");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {
@@ -328,6 +388,38 @@ public class PathInfoDOExample {
         private boolean listValue;
 
         private String typeHandler;
+
+        public String getCondition() {
+            return condition;
+        }
+
+        public Object getValue() {
+            return value;
+        }
+
+        public Object getSecondValue() {
+            return secondValue;
+        }
+
+        public boolean isNoValue() {
+            return noValue;
+        }
+
+        public boolean isSingleValue() {
+            return singleValue;
+        }
+
+        public boolean isBetweenValue() {
+            return betweenValue;
+        }
+
+        public boolean isListValue() {
+            return listValue;
+        }
+
+        public String getTypeHandler() {
+            return typeHandler;
+        }
 
         protected Criterion(String condition) {
             super();
@@ -363,38 +455,6 @@ public class PathInfoDOExample {
 
         protected Criterion(String condition, Object value, Object secondValue) {
             this(condition, value, secondValue, null);
-        }
-
-        public String getCondition() {
-            return condition;
-        }
-
-        public Object getValue() {
-            return value;
-        }
-
-        public Object getSecondValue() {
-            return secondValue;
-        }
-
-        public boolean isNoValue() {
-            return noValue;
-        }
-
-        public boolean isSingleValue() {
-            return singleValue;
-        }
-
-        public boolean isBetweenValue() {
-            return betweenValue;
-        }
-
-        public boolean isListValue() {
-            return listValue;
-        }
-
-        public String getTypeHandler() {
-            return typeHandler;
         }
     }
 }

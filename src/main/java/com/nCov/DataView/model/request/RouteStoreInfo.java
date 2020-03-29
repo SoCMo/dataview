@@ -3,7 +3,7 @@ package com.nCov.DataView.model.request;
 import lombok.Data;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Min;
+import javax.validation.constraints.Size;
 import java.util.List;
 
 /**
@@ -14,7 +14,7 @@ import java.util.List;
  */
 @Data
 public class RouteStoreInfo {
-    @Min(value = 1, message = "至少应有一个路径")
     @Valid
+    @Size(min = 1, message = "至少应有一个路径")
     List<RouteListRequest> pathList;
 }

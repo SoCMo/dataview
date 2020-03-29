@@ -17,7 +17,7 @@ public class PassInfoDO {
 
     private String end;
 
-    private Integer title;
+    private String title;
 
     public Integer getId() {
         return id;
@@ -83,11 +83,11 @@ public class PassInfoDO {
         this.end = end == null ? null : end.trim();
     }
 
-    public Integer getTitle() {
+    public String getTitle() {
         return title;
     }
 
-    public void setTitle(Integer title) {
-        this.title = title;
+    public void setTitle(String title) {
+        this.title = title == null ? null : title.trim();
     }
 }
