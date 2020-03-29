@@ -423,6 +423,29 @@ public class EpidemicServiceImpl implements EpidemicService {
 
                 SumCalResponse sumCalResponse = new SumCalResponse();
                 sumCalResponse.setResultList(new ArrayList<>());
+                PathInfoDOExample pathInfoDOExample = new PathInfoDOExample();
+
+                int type = 0;
+                for (RouteCalRequest findMainType : routeListRequest.getRouteCalRequestList()) {
+                    if (findMainType.getType() > type) type = findMainType.getType();
+                }
+
+                pathInfoDOExample.createCriteria()
+                        .andStartEqualTo(routeListRequest.getRouteCalRequestList().get(0).getStartAdressZone())
+//                            .andEndEqualTo("上海大学宝山校区")
+                        .andMainTypeEqualTo(type);
+                List<PathInfoDO> pathInfoDOList = pathInfoDOMapper.selectByExample(pathInfoDOExample);
+
+                //查询是否已经存在
+                int exist = 1;
+                PathInfoDO pathInfoDO = new PathInfoDO();
+                if (pathInfoDOList.isEmpty()) {
+                    pathInfoDO.setStart(routeListRequest.getRouteCalRequestList().get(0).getStartAdressZone());
+                    pathInfoDO.setEnd("上海大学宝山校区");
+                    pathInfoDO.setMainType(type);
+                    exist = 0;
+                    pathInfoDOMapper.insertSelective(pathInfoDO);
+                }
 
                 int number = 0;
                 for (RouteCalRequest routeCalRequest : routeListRequest.getRouteCalRequestList()) {
@@ -475,40 +498,20 @@ public class EpidemicServiceImpl implements EpidemicService {
                     );
                     sumCalResponse.getResultList().add(routeCalReponse);
 
-                    int type = 0;
-                    for (RouteCalRequest findMainType : routeListRequest.getRouteCalRequestList()) {
-                        if (findMainType.getType() > type) type = findMainType.getType();
-                    }
-
-                    PathInfoDOExample pathInfoDOExample = new PathInfoDOExample();
-                    pathInfoDOExample.createCriteria()
-                            .andStartEqualTo(routeListRequest.getRouteCalRequestList().get(0).getStartAdressZone())
-//                            .andEndEqualTo("上海大学宝山校区")
-                            .andMainTypeEqualTo(type);
-                    List<PathInfoDO> pathInfoDOList = pathInfoDOMapper.selectByExample(pathInfoDOExample);
-
-                    PathInfoDO pathInfoDO = new PathInfoDO();
-                    if (pathInfoDOList.isEmpty()) {
-                        pathInfoDO.setStart(routeListRequest.getRouteCalRequestList().get(0).getStartAdressZone());
-                        pathInfoDO.setEnd("上海大学宝山校区");
-                        pathInfoDO.setMainType(type);
-                        pathInfoDOMapper.insertSelective(pathInfoDO);
-                    } else {
-                        pathInfoDO = pathInfoDOList.get(0);
-                    }
-
                     //准备插入数据
-                    for (String area : cityRequestList) {
-                        PassInfoDO passInfoDO = new PassInfoDO();
-                        passInfoDO.setPathId(pathInfoDO.getId());
-                        passInfoDO.setArea(area);
-                        passInfoDO.setType(routeCalRequest.getType());
-                        passInfoDO.setStart(routeCalRequest.getStart());
-                        passInfoDO.setEnd(routeCalRequest.getEnd());
-                        passInfoDO.setTitle(routeCalReponse.getTitle());
-                        passInfoDO.setOrder(number);
-                        passInfoDO.setDistance((int) routeCalRequest.getDistance());
-                        passInfoDOList.add(passInfoDO);
+                    if (exist == 0) {
+                        for (String area : cityRequestList) {
+                            PassInfoDO passInfoDO = new PassInfoDO();
+                            passInfoDO.setPathId(pathInfoDO.getId());
+                            passInfoDO.setArea(area);
+                            passInfoDO.setType(routeCalRequest.getType());
+                            passInfoDO.setStart(routeCalRequest.getStart());
+                            passInfoDO.setEnd(routeCalRequest.getEnd());
+                            passInfoDO.setTitle(routeCalReponse.getTitle());
+                            passInfoDO.setOrder(number);
+                            passInfoDO.setDistance((int) routeCalRequest.getDistance());
+                            passInfoDOList.add(passInfoDO);
+                        }
                     }
                     number++;
                 }
