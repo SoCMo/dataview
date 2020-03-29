@@ -71,7 +71,7 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, path_id, area, type, order, distance, start, end, title
+    id, path_id, area, `type`, `order`, distance, `start`, `end`, title
   </sql>
   <select id="selectByExample" resultMap="BaseResultMap"
           parameterType="com.nCov.DataView.model.entity.PassInfoDOExample">

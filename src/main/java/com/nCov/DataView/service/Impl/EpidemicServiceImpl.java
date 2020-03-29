@@ -622,22 +622,6 @@ public class EpidemicServiceImpl implements EpidemicService {
                                 return cityCal;
                             }).collect(Collectors.toList());
 
-                    //有城市未找到信息，进行错误处理
-                    if (cityCalList.size() < cityRequestList.size()) {
-                        StringBuilder stringBuilder = new StringBuilder("以下城市信息未找到");
-                        for (String str : cityRequestList) {
-                            int flag = 0;
-                            for (CityCal cityCal : cityCalList) {
-                                if (cityCal.getCityname().contains(fixTool.areaUni(str))) {
-                                    flag = 1;
-                                    break;
-                                }
-                            }
-                            if (flag == 0) stringBuilder.append(str).append(",");
-                        }
-                        throw new AllException(EmAllException.DATABASE_ERROR,
-                                stringBuilder.substring(0, stringBuilder.length() - 1));
-                    }
                     //赋值与计算
                     double time = routeCalRequest.getDistance() / 1000.0 / ConstCorrespond.SPEED[routeCalRequest.getType()];
                     BeanUtils.copyProperties(routeCalRequest, routeCalReponse);
