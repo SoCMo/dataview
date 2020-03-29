@@ -105,6 +105,13 @@ public class TimeTool {
         return calendarNow;
     }
 
+    /**
+     * @Description: 时单位转时分单位格式
+     * @Param: [hour]
+     * @return: java.lang.String
+     * @Author: SoCMo
+     * @Date: 2020/3/29
+     */
     public static String timeSlotToString(double hour) {
         return "" + (int) hour +
                 "时" +
