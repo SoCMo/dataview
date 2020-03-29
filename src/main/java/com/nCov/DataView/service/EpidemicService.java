@@ -5,6 +5,7 @@ import com.nCov.DataView.model.request.AllAreaRequest;
 import com.nCov.DataView.model.request.AreaInfoRequest;
 import com.nCov.DataView.model.request.RouteCalRequest;
 import com.nCov.DataView.model.response.Result;
+import com.nCov.DataView.model.response.info.SumCalResponse;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -73,5 +74,10 @@ public interface EpidemicService {
     public Result excelIn(MultipartFile file) throws AllException, IOException;
 
     public Result routeCal(List<RouteCalRequest> routeCalRequestList);
+
+
+    public SumCalResponse getRouteCal(List<RouteCalRequest> routeCalRequestList);
+
+    public Result test(Integer pathId);
 
 }

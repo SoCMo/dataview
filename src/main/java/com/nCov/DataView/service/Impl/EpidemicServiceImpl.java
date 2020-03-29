@@ -402,6 +402,297 @@ public class EpidemicServiceImpl implements EpidemicService {
         }
     }
 
+
+
+    /**
+     * @Description: 对数据库中所有数据进行回校评估，并返回
+     * @Param: []
+     * @return:
+     * @Author: pongshy
+     * @Date: 2020/3/29
+     */
+    @Override
+    public Result getAllRouteCal() {
+        List<SumCalResponse> responseList = new ArrayList<>();
+
+        List<PathInfoDO> pathInfoDOList = pathInfoDOMapper.selectByExample(null);
+        if (pathInfoDOList.size() == 0) {
+            return ResultTool.error(500, "暂无数据");
+        }
+
+        PassInfoDOExample passInfoDOExample = new PassInfoDOExample();
+        for (PathInfoDO pathInfoDO : pathInfoDOList) {
+            Integer pathId = pathInfoDO.getId();
+
+            //根据order字段进行去重
+            //List<PassInfoDO> passInfoDOS = passInfoDOMapper.selectByPathId(pathId);
+            List<PassInfoDO> orderList = passInfoDOMapper.selectByPathId(pathId);
+
+            List<RouteCalRequest> routeCalRequestList = new ArrayList<>();
+            for (PassInfoDO temp : orderList) {
+                PassInfoDOExample passInfoDOExample1 = new PassInfoDOExample();
+                passInfoDOExample1.createCriteria().andPathIdEqualTo(pathId).andOrderEqualTo(temp.getOrder());
+                List<PassInfoDO> passInfoDOS = passInfoDOMapper.selectByExample(passInfoDOExample1);
+                passInfoDOExample1.clear();
+
+                if (passInfoDOS.size() <= 0) {
+                    continue;
+                }
+                PassInfoDO passInfoDO = passInfoDOS.get(0);
+
+                RouteCalRequest routeCalRequest = new RouteCalRequest();
+
+                List<String> citys = new ArrayList<>();
+                for (PassInfoDO temp_city : passInfoDOS) {
+                    citys.add(temp_city.getArea());
+                }
+                routeCalRequest.setCitys(citys);
+                routeCalRequest.setDistance(passInfoDO.getDistance());
+                routeCalRequest.setType(passInfoDO.getType());
+                routeCalRequest.setTitle(passInfoDO.getTitle());
+                routeCalRequest.setStart(passInfoDO.getStart());
+                routeCalRequest.setEnd(passInfoDO.getEnd());
+
+                routeCalRequestList.add(routeCalRequest);
+            }
+
+            SumCalResponse sumCalResponse = getRouteCal(routeCalRequestList);
+            responseList.add(sumCalResponse);
+
+            passInfoDOExample.clear();
+        }
+
+        return ResultTool.success(responseList);
+    }
+
+    @Override
+    public SumCalResponse getRouteCal(List<RouteCalRequest> routeCalRequestList) {
+        try {
+            if (routeCalRequestList.isEmpty()) {
+                throw new AllException(EmAllException.DATABASE_ERROR, "参数不能为空");
+            }
+
+            List<RouteCalReponse> resultList = new ArrayList<>();
+            List<RouteCalDO> routeCalDOList = new ArrayList<>();
+            List<CovRankResponse> allAreaRequestList = allAreaCal(TimeTool.timeToDaySy(new Date()));
+            if (allAreaRequestList.isEmpty()) {
+                throw new AllException(EmAllException.DATABASE_ERROR, "无地区评估数据");
+            }
+
+            for (RouteCalRequest routeCalRequest : routeCalRequestList) {
+                RouteCalDOExample routeCalDataExample = new RouteCalDOExample();
+                Calendar calendarToday = TimeTool.todayCreate();
+                routeCalDataExample.createCriteria()
+                        .andTypeEqualTo(routeCalRequest.getType())
+                        .andStartEqualTo(routeCalRequest.getStart())
+                        .andEndEqualTo(routeCalRequest.getEnd());
+
+                List<RouteCalDO> routeCalDataList = routeCalDOMapper.selectByExample(routeCalDataExample);
+                if (routeCalDataList.size() > 1) {
+                    throw new AllException(EmAllException.DATABASE_ERROR, routeCalRequest.getStart() + "至" + routeCalRequest.getEnd() + ",交通方式为:" + ConstCorrespond.TRAN_TYPE[routeCalRequest.getType()] + ",时间为" + calendarToday.getTime());
+                }
+
+                //得到城市分数列表
+                List<String> cityRequestList = new ArrayList<>(new HashSet<String>(routeCalRequest.getCitys()));
+                List<CityCal> cityCalList = allAreaRequestList.stream()
+                        .filter(covRankResponse -> {
+                            for (String areaName : cityRequestList) {
+                                if (areaName.contains(covRankResponse.getName()))
+                                    return true;
+                            }
+                            return false;
+                        })
+                        .map(covRankResponse -> {
+                            CityCal cityCal = new CityCal();
+                            cityCal.setCityname(covRankResponse.getName());
+                            cityCal.setCityscore((int) covRankResponse.getSumScore());
+                            return cityCal;
+                        }).collect(Collectors.toList());
+
+                //有城市未找到信息，进行错误处理
+                if (cityCalList.size() < cityRequestList.size()) {
+                    StringBuilder stringBuilder = new StringBuilder("以下城市信息未找到");
+                    for (String str : cityRequestList) {
+                        int flag = 0;
+                        for (CityCal cityCal : cityCalList) {
+                            if (cityCal.getCityname().contains(fixTool.areaUni(str))) {
+                                flag = 1;
+                                break;
+                            }
+                        }
+                        if (flag == 0) stringBuilder.append(str).append(",");
+                    }
+                    throw new AllException(EmAllException.DATABASE_ERROR,
+                            stringBuilder.substring(0, stringBuilder.length() - 1));
+                }
+
+                //找到当前城市信息
+                if (routeCalDataList.size() == 1) {
+                    RouteCalReponse routeCalReponse = new RouteCalReponse();
+                    BeanUtils.copyProperties(routeCalRequest, routeCalReponse);
+                    routeCalReponse.setTime(routeCalDataList.get(0).getTime());
+                    routeCalReponse.setFinalscore(routeCalDataList.get(0).getScore());
+                    routeCalReponse.setCity(cityCalList);
+                    resultList.add(routeCalReponse);
+                } else if (routeCalDataList.isEmpty()) {
+                    RouteCalReponse routeCalReponse = new RouteCalReponse();
+                    RouteCalDO routeCalDO = new RouteCalDO();
+                    BeanUtils.copyProperties(routeCalRequest, routeCalReponse);
+                    BeanUtils.copyProperties(routeCalRequest, routeCalDO);
+                    DoubleSummaryStatistics sum = cityCalList.stream().mapToDouble(CityCal::getCityscore).summaryStatistics();
+
+                    //准备插入数据库的数据
+                    double time = routeCalRequest.getDistance() / 1000.0 / ConstCorrespond.SPEED[routeCalRequest.getType()];
+                    routeCalDO.setTime(TimeTool.timeSlotToString(time));
+                    routeCalDO.setDate(new Date());
+                    routeCalDO.setScore(
+                            (ConstCorrespond.ROUTE_WEIGHT[0] * ConstCorrespond.CROWD[routeCalRequest.getType()]
+                                    + ConstCorrespond.ROUTE_WEIGHT[1] * (time >= 24 ? 100 : (time / 24.0 * 100))
+                                    + ConstCorrespond.ROUTE_WEIGHT[2] * ConstCorrespond.CLEAN_SCORE[routeCalRequest.getType()]
+                                    + ConstCorrespond.ROUTE_WEIGHT[3] * sum.getAverage()) / 20.0
+                    );
+                    routeCalDO.setId(null);
+
+                    routeCalDOList.add(routeCalDO);
+                    routeCalReponse.setTime(routeCalDO.getTime());
+                    routeCalReponse.setFinalscore(routeCalDO.getScore());
+                    routeCalReponse.setCity(cityCalList);
+                    resultList.add(routeCalReponse);
+                }
+            }
+            if (!routeCalDOList.isEmpty()) {
+                routeCalDOMapper.insertList(routeCalDOList);
+            }
+
+            SumCalResponse sumCalResponse = new SumCalResponse();
+            sumCalResponse.setResultList(resultList);
+            sumCalResponse.setSumScore(NumberTool.doubleToStringWotH(resultList.stream().mapToDouble(RouteCalReponse::getFinalscore).average().getAsDouble()));
+            return sumCalResponse;
+        } catch (AllException e) {
+            log.error(e.getMsg());
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        }
+
+        return null;
+    }
+
+    //测试方法
+    @Override
+    public Result test(Integer pathId) {
+        List<PassInfoDO> passInfoDOS = passInfoDOMapper.selectByPathId(pathId);
+
+        return ResultTool.success(passInfoDOS);
+    }
+
+    /**
+     * @Description: 路径存储兼查询
+     * @Param: [routeCalRequestList]
+     * @return: com.nCov.DataView.model.response.Result
+     * @Author: SoCMo
+     * @Date: 2020/3/29
+     */
+    @Transactional
+    @Override
+    public Result routeStore(RouteStoreInfo routeStoreInfo) {
+        try {
+            //待返回的数据
+            PathResponse pathResponse = new PathResponse();
+            pathResponse.setSumCalResponseList(new ArrayList<>());
+
+            List<CovRankResponse> covRankResponseList = allAreaCal(TimeTool.timeToDaySy(new Date()));
+
+            //待插入的途径地区
+            List<PassInfoDO> passInfoDOList = new ArrayList<>();
+            for (RouteListRequest routeListRequest : routeStoreInfo.getPathList()) {
+                SumCalResponse sumCalResponse = new SumCalResponse();
+                sumCalResponse.setResultList(new ArrayList<>());
+
+                PathInfoDO pathInfoDO = new PathInfoDO();
+                pathInfoDO.setStart(routeListRequest.getRouteCalRequestList().get(0).getStart());
+                pathInfoDO.setEnd(routeListRequest.getRouteCalRequestList().get(0).getEnd());
+                pathInfoDOMapper.insertSelective(pathInfoDO);
+                int number = 0;
+                for (RouteCalRequest routeCalRequest : routeListRequest.getRouteCalRequestList()) {
+                    RouteCalReponse routeCalReponse = new RouteCalReponse();
+
+                    //算出总分
+                    //得到城市分数列表
+                    List<String> cityRequestList = new ArrayList<>(new HashSet<String>(routeCalRequest.getCitys()));
+                    List<CityCal> cityCalList = covRankResponseList.stream()
+                            .filter(covRankResponse -> {
+                                for (String areaName : cityRequestList) {
+                                    if (areaName.contains(covRankResponse.getName()))
+                                        return true;
+                                }
+                                return false;
+                            })
+                            .map(covRankResponse -> {
+                                CityCal cityCal = new CityCal();
+                                cityCal.setCityname(covRankResponse.getName());
+                                cityCal.setCityscore((int) covRankResponse.getSumScore());
+                                return cityCal;
+                            }).collect(Collectors.toList());
+
+                    //有城市未找到信息，进行错误处理
+                    if (cityCalList.size() < cityRequestList.size()) {
+                        StringBuilder stringBuilder = new StringBuilder("以下城市信息未找到");
+                        for (String str : cityRequestList) {
+                            int flag = 0;
+                            for (CityCal cityCal : cityCalList) {
+                                if (cityCal.getCityname().contains(fixTool.areaUni(str))) {
+                                    flag = 1;
+                                    break;
+                                }
+                            }
+                            if (flag == 0) stringBuilder.append(str).append(",");
+                        }
+                        throw new AllException(EmAllException.DATABASE_ERROR,
+                                stringBuilder.substring(0, stringBuilder.length() - 1));
+                    }
+                    //赋值与计算
+                    double time = routeCalRequest.getDistance() / 1000.0 / ConstCorrespond.SPEED[routeCalRequest.getType()];
+                    BeanUtils.copyProperties(routeCalRequest, routeCalReponse);
+                    routeCalReponse.setTime(TimeTool.timeSlotToString(time));
+                    routeCalReponse.setCity(cityCalList);
+                    routeCalReponse.setFinalscore(
+                            (ConstCorrespond.ROUTE_WEIGHT[0] * ConstCorrespond.CROWD[routeCalRequest.getType()]
+                                    + ConstCorrespond.ROUTE_WEIGHT[1] * (time >= 24 ? 100 : (time / 24.0 * 100))
+                                    + ConstCorrespond.ROUTE_WEIGHT[2] * ConstCorrespond.CLEAN_SCORE[routeCalRequest.getType()]
+                                    + ConstCorrespond.ROUTE_WEIGHT[3] * cityCalList.stream().mapToDouble(CityCal::getCityscore).average().getAsDouble()) / 20.0
+                    );
+                    sumCalResponse.getResultList().add(routeCalReponse);
+
+                    //准备插入数据
+                    for (String area : cityRequestList) {
+                        PassInfoDO passInfoDO = new PassInfoDO();
+                        passInfoDO.setPathId(pathInfoDO.getId());
+                        passInfoDO.setArea(area);
+                        passInfoDO.setType(routeCalRequest.getType());
+                        passInfoDO.setStart(routeCalRequest.getStart());
+                        passInfoDO.setEnd(routeCalRequest.getEnd());
+                        passInfoDO.setTitle(routeCalReponse.getTitle());
+                        passInfoDO.setOrder(number);
+                        passInfoDO.setDistance((int) routeCalRequest.getDistance());
+                        passInfoDOList.add(passInfoDO);
+                    }
+                    number++;
+                }
+                sumCalResponse.setSumScore(NumberTool.doubleToStringWotH(sumCalResponse.getResultList().stream().mapToDouble(RouteCalReponse::getFinalscore).average().getAsDouble()));
+                pathResponse.getSumCalResponseList().add(sumCalResponse);
+            }
+
+            passInfoDOMapper.insertList(passInfoDOList);
+            return ResultTool.success(pathResponse);
+        } catch (AllException e) {
+            log.error(e.getMsg());
+            return ResultTool.error(e.getErrCode(), e.getMsg());
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return ResultTool.error(500, e.getMessage());
+        }
+    }
+
     /**
      * @Description: 使用excel表格导入学生信息
      * @Param: [file]

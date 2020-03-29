@@ -1,5 +1,6 @@
 package com.nCov.DataView;
 
+import com.nCov.DataView.model.response.Result;
 import com.nCov.DataView.service.EpidemicService;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -14,6 +15,7 @@ class NCovApplicationTests {
 
     @Test
     void contextLoads() throws ParseException {
+        Result result = epidemicService.test(1);
 
     }
 
