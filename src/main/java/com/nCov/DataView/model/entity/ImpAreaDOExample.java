@@ -2,6 +2,7 @@ package com.nCov.DataView.model.entity;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 public class ImpAreaDOExample {
@@ -15,20 +16,20 @@ public class ImpAreaDOExample {
         oredCriteria = new ArrayList<Criteria>();
     }
 
-    public String getOrderByClause() {
-        return orderByClause;
-    }
-
     public void setOrderByClause(String orderByClause) {
         this.orderByClause = orderByClause;
     }
 
-    public boolean isDistinct() {
-        return distinct;
+    public String getOrderByClause() {
+        return orderByClause;
     }
 
     public void setDistinct(boolean distinct) {
         this.distinct = distinct;
+    }
+
+    public boolean isDistinct() {
+        return distinct;
     }
 
     public List<Criteria> getOredCriteria() {
@@ -103,6 +104,32 @@ public class ImpAreaDOExample {
                 throw new RuntimeException("Between values for " + property + " cannot be null");
             }
             criteria.add(new Criterion(condition, value1, value2));
+        }
+
+        protected void addCriterionForJDBCDate(String condition, Date value, String property) {
+            if (value == null) {
+                throw new RuntimeException("Value for " + property + " cannot be null");
+            }
+            addCriterion(condition, new java.sql.Date(value.getTime()), property);
+        }
+
+        protected void addCriterionForJDBCDate(String condition, List<Date> values, String property) {
+            if (values == null || values.size() == 0) {
+                throw new RuntimeException("Value list for " + property + " cannot be null or empty");
+            }
+            List<java.sql.Date> dateList = new ArrayList<java.sql.Date>();
+            Iterator<Date> iter = values.iterator();
+            while (iter.hasNext()) {
+                dateList.add(new java.sql.Date(iter.next().getTime()));
+            }
+            addCriterion(condition, dateList, property);
+        }
+
+        protected void addCriterionForJDBCDate(String condition, Date value1, Date value2, String property) {
+            if (value1 == null || value2 == null) {
+                throw new RuntimeException("Between values for " + property + " cannot be null");
+            }
+            addCriterion(condition, new java.sql.Date(value1.getTime()), new java.sql.Date(value2.getTime()), property);
         }
 
         public Criteria andIdIsNull() {
@@ -976,52 +1003,52 @@ public class ImpAreaDOExample {
         }
 
         public Criteria andDateEqualTo(Date value) {
-            addCriterion("date =", value, "date");
+            addCriterionForJDBCDate("date =", value, "date");
             return (Criteria) this;
         }
 
         public Criteria andDateNotEqualTo(Date value) {
-            addCriterion("date <>", value, "date");
+            addCriterionForJDBCDate("date <>", value, "date");
             return (Criteria) this;
         }
 
         public Criteria andDateGreaterThan(Date value) {
-            addCriterion("date >", value, "date");
+            addCriterionForJDBCDate("date >", value, "date");
             return (Criteria) this;
         }
 
         public Criteria andDateGreaterThanOrEqualTo(Date value) {
-            addCriterion("date >=", value, "date");
+            addCriterionForJDBCDate("date >=", value, "date");
             return (Criteria) this;
         }
 
         public Criteria andDateLessThan(Date value) {
-            addCriterion("date <", value, "date");
+            addCriterionForJDBCDate("date <", value, "date");
             return (Criteria) this;
         }
 
         public Criteria andDateLessThanOrEqualTo(Date value) {
-            addCriterion("date <=", value, "date");
+            addCriterionForJDBCDate("date <=", value, "date");
             return (Criteria) this;
         }
 
         public Criteria andDateIn(List<Date> values) {
-            addCriterion("date in", values, "date");
+            addCriterionForJDBCDate("date in", values, "date");
             return (Criteria) this;
         }
 
         public Criteria andDateNotIn(List<Date> values) {
-            addCriterion("date not in", values, "date");
+            addCriterionForJDBCDate("date not in", values, "date");
             return (Criteria) this;
         }
 
         public Criteria andDateBetween(Date value1, Date value2) {
-            addCriterion("date between", value1, value2, "date");
+            addCriterionForJDBCDate("date between", value1, value2, "date");
             return (Criteria) this;
         }
 
         public Criteria andDateNotBetween(Date value1, Date value2) {
-            addCriterion("date not between", value1, value2, "date");
+            addCriterionForJDBCDate("date not between", value1, value2, "date");
             return (Criteria) this;
         }
     }
@@ -1049,6 +1076,38 @@ public class ImpAreaDOExample {
         private boolean listValue;
 
         private String typeHandler;
+
+        public String getCondition() {
+            return condition;
+        }
+
+        public Object getValue() {
+            return value;
+        }
+
+        public Object getSecondValue() {
+            return secondValue;
+        }
+
+        public boolean isNoValue() {
+            return noValue;
+        }
+
+        public boolean isSingleValue() {
+            return singleValue;
+        }
+
+        public boolean isBetweenValue() {
+            return betweenValue;
+        }
+
+        public boolean isListValue() {
+            return listValue;
+        }
+
+        public String getTypeHandler() {
+            return typeHandler;
+        }
 
         protected Criterion(String condition) {
             super();
@@ -1084,38 +1143,6 @@ public class ImpAreaDOExample {
 
         protected Criterion(String condition, Object value, Object secondValue) {
             this(condition, value, secondValue, null);
-        }
-
-        public String getCondition() {
-            return condition;
-        }
-
-        public Object getValue() {
-            return value;
-        }
-
-        public Object getSecondValue() {
-            return secondValue;
-        }
-
-        public boolean isNoValue() {
-            return noValue;
-        }
-
-        public boolean isSingleValue() {
-            return singleValue;
-        }
-
-        public boolean isBetweenValue() {
-            return betweenValue;
-        }
-
-        public boolean isListValue() {
-            return listValue;
-        }
-
-        public String getTypeHandler() {
-            return typeHandler;
         }
     }
 }

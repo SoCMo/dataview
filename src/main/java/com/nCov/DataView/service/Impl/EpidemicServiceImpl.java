@@ -47,11 +47,11 @@ public class EpidemicServiceImpl implements EpidemicService {
 
     private StudentInformationDOMapper studentInformationDOMapper;
 
+    @Resource
     private RouteCalDOMapper routeCalDOMapper;
 
     @Resource
     private ImpAreaDOMapper impAreaDOMapper;
-
 
     @Resource
     private FixTool fixTool;
