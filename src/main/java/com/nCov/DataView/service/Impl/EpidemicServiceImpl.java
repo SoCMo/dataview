@@ -8,6 +8,7 @@ import com.nCov.DataView.model.entity.*;
 import com.nCov.DataView.model.request.AllAreaRequest;
 import com.nCov.DataView.model.request.AreaInfoRequest;
 import com.nCov.DataView.model.request.RouteCalRequest;
+import com.nCov.DataView.model.request.RouteStoreInfo;
 import com.nCov.DataView.model.response.Result;
 import com.nCov.DataView.model.response.info.*;
 import com.nCov.DataView.service.EpidemicService;
@@ -44,7 +45,6 @@ public class EpidemicServiceImpl implements EpidemicService {
     private CovDataMapper covDataMapper;
 
     @Resource
-
     private StudentInformationDOMapper studentInformationDOMapper;
 
     @Resource
@@ -55,6 +55,12 @@ public class EpidemicServiceImpl implements EpidemicService {
 
     @Resource
     private FixTool fixTool;
+
+    @Resource
+    private PassInfoDOMapper passInfoDOMapper;
+
+    @Resource
+    private PathInfoDOMapper pathInfoDOMapper;
 
     /**
      * @Description: 获取地区信息
@@ -392,6 +398,35 @@ public class EpidemicServiceImpl implements EpidemicService {
     }
 
     /**
+     * @Description: 路径存储兼查询
+     * @Param: [routeCalRequestList]
+     * @return: com.nCov.DataView.model.response.Result
+     * @Author: SoCMo
+     * @Date: 2020/3/29
+     */
+    @Override
+    public Result routeStore(RouteStoreInfo routeStoreInfo) {
+        try {
+            PathResponse pathResponse = new PathResponse();
+            pathResponse.setSumCalResponseList(new ArrayList<>());
+
+            List<PathInfoDO> pathInfoDOList = new ArrayList<>();
+            List<PassInfoDO> passInfoDOList = new ArrayList<>();
+
+
+            return ResultTool.success(pathResponse);
+        }
+//        catch (AllException e) {
+//            log.error(e.getMsg());
+//            return ResultTool.error(e.getErrCode(), e.getMsg());
+//        }
+        catch (Exception e) {
+            log.error(e.getMessage());
+            return ResultTool.error(500, e.getMessage());
+        }
+    }
+
+    /**
      * @Description: 使用excel表格导入学生信息
      * @Param: [file]
      * @return:
@@ -412,7 +447,7 @@ public class EpidemicServiceImpl implements EpidemicService {
         for (int i = 1; i <= sheet.getLastRowNum(); ++i) {
             Row row =sheet.getRow(i);
 
-            InformationInfo info = new InformationInfo();
+            StudentInfo info = new StudentInfo();
             info.setCountry(row.getCell(9).getStringCellValue());
             info.setProvince(row.getCell(10).getStringCellValue());
             info.setCity(row.getCell(11).getStringCellValue());
@@ -432,7 +467,6 @@ public class EpidemicServiceImpl implements EpidemicService {
             catch (Exception e) {
                 throw new AllException(EmAllException.DATABASE_ERROR);
             }
-
         }
 
         return ResultTool.success();
@@ -637,7 +671,6 @@ public class EpidemicServiceImpl implements EpidemicService {
             }
         }
         for (ImpAreaDO impAreaDO : impAreaDOList) {
-            impAreaDO.setId(null);
             impAreaDO.setDate(TimeTool.stringToDay(date));
         }
         impAreaDOMapper.insertList(impAreaDOList);

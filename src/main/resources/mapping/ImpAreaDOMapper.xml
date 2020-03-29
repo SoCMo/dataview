@@ -118,14 +118,14 @@
                order="AFTER">
       SELECT LAST_INSERT_ID()
     </selectKey>
-    insert into impArea (id, province_name, name,
+    insert into impArea (province_name, name,
     remain_confirm_rank, remain_count_rank, growth_rank,
     remain_confirm, remain_count, growth,
     remain_score, remain_count_score, growth_score,
     sum_score, allRank, date
     ) values
     <foreach collection="list" item="ImpAreaDO" index="index" separator=",">
-      (#{ImpAreaDO.id},
+      (
       #{ImpAreaDO.provinceName},
       #{ImpAreaDO.name},
       #{ImpAreaDO.remainConfirmRank},

@@ -1,4 +1,4 @@
-package com.nCov.DataView.model.response.info;
+package com.nCov.DataView.model.entity;
 
 import lombok.Data;
 
@@ -8,7 +8,7 @@ import lombok.Data;
  * @Date: 2020/3/28
  */
 @Data
-public class InformationInfo {
+public class StudentInfo {
     private String province;
 
     private String city;

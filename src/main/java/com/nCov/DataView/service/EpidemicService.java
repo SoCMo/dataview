@@ -4,6 +4,7 @@ import com.nCov.DataView.exception.AllException;
 import com.nCov.DataView.model.request.AllAreaRequest;
 import com.nCov.DataView.model.request.AreaInfoRequest;
 import com.nCov.DataView.model.request.RouteCalRequest;
+import com.nCov.DataView.model.request.RouteStoreInfo;
 import com.nCov.DataView.model.response.Result;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -70,4 +71,13 @@ public interface EpidemicService {
      * @Date: 2020/3/28
      */
     public Result routeCal(List<RouteCalRequest> routeCalRequestList);
+
+    /**
+     * @Description: 路径存储兼查询
+     * @Param: [routeCalRequestList]
+     * @return: com.nCov.DataView.model.response.Result
+     * @Author: SoCMo
+     * @Date: 2020/3/29
+     */
+    public Result routeStore(RouteStoreInfo routeStoreInfo);
 }

@@ -11,6 +11,8 @@ public class PassInfoDO {
 
     private Integer order;
 
+    private Integer distance;
+
     public Integer getId() {
         return id;
     }
@@ -49,5 +51,13 @@ public class PassInfoDO {
 
     public void setOrder(Integer order) {
         this.order = order;
+    }
+
+    public Integer getDistance() {
+        return distance;
+    }
+
+    public void setDistance(Integer distance) {
+        this.distance = distance;
     }
 }
