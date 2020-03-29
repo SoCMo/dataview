@@ -108,7 +108,8 @@
         values (#{id,jdbcType=INTEGER}, #{start,jdbcType=VARCHAR}, #{end,jdbcType=VARCHAR},
         #{mainType,jdbcType=INTEGER})
     </insert>
-    <insert id="insertSelective" parameterType="com.nCov.DataView.model.entity.PathInfoDO">
+    <insert id="insertSelective" parameterType="com.nCov.DataView.model.entity.PathInfoDO" useGeneratedKeys="true"
+            keyProperty="id">
         insert into pathInfo
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id != null">
