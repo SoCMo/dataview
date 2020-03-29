@@ -14,7 +14,7 @@ class NCovApplicationTests {
 
     @Test
     void contextLoads() throws ParseException {
-
+        epidemicService.getAllRouteCal();
     }
 
 }

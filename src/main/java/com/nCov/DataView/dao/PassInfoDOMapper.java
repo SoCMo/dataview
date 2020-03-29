@@ -30,4 +30,6 @@ public interface PassInfoDOMapper {
     int updateByPrimaryKey(PassInfoDO record);
 
     void insertList(List<PassInfoDO> passInfoDOList);
+
+    List<PassInfoDO> selectByPathId(Integer pathId);
 }

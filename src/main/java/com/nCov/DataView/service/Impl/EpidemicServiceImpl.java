@@ -416,25 +416,45 @@ public class EpidemicServiceImpl implements EpidemicService {
         for (PathInfoDO pathInfoDO : pathInfoDOList) {
             Integer pathId = pathInfoDO.getId();
 
-            passInfoDOExample.createCriteria().andPathIdEqualTo(pathId);
-            List<PassInfoDO>  passInfoDOS = passInfoDOMapper.selectByExample(passInfoDOExample);
-            passInfoDOExample.clear();
+            //根据order字段进行去重
+            //List<PassInfoDO> passInfoDOS = passInfoDOMapper.selectByPathId(pathId);
+            List<PassInfoDO> orderList = passInfoDOMapper.selectByPathId(pathId);
 
             List<RouteCalRequest> routeCalRequestList = new ArrayList<>();
-            for (PassInfoDO passInfoDO : passInfoDOS) {
+            for (PassInfoDO temp : orderList) {
+                PassInfoDOExample passInfoDOExample1 = new PassInfoDOExample();
+                passInfoDOExample1.createCriteria().andPathIdEqualTo(pathId).andOrderEqualTo(temp.getOrder());
+                List<PassInfoDO> passInfoDOS = passInfoDOMapper.selectByExample(passInfoDOExample1);
+                passInfoDOExample1.clear();
+
+                if (passInfoDOS.size() <= 0) {
+                    continue;
+                }
+                PassInfoDO passInfoDO = passInfoDOS.get(0);
+
                 RouteCalRequest routeCalRequest = new RouteCalRequest();
 
-                passInfoDOExample.createCriteria().andPathIdEqualTo(passInfoDO.getPathId()).andEndEqualTo(passInfoDO.getEnd()).andStartEqualTo(passInfoDO.getStart());
-                List<PassInfoDO> passInfo_area = passInfoDOMapper.selectByExample(passInfoDOExample);
-
+                List<String> citys = new ArrayList<>();
+                for (PassInfoDO temp_city : passInfoDOS) {
+                    citys.add(temp_city.getArea());
+                }
+                routeCalRequest.setCitys(citys);
                 routeCalRequest.setDistance(passInfoDO.getDistance());
                 routeCalRequest.setType(passInfoDO.getType());
+                routeCalRequest.setTitle(passInfoDO.getTitle());
+                routeCalRequest.setStart(passInfoDO.getStart());
+                routeCalRequest.setEnd(passInfoDO.getEnd());
 
+                routeCalRequestList.add(routeCalRequest);
             }
 
+            SumCalResponse sumCalResponse = getRouteCal(routeCalRequestList);
+            responseList.add(sumCalResponse);
 
             passInfoDOExample.clear();
         }
+
+        return ResultTool.success(responseList);
     }
 
     @Override
@@ -545,6 +565,8 @@ public class EpidemicServiceImpl implements EpidemicService {
         } catch (Exception e) {
             log.error(e.getMessage());
         }
+
+        return null;
     }
 
     /**
