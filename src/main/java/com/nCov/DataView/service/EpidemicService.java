@@ -6,6 +6,7 @@ import com.nCov.DataView.model.request.AreaInfoRequest;
 import com.nCov.DataView.model.request.RouteCalRequest;
 import com.nCov.DataView.model.request.RouteStoreInfo;
 import com.nCov.DataView.model.response.Result;
+import com.nCov.DataView.model.response.info.SumCalResponse;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -80,4 +81,15 @@ public interface EpidemicService {
      * @Date: 2020/3/29
      */
     public Result routeStore(RouteStoreInfo routeStoreInfo);
+
+    /**
+     * @Description: 对数据库中所有数据进行回校评估，并返回
+     * @Param: []
+     * @return: com.nCov.DataView.model.response.Result
+     * @Author: pongshy
+     * @Date: 2020/3/29
+     */
+    public Result getAllRouteCal();
+
+    public SumCalResponse getRouteCal(List<RouteCalRequest> routeCalRequestList);
 }

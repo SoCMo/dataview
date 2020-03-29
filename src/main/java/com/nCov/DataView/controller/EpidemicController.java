@@ -92,6 +92,20 @@ public class EpidemicController {
         return epidemicService.routeCal(RouteListRequest.getRouteCalRequestList());
     }
 
+    /**
+     * @Description: 对数据库中所有数据进行回校评估，并返回
+     * @Param: []
+     * @return: com.nCov.DataView.model.response.Result
+     * @Author: pongshy
+     * @Date: 2020/3/29
+     */
+    @GetMapping("/allRouteCal")
+    public Result allRouteCal() {
+
+        return epidemicService.getAllRouteCal();
+    }
+
+
 
     /**
      * @Description: 使用excel表格导入学生信息

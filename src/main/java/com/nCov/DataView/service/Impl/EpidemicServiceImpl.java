@@ -394,6 +394,159 @@ public class EpidemicServiceImpl implements EpidemicService {
         }
     }
 
+
+
+    /**
+     * @Description: 对数据库中所有数据进行回校评估，并返回
+     * @Param: []
+     * @return:
+     * @Author: pongshy
+     * @Date: 2020/3/29
+     */
+    @Override
+    public Result getAllRouteCal() {
+        List<SumCalResponse> responseList = new ArrayList<>();
+
+        List<PathInfoDO> pathInfoDOList = pathInfoDOMapper.selectByExample(null);
+        if (pathInfoDOList.size() == 0) {
+            return ResultTool.error(500, "暂无数据");
+        }
+
+        PassInfoDOExample passInfoDOExample = new PassInfoDOExample();
+        for (PathInfoDO pathInfoDO : pathInfoDOList) {
+            Integer pathId = pathInfoDO.getId();
+
+            passInfoDOExample.createCriteria().andPathIdEqualTo(pathId);
+            List<PassInfoDO>  passInfoDOS = passInfoDOMapper.selectByExample(passInfoDOExample);
+            passInfoDOExample.clear();
+
+            List<RouteCalRequest> routeCalRequestList = new ArrayList<>();
+            for (PassInfoDO passInfoDO : passInfoDOS) {
+                RouteCalRequest routeCalRequest = new RouteCalRequest();
+
+                passInfoDOExample.createCriteria().andPathIdEqualTo(passInfoDO.getPathId()).andEndEqualTo(passInfoDO.getEnd()).andStartEqualTo(passInfoDO.getStart());
+                List<PassInfoDO> passInfo_area = passInfoDOMapper.selectByExample(passInfoDOExample);
+
+                routeCalRequest.setDistance(passInfoDO.getDistance());
+                routeCalRequest.setType(passInfoDO.getType());
+
+            }
+
+
+            passInfoDOExample.clear();
+        }
+    }
+
+    @Override
+    public SumCalResponse getRouteCal(List<RouteCalRequest> routeCalRequestList) {
+        try {
+            if (routeCalRequestList.isEmpty()) {
+                throw new AllException(EmAllException.DATABASE_ERROR, "参数不能为空");
+            }
+
+            List<RouteCalReponse> resultList = new ArrayList<>();
+            List<RouteCalDO> routeCalDOList = new ArrayList<>();
+            List<CovRankResponse> allAreaRequestList = allAreaCal(TimeTool.timeToDaySy(new Date()));
+            if (allAreaRequestList.isEmpty()) {
+                throw new AllException(EmAllException.DATABASE_ERROR, "无地区评估数据");
+            }
+
+            for (RouteCalRequest routeCalRequest : routeCalRequestList) {
+                RouteCalDOExample routeCalDataExample = new RouteCalDOExample();
+                Calendar calendarToday = TimeTool.todayCreate();
+                routeCalDataExample.createCriteria()
+                        .andTypeEqualTo(routeCalRequest.getType())
+                        .andStartEqualTo(routeCalRequest.getStart())
+                        .andEndEqualTo(routeCalRequest.getEnd());
+
+                List<RouteCalDO> routeCalDataList = routeCalDOMapper.selectByExample(routeCalDataExample);
+                if (routeCalDataList.size() > 1) {
+                    throw new AllException(EmAllException.DATABASE_ERROR, routeCalRequest.getStart() + "至" + routeCalRequest.getEnd() + ",交通方式为:" + ConstCorrespond.TRAN_TYPE[routeCalRequest.getType()] + ",时间为" + calendarToday.getTime());
+                }
+
+                //得到城市分数列表
+                List<String> cityRequestList = new ArrayList<>(new HashSet<String>(routeCalRequest.getCitys()));
+                List<CityCal> cityCalList = allAreaRequestList.stream()
+                        .filter(covRankResponse -> {
+                            for (String areaName : cityRequestList) {
+                                if (areaName.contains(covRankResponse.getName()))
+                                    return true;
+                            }
+                            return false;
+                        })
+                        .map(covRankResponse -> {
+                            CityCal cityCal = new CityCal();
+                            cityCal.setCityname(covRankResponse.getName());
+                            cityCal.setCityscore((int) covRankResponse.getSumScore());
+                            return cityCal;
+                        }).collect(Collectors.toList());
+
+                //有城市未找到信息，进行错误处理
+                if (cityCalList.size() < cityRequestList.size()) {
+                    StringBuilder stringBuilder = new StringBuilder("以下城市信息未找到");
+                    for (String str : cityRequestList) {
+                        int flag = 0;
+                        for (CityCal cityCal : cityCalList) {
+                            if (cityCal.getCityname().contains(fixTool.areaUni(str))) {
+                                flag = 1;
+                                break;
+                            }
+                        }
+                        if (flag == 0) stringBuilder.append(str).append(",");
+                    }
+                    throw new AllException(EmAllException.DATABASE_ERROR,
+                            stringBuilder.substring(0, stringBuilder.length() - 1));
+                }
+
+                //找到当前城市信息
+                if (routeCalDataList.size() == 1) {
+                    RouteCalReponse routeCalReponse = new RouteCalReponse();
+                    BeanUtils.copyProperties(routeCalRequest, routeCalReponse);
+                    routeCalReponse.setTime(routeCalDataList.get(0).getTime());
+                    routeCalReponse.setFinalscore(routeCalDataList.get(0).getScore());
+                    routeCalReponse.setCity(cityCalList);
+                    resultList.add(routeCalReponse);
+                } else if (routeCalDataList.isEmpty()) {
+                    RouteCalReponse routeCalReponse = new RouteCalReponse();
+                    RouteCalDO routeCalDO = new RouteCalDO();
+                    BeanUtils.copyProperties(routeCalRequest, routeCalReponse);
+                    BeanUtils.copyProperties(routeCalRequest, routeCalDO);
+                    DoubleSummaryStatistics sum = cityCalList.stream().mapToDouble(CityCal::getCityscore).summaryStatistics();
+
+                    //准备插入数据库的数据
+                    double time = routeCalRequest.getDistance() / 1000.0 / ConstCorrespond.SPEED[routeCalRequest.getType()];
+                    routeCalDO.setTime(TimeTool.timeSlotToString(time));
+                    routeCalDO.setDate(new Date());
+                    routeCalDO.setScore(
+                            (ConstCorrespond.ROUTE_WEIGHT[0] * ConstCorrespond.CROWD[routeCalRequest.getType()]
+                                    + ConstCorrespond.ROUTE_WEIGHT[1] * (time >= 24 ? 100 : (time / 24.0 * 100))
+                                    + ConstCorrespond.ROUTE_WEIGHT[2] * ConstCorrespond.CLEAN_SCORE[routeCalRequest.getType()]
+                                    + ConstCorrespond.ROUTE_WEIGHT[3] * sum.getAverage()) / 20.0
+                    );
+                    routeCalDO.setId(null);
+
+                    routeCalDOList.add(routeCalDO);
+                    routeCalReponse.setTime(routeCalDO.getTime());
+                    routeCalReponse.setFinalscore(routeCalDO.getScore());
+                    routeCalReponse.setCity(cityCalList);
+                    resultList.add(routeCalReponse);
+                }
+            }
+            if (!routeCalDOList.isEmpty()) {
+                routeCalDOMapper.insertList(routeCalDOList);
+            }
+
+            SumCalResponse sumCalResponse = new SumCalResponse();
+            sumCalResponse.setResultList(resultList);
+            sumCalResponse.setSumScore(NumberTool.doubleToStringWotH(resultList.stream().mapToDouble(RouteCalReponse::getFinalscore).average().getAsDouble()));
+            return sumCalResponse;
+        } catch (AllException e) {
+            log.error(e.getMsg());
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        }
+    }
+
     /**
      * @Description: 路径存储兼查询
      * @Param: [routeCalRequestList]
@@ -492,7 +645,7 @@ public class EpidemicServiceImpl implements EpidemicService {
     /**
      * @Description: 使用excel表格导入学生信息
      * @Param: [file]
-     * @return:
+     * @return: com.nCov.DataView.model.response.Result
      * @Author: pongshy
      * @Date: 2020/3/28
      */
