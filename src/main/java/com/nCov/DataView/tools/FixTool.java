@@ -116,8 +116,7 @@ public class FixTool {
                 JSONArray cityArray = jsonObject.getJSONArray("citys");
                 if (jsonObject.getString("countryName").equals("中国") && !cityArray.isEmpty() && TimeTool.timeToDaySy(jsonObject.getDate("updateTime")).equals(TimeTool.timeToDaySy(TimeTool.todayCreate().getTime()))) {
                     for (int j = 0; j < jsonArray.size(); j++) {
-                        JSONObject city = cityArray.getJSONObject(j);
-
+                        //TODO 数据获取
                     }
                 }
             }

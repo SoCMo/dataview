@@ -14,20 +14,20 @@ public class PassInfoDOExample {
         oredCriteria = new ArrayList<Criteria>();
     }
 
-    public String getOrderByClause() {
-        return orderByClause;
-    }
-
     public void setOrderByClause(String orderByClause) {
         this.orderByClause = orderByClause;
     }
 
-    public boolean isDistinct() {
-        return distinct;
+    public String getOrderByClause() {
+        return orderByClause;
     }
 
     public void setDistinct(boolean distinct) {
         this.distinct = distinct;
+    }
+
+    public boolean isDistinct() {
+        return distinct;
     }
 
     public List<Criteria> getOredCriteria() {
@@ -164,63 +164,63 @@ public class PassInfoDOExample {
             return (Criteria) this;
         }
 
-        public Criteria andPathidIsNull() {
-            addCriterion("pathId is null");
+        public Criteria andPathIdIsNull() {
+            addCriterion("path_id is null");
             return (Criteria) this;
         }
 
-        public Criteria andPathidIsNotNull() {
-            addCriterion("pathId is not null");
+        public Criteria andPathIdIsNotNull() {
+            addCriterion("path_id is not null");
             return (Criteria) this;
         }
 
-        public Criteria andPathidEqualTo(Integer value) {
-            addCriterion("pathId =", value, "pathid");
+        public Criteria andPathIdEqualTo(Integer value) {
+            addCriterion("path_id =", value, "pathId");
             return (Criteria) this;
         }
 
-        public Criteria andPathidNotEqualTo(Integer value) {
-            addCriterion("pathId <>", value, "pathid");
+        public Criteria andPathIdNotEqualTo(Integer value) {
+            addCriterion("path_id <>", value, "pathId");
             return (Criteria) this;
         }
 
-        public Criteria andPathidGreaterThan(Integer value) {
-            addCriterion("pathId >", value, "pathid");
+        public Criteria andPathIdGreaterThan(Integer value) {
+            addCriterion("path_id >", value, "pathId");
             return (Criteria) this;
         }
 
-        public Criteria andPathidGreaterThanOrEqualTo(Integer value) {
-            addCriterion("pathId >=", value, "pathid");
+        public Criteria andPathIdGreaterThanOrEqualTo(Integer value) {
+            addCriterion("path_id >=", value, "pathId");
             return (Criteria) this;
         }
 
-        public Criteria andPathidLessThan(Integer value) {
-            addCriterion("pathId <", value, "pathid");
+        public Criteria andPathIdLessThan(Integer value) {
+            addCriterion("path_id <", value, "pathId");
             return (Criteria) this;
         }
 
-        public Criteria andPathidLessThanOrEqualTo(Integer value) {
-            addCriterion("pathId <=", value, "pathid");
+        public Criteria andPathIdLessThanOrEqualTo(Integer value) {
+            addCriterion("path_id <=", value, "pathId");
             return (Criteria) this;
         }
 
-        public Criteria andPathidIn(List<Integer> values) {
-            addCriterion("pathId in", values, "pathid");
+        public Criteria andPathIdIn(List<Integer> values) {
+            addCriterion("path_id in", values, "pathId");
             return (Criteria) this;
         }
 
-        public Criteria andPathidNotIn(List<Integer> values) {
-            addCriterion("pathId not in", values, "pathid");
+        public Criteria andPathIdNotIn(List<Integer> values) {
+            addCriterion("path_id not in", values, "pathId");
             return (Criteria) this;
         }
 
-        public Criteria andPathidBetween(Integer value1, Integer value2) {
-            addCriterion("pathId between", value1, value2, "pathid");
+        public Criteria andPathIdBetween(Integer value1, Integer value2) {
+            addCriterion("path_id between", value1, value2, "pathId");
             return (Criteria) this;
         }
 
-        public Criteria andPathidNotBetween(Integer value1, Integer value2) {
-            addCriterion("pathId not between", value1, value2, "pathid");
+        public Criteria andPathIdNotBetween(Integer value1, Integer value2) {
+            addCriterion("path_id not between", value1, value2, "pathId");
             return (Criteria) this;
         }
 
@@ -293,6 +293,126 @@ public class PassInfoDOExample {
             addCriterion("area not between", value1, value2, "area");
             return (Criteria) this;
         }
+
+        public Criteria andTypeIsNull() {
+            addCriterion("type is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andTypeIsNotNull() {
+            addCriterion("type is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andTypeEqualTo(Integer value) {
+            addCriterion("type =", value, "type");
+            return (Criteria) this;
+        }
+
+        public Criteria andTypeNotEqualTo(Integer value) {
+            addCriterion("type <>", value, "type");
+            return (Criteria) this;
+        }
+
+        public Criteria andTypeGreaterThan(Integer value) {
+            addCriterion("type >", value, "type");
+            return (Criteria) this;
+        }
+
+        public Criteria andTypeGreaterThanOrEqualTo(Integer value) {
+            addCriterion("type >=", value, "type");
+            return (Criteria) this;
+        }
+
+        public Criteria andTypeLessThan(Integer value) {
+            addCriterion("type <", value, "type");
+            return (Criteria) this;
+        }
+
+        public Criteria andTypeLessThanOrEqualTo(Integer value) {
+            addCriterion("type <=", value, "type");
+            return (Criteria) this;
+        }
+
+        public Criteria andTypeIn(List<Integer> values) {
+            addCriterion("type in", values, "type");
+            return (Criteria) this;
+        }
+
+        public Criteria andTypeNotIn(List<Integer> values) {
+            addCriterion("type not in", values, "type");
+            return (Criteria) this;
+        }
+
+        public Criteria andTypeBetween(Integer value1, Integer value2) {
+            addCriterion("type between", value1, value2, "type");
+            return (Criteria) this;
+        }
+
+        public Criteria andTypeNotBetween(Integer value1, Integer value2) {
+            addCriterion("type not between", value1, value2, "type");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrderIsNull() {
+            addCriterion("order is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrderIsNotNull() {
+            addCriterion("order is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrderEqualTo(Integer value) {
+            addCriterion("order =", value, "order");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrderNotEqualTo(Integer value) {
+            addCriterion("order <>", value, "order");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrderGreaterThan(Integer value) {
+            addCriterion("order >", value, "order");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrderGreaterThanOrEqualTo(Integer value) {
+            addCriterion("order >=", value, "order");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrderLessThan(Integer value) {
+            addCriterion("order <", value, "order");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrderLessThanOrEqualTo(Integer value) {
+            addCriterion("order <=", value, "order");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrderIn(List<Integer> values) {
+            addCriterion("order in", values, "order");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrderNotIn(List<Integer> values) {
+            addCriterion("order not in", values, "order");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrderBetween(Integer value1, Integer value2) {
+            addCriterion("order between", value1, value2, "order");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrderNotBetween(Integer value1, Integer value2) {
+            addCriterion("order not between", value1, value2, "order");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {
@@ -318,6 +438,38 @@ public class PassInfoDOExample {
         private boolean listValue;
 
         private String typeHandler;
+
+        public String getCondition() {
+            return condition;
+        }
+
+        public Object getValue() {
+            return value;
+        }
+
+        public Object getSecondValue() {
+            return secondValue;
+        }
+
+        public boolean isNoValue() {
+            return noValue;
+        }
+
+        public boolean isSingleValue() {
+            return singleValue;
+        }
+
+        public boolean isBetweenValue() {
+            return betweenValue;
+        }
+
+        public boolean isListValue() {
+            return listValue;
+        }
+
+        public String getTypeHandler() {
+            return typeHandler;
+        }
 
         protected Criterion(String condition) {
             super();
@@ -353,38 +505,6 @@ public class PassInfoDOExample {
 
         protected Criterion(String condition, Object value, Object secondValue) {
             this(condition, value, secondValue, null);
-        }
-
-        public String getCondition() {
-            return condition;
-        }
-
-        public Object getValue() {
-            return value;
-        }
-
-        public Object getSecondValue() {
-            return secondValue;
-        }
-
-        public boolean isNoValue() {
-            return noValue;
-        }
-
-        public boolean isSingleValue() {
-            return singleValue;
-        }
-
-        public boolean isBetweenValue() {
-            return betweenValue;
-        }
-
-        public boolean isListValue() {
-            return listValue;
-        }
-
-        public String getTypeHandler() {
-            return typeHandler;
         }
     }
 }

@@ -1,263 +1,261 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.nCov.DataView.dao.RouteCalDOMapper">
-    <resultMap id="BaseResultMap" type="com.nCov.DataView.model.entity.RouteCalDO">
-        <id column="id" property="id" jdbcType="INTEGER"/>
-        <result column="start" property="start" jdbcType="VARCHAR"/>
-        <result column="end" property="end" jdbcType="VARCHAR"/>
-        <result column="type" property="type" jdbcType="INTEGER"/>
-        <result column="score" property="score" jdbcType="DOUBLE"/>
-        <result column="date" property="date" jdbcType="TIMESTAMP"/>
-        <result column="time" property="time" jdbcType="VARCHAR"/>
-    </resultMap>
-    <sql id="Example_Where_Clause">
-        <where>
-            <foreach collection="oredCriteria" item="criteria" separator="or">
-                <if test="criteria.valid">
-                    <trim prefix="(" suffix=")" prefixOverrides="and">
-                        <foreach collection="criteria.criteria" item="criterion">
-                            <choose>
-                                <when test="criterion.noValue">
-                                    and ${criterion.condition}
-                                </when>
-                                <when test="criterion.singleValue">
-                                    and ${criterion.condition} #{criterion.value}
-                                </when>
-                                <when test="criterion.betweenValue">
-                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
-                                </when>
-                                <when test="criterion.listValue">
-                                    and ${criterion.condition}
-                                    <foreach collection="criterion.value" item="listItem" open="(" close=")"
-                                             separator=",">
-                                        #{listItem}
-                                    </foreach>
-                                </when>
-                            </choose>
-                        </foreach>
-                    </trim>
-                </if>
+  <resultMap id="BaseResultMap" type="com.nCov.DataView.model.entity.RouteCalDO">
+    <id column="id" property="id" jdbcType="INTEGER"/>
+    <result column="start" property="start" jdbcType="VARCHAR"/>
+    <result column="end" property="end" jdbcType="VARCHAR"/>
+    <result column="type" property="type" jdbcType="INTEGER"/>
+    <result column="score" property="score" jdbcType="DOUBLE"/>
+    <result column="date" property="date" jdbcType="DATE"/>
+    <result column="time" property="time" jdbcType="VARCHAR"/>
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" suffix=")" prefixOverrides="and">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
             </foreach>
-        </where>
-    </sql>
-    <sql id="Update_By_Example_Where_Clause">
-        <where>
-            <foreach collection="example.oredCriteria" item="criteria" separator="or">
-                <if test="criteria.valid">
-                    <trim prefix="(" suffix=")" prefixOverrides="and">
-                        <foreach collection="criteria.criteria" item="criterion">
-                            <choose>
-                                <when test="criterion.noValue">
-                                    and ${criterion.condition}
-                                </when>
-                                <when test="criterion.singleValue">
-                                    and ${criterion.condition} #{criterion.value}
-                                </when>
-                                <when test="criterion.betweenValue">
-                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
-                                </when>
-                                <when test="criterion.listValue">
-                                    and ${criterion.condition}
-                                    <foreach collection="criterion.value" item="listItem" open="(" close=")"
-                                             separator=",">
-                                        #{listItem}
-                                    </foreach>
-                                </when>
-                            </choose>
-                        </foreach>
-                    </trim>
-                </if>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" suffix=")" prefixOverrides="and">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
             </foreach>
-        </where>
-    </sql>
-    <sql id="Base_Column_List">
-        id, start, end, type, score, date, time
-    </sql>
-    <select id="selectByExample" resultMap="BaseResultMap"
-            parameterType="com.nCov.DataView.model.entity.RouteCalDOExample">
-        select
-        <if test="distinct">
-            distinct
+          </trim>
         </if>
-        'true' as QUERYID,
-        <include refid="Base_Column_List"/>
-        from routeCal
-        <if test="_parameter != null">
-            <include refid="Example_Where_Clause"/>
-        </if>
-        <if test="orderByClause != null">
-            order by ${orderByClause}
-        </if>
-    </select>
-    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer">
-        select
-        <include refid="Base_Column_List"/>
-        from routeCal
-        where id = #{id,jdbcType=INTEGER}
-    </select>
-    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
-        delete from routeCal
-        where id = #{id,jdbcType=INTEGER}
-    </delete>
-    <delete id="deleteByExample" parameterType="com.nCov.DataView.model.entity.RouteCalDOExample">
-        delete from routeCal
-        <if test="_parameter != null">
-            <include refid="Example_Where_Clause"/>
-        </if>
-    </delete>
-    <insert id="insertList" parameterType="java.util.List">
-        insert into routeCal (start, end,
-        type, score, date,
-        time) values
-        <foreach collection="list" item="routeCalDO" index="index" separator=",">
-            (
-            #{routeCalDO.start},
-            #{routeCalDO.end},
-            #{routeCalDO.type},
-            #{routeCalDO.score},
-            #{routeCalDO.date},
-            #{routeCalDO.time}
-            )
-        </foreach>
-    </insert>
-    <insert id="insert" parameterType="com.nCov.DataView.model.entity.RouteCalDO">
-        insert into routeCal (id, start, end,
-        type, score, date,
-        time)
-        values (#{id,jdbcType=INTEGER}, #{start,jdbcType=VARCHAR}, #{end,jdbcType=VARCHAR},
-        #{type,jdbcType=INTEGER}, #{score,jdbcType=DOUBLE}, #{date,jdbcType=TIMESTAMP},
-        #{time,jdbcType=VARCHAR})
-    </insert>
-    <insert id="insertSelective" parameterType="com.nCov.DataView.model.entity.RouteCalDO">
-        insert into routeCal
-        <trim prefix="(" suffix=")" suffixOverrides=",">
-            <if test="id != null">
-                id,
-            </if>
-            <if test="start != null">
-                start,
-            </if>
-            <if test="end != null">
-                end,
-            </if>
-            <if test="type != null">
-                type,
-            </if>
-            <if test="score != null">
-                score,
-            </if>
-            <if test="date != null">
-                date,
-            </if>
-            <if test="time != null">
-                time,
-            </if>
-        </trim>
-        <trim prefix="values (" suffix=")" suffixOverrides=",">
-            <if test="id != null">
-                #{id,jdbcType=INTEGER},
-            </if>
-            <if test="start != null">
-                #{start,jdbcType=VARCHAR},
-            </if>
-            <if test="end != null">
-                #{end,jdbcType=VARCHAR},
-            </if>
-            <if test="type != null">
-                #{type,jdbcType=INTEGER},
-            </if>
-            <if test="score != null">
-                #{score,jdbcType=DOUBLE},
-            </if>
-            <if test="date != null">
-                #{date,jdbcType=TIMESTAMP},
-            </if>
-            <if test="time != null">
-                #{time,jdbcType=VARCHAR},
-            </if>
-        </trim>
-    </insert>
-    <select id="countByExample" parameterType="com.nCov.DataView.model.entity.RouteCalDOExample"
-            resultType="java.lang.Integer">
-        select count(*) from routeCal
-        <if test="_parameter != null">
-            <include refid="Example_Where_Clause"/>
-        </if>
-    </select>
-    <update id="updateByExampleSelective" parameterType="map">
-        update routeCal
-        <set>
-            <if test="record.id != null">
-                id = #{record.id,jdbcType=INTEGER},
-            </if>
-            <if test="record.start != null">
-                start = #{record.start,jdbcType=VARCHAR},
-            </if>
-            <if test="record.end != null">
-                end = #{record.end,jdbcType=VARCHAR},
-            </if>
-            <if test="record.type != null">
-                type = #{record.type,jdbcType=INTEGER},
-            </if>
-            <if test="record.score != null">
-                score = #{record.score,jdbcType=DOUBLE},
-            </if>
-            <if test="record.date != null">
-                date = #{record.date,jdbcType=TIMESTAMP},
-            </if>
-            <if test="record.time != null">
-                time = #{record.time,jdbcType=VARCHAR},
-            </if>
-        </set>
-        <if test="_parameter != null">
-            <include refid="Update_By_Example_Where_Clause"/>
-        </if>
-    </update>
-    <update id="updateByExample" parameterType="map">
-        update routeCal
-        set id = #{record.id,jdbcType=INTEGER},
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    id, start, end, type, score, date, time
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap"
+          parameterType="com.nCov.DataView.model.entity.RouteCalDOExample">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    'true' as QUERYID,
+    <include refid="Base_Column_List"/>
+    from routeCal
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause"/>
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+    select
+    <include refid="Base_Column_List"/>
+    from routeCal
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from routeCal
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.nCov.DataView.model.entity.RouteCalDOExample">
+    delete from routeCal
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause"/>
+    </if>
+  </delete>
+  <insert id="insertList" parameterType="java.util.List">
+    insert into routeCal (start, end,
+    type, score, date,
+    time) values
+    <foreach collection="list" item="routeCalDO" index="index" separator=",">
+      (
+      #{routeCalDO.start},
+      #{routeCalDO.end},
+      #{routeCalDO.type},
+      #{routeCalDO.score},
+      #{routeCalDO.date},
+      #{routeCalDO.time}
+      )
+    </foreach>
+  </insert>
+  <insert id="insert" parameterType="com.nCov.DataView.model.entity.RouteCalDO">
+    insert into routeCal (id, start, end,
+    type, score, date, time
+    )
+    values (#{id,jdbcType=INTEGER}, #{start,jdbcType=VARCHAR}, #{end,jdbcType=VARCHAR},
+    #{type,jdbcType=INTEGER}, #{score,jdbcType=DOUBLE}, #{date,jdbcType=DATE}, #{time,jdbcType=VARCHAR}
+    )
+  </insert>
+  <insert id="insertSelective" parameterType="com.nCov.DataView.model.entity.RouteCalDO">
+    insert into routeCal
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="start != null">
+        start,
+      </if>
+      <if test="end != null">
+        end,
+      </if>
+      <if test="type != null">
+        type,
+      </if>
+      <if test="score != null">
+        score,
+      </if>
+      <if test="date != null">
+        date,
+      </if>
+      <if test="time != null">
+        time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="start != null">
+        #{start,jdbcType=VARCHAR},
+      </if>
+      <if test="end != null">
+        #{end,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null">
+        #{type,jdbcType=INTEGER},
+      </if>
+      <if test="score != null">
+        #{score,jdbcType=DOUBLE},
+      </if>
+      <if test="date != null">
+        #{date,jdbcType=DATE},
+      </if>
+      <if test="time != null">
+        #{time,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.nCov.DataView.model.entity.RouteCalDOExample"
+          resultType="java.lang.Integer">
+    select count(*) from routeCal
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause"/>
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    update routeCal
+    <set>
+      <if test="record.id != null">
+        id = #{record.id,jdbcType=INTEGER},
+      </if>
+      <if test="record.start != null">
         start = #{record.start,jdbcType=VARCHAR},
+      </if>
+      <if test="record.end != null">
         end = #{record.end,jdbcType=VARCHAR},
+      </if>
+      <if test="record.type != null">
         type = #{record.type,jdbcType=INTEGER},
+      </if>
+      <if test="record.score != null">
         score = #{record.score,jdbcType=DOUBLE},
-        date = #{record.date,jdbcType=TIMESTAMP},
-        time = #{record.time,jdbcType=VARCHAR}
-        <if test="_parameter != null">
-            <include refid="Update_By_Example_Where_Clause"/>
-        </if>
-    </update>
-    <update id="updateByPrimaryKeySelective" parameterType="com.nCov.DataView.model.entity.RouteCalDO">
-        update routeCal
-        <set>
-            <if test="start != null">
-                start = #{start,jdbcType=VARCHAR},
-            </if>
-            <if test="end != null">
-                end = #{end,jdbcType=VARCHAR},
-            </if>
-            <if test="type != null">
-                type = #{type,jdbcType=INTEGER},
-            </if>
-            <if test="score != null">
-                score = #{score,jdbcType=DOUBLE},
-            </if>
-            <if test="date != null">
-                date = #{date,jdbcType=TIMESTAMP},
-            </if>
-            <if test="time != null">
-                time = #{time,jdbcType=VARCHAR},
-            </if>
-        </set>
-        where id = #{id,jdbcType=INTEGER}
-    </update>
-    <update id="updateByPrimaryKey" parameterType="com.nCov.DataView.model.entity.RouteCalDO">
-        update routeCal
-        set start = #{start,jdbcType=VARCHAR},
+      </if>
+      <if test="record.date != null">
+        date = #{record.date,jdbcType=DATE},
+      </if>
+      <if test="record.time != null">
+        time = #{record.time,jdbcType=VARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause"/>
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update routeCal
+    set id = #{record.id,jdbcType=INTEGER},
+    start = #{record.start,jdbcType=VARCHAR},
+    end = #{record.end,jdbcType=VARCHAR},
+    type = #{record.type,jdbcType=INTEGER},
+    score = #{record.score,jdbcType=DOUBLE},
+    date = #{record.date,jdbcType=DATE},
+    time = #{record.time,jdbcType=VARCHAR}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause"/>
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.nCov.DataView.model.entity.RouteCalDO">
+    update routeCal
+    <set>
+      <if test="start != null">
+        start = #{start,jdbcType=VARCHAR},
+      </if>
+      <if test="end != null">
         end = #{end,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null">
         type = #{type,jdbcType=INTEGER},
+      </if>
+      <if test="score != null">
         score = #{score,jdbcType=DOUBLE},
-        date = #{date,jdbcType=TIMESTAMP},
-        time = #{time,jdbcType=VARCHAR}
-        where id = #{id,jdbcType=INTEGER}
-    </update>
+      </if>
+      <if test="date != null">
+        date = #{date,jdbcType=DATE},
+      </if>
+      <if test="time != null">
+        time = #{time,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.nCov.DataView.model.entity.RouteCalDO">
+    update routeCal
+    set start = #{start,jdbcType=VARCHAR},
+    end = #{end,jdbcType=VARCHAR},
+    type = #{type,jdbcType=INTEGER},
+    score = #{score,jdbcType=DOUBLE},
+    date = #{date,jdbcType=DATE},
+    time = #{time,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
 </mapper>

@@ -3,8 +3,10 @@
 <mapper namespace="com.nCov.DataView.dao.PassInfoDOMapper">
     <resultMap id="BaseResultMap" type="com.nCov.DataView.model.entity.PassInfoDO">
         <id column="id" property="id" jdbcType="INTEGER"/>
-        <result column="pathId" property="pathid" jdbcType="INTEGER"/>
+        <result column="path_id" property="pathId" jdbcType="INTEGER"/>
         <result column="area" property="area" jdbcType="VARCHAR"/>
+        <result column="type" property="type" jdbcType="INTEGER"/>
+        <result column="order" property="order" jdbcType="INTEGER"/>
     </resultMap>
     <sql id="Example_Where_Clause">
         <where>
@@ -67,7 +69,7 @@
         </where>
     </sql>
     <sql id="Base_Column_List">
-        id, pathId, area
+        id, path_id, area, type, order
     </sql>
     <select id="selectByExample" resultMap="BaseResultMap"
             parameterType="com.nCov.DataView.model.entity.PassInfoDOExample">
@@ -102,10 +104,10 @@
         </if>
     </delete>
     <insert id="insert" parameterType="com.nCov.DataView.model.entity.PassInfoDO">
-        insert into passInfo (id, pathId, area
-        )
-        values (#{id,jdbcType=INTEGER}, #{pathid,jdbcType=INTEGER}, #{area,jdbcType=VARCHAR}
-        )
+        insert into passInfo (id, path_id, area,
+        type, order)
+        values (#{id,jdbcType=INTEGER}, #{pathId,jdbcType=INTEGER}, #{area,jdbcType=VARCHAR},
+        #{type,jdbcType=INTEGER}, #{order,jdbcType=INTEGER})
     </insert>
     <insert id="insertSelective" parameterType="com.nCov.DataView.model.entity.PassInfoDO">
         insert into passInfo
@@ -113,22 +115,34 @@
             <if test="id != null">
                 id,
             </if>
-            <if test="pathid != null">
-                pathId,
+            <if test="pathId != null">
+                path_id,
             </if>
             <if test="area != null">
                 area,
+            </if>
+            <if test="type != null">
+                type,
+            </if>
+            <if test="order != null">
+                order,
             </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">
                 #{id,jdbcType=INTEGER},
             </if>
-            <if test="pathid != null">
-                #{pathid,jdbcType=INTEGER},
+            <if test="pathId != null">
+                #{pathId,jdbcType=INTEGER},
             </if>
             <if test="area != null">
                 #{area,jdbcType=VARCHAR},
+            </if>
+            <if test="type != null">
+                #{type,jdbcType=INTEGER},
+            </if>
+            <if test="order != null">
+                #{order,jdbcType=INTEGER},
             </if>
         </trim>
     </insert>
@@ -145,11 +159,17 @@
             <if test="record.id != null">
                 id = #{record.id,jdbcType=INTEGER},
             </if>
-            <if test="record.pathid != null">
-                pathId = #{record.pathid,jdbcType=INTEGER},
+            <if test="record.pathId != null">
+                path_id = #{record.pathId,jdbcType=INTEGER},
             </if>
             <if test="record.area != null">
                 area = #{record.area,jdbcType=VARCHAR},
+            </if>
+            <if test="record.type != null">
+                type = #{record.type,jdbcType=INTEGER},
+            </if>
+            <if test="record.order != null">
+                order = #{record.order,jdbcType=INTEGER},
             </if>
         </set>
         <if test="_parameter != null">
@@ -159,8 +179,10 @@
     <update id="updateByExample" parameterType="map">
         update passInfo
         set id = #{record.id,jdbcType=INTEGER},
-        pathId = #{record.pathid,jdbcType=INTEGER},
-        area = #{record.area,jdbcType=VARCHAR}
+        path_id = #{record.pathId,jdbcType=INTEGER},
+        area = #{record.area,jdbcType=VARCHAR},
+        type = #{record.type,jdbcType=INTEGER},
+        order = #{record.order,jdbcType=INTEGER}
         <if test="_parameter != null">
             <include refid="Update_By_Example_Where_Clause"/>
         </if>
@@ -168,19 +190,27 @@
     <update id="updateByPrimaryKeySelective" parameterType="com.nCov.DataView.model.entity.PassInfoDO">
         update passInfo
         <set>
-            <if test="pathid != null">
-                pathId = #{pathid,jdbcType=INTEGER},
+            <if test="pathId != null">
+                path_id = #{pathId,jdbcType=INTEGER},
             </if>
             <if test="area != null">
                 area = #{area,jdbcType=VARCHAR},
+            </if>
+            <if test="type != null">
+                type = #{type,jdbcType=INTEGER},
+            </if>
+            <if test="order != null">
+                order = #{order,jdbcType=INTEGER},
             </if>
         </set>
         where id = #{id,jdbcType=INTEGER}
     </update>
     <update id="updateByPrimaryKey" parameterType="com.nCov.DataView.model.entity.PassInfoDO">
         update passInfo
-        set pathId = #{pathid,jdbcType=INTEGER},
-        area = #{area,jdbcType=VARCHAR}
+        set path_id = #{pathId,jdbcType=INTEGER},
+        area = #{area,jdbcType=VARCHAR},
+        type = #{type,jdbcType=INTEGER},
+        order = #{order,jdbcType=INTEGER}
         where id = #{id,jdbcType=INTEGER}
     </update>
 </mapper>
