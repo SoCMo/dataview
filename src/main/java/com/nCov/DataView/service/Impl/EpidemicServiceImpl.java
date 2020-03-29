@@ -430,7 +430,6 @@ public class EpidemicServiceImpl implements EpidemicService {
                 PassInfoDO passInfoDO = passInfoDOS.get(0);
 
                 RouteCalRequest routeCalRequest = new RouteCalRequest();
-
                 List<String> citys = new ArrayList<>();
                 for (PassInfoDO temp_city : passInfoDOS) {
                     citys.add(temp_city.getArea());
