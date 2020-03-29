@@ -401,6 +401,7 @@ public class EpidemicServiceImpl implements EpidemicService {
      * @Author: SoCMo
      * @Date: 2020/3/29
      */
+    @Transactional
     @Override
     public Result routeStore(RouteStoreInfo routeStoreInfo) {
         try {
@@ -460,22 +461,34 @@ public class EpidemicServiceImpl implements EpidemicService {
                     }
                     //赋值与计算
                     double time = routeCalRequest.getDistance() / 1000.0 / ConstCorrespond.SPEED[routeCalRequest.getType()];
-                    routeCalReponse.setTime(TimeTool.timeSlotToString(time));
-//                    NumberTool.routeCal(routeCalReponse, time);
                     BeanUtils.copyProperties(routeCalRequest, routeCalReponse);
-
+                    routeCalReponse.setTime(TimeTool.timeSlotToString(time));
+                    routeCalReponse.setCity(cityCalList);
+                    routeCalReponse.setFinalscore(
+                            (ConstCorrespond.ROUTE_WEIGHT[0] * ConstCorrespond.CROWD[routeCalRequest.getType()]
+                                    + ConstCorrespond.ROUTE_WEIGHT[1] * (time >= 24 ? 100 : (time / 24.0 * 100))
+                                    + ConstCorrespond.ROUTE_WEIGHT[2] * ConstCorrespond.CLEAN_SCORE[routeCalRequest.getType()]
+                                    + ConstCorrespond.ROUTE_WEIGHT[3] * cityCalList.stream().mapToDouble(CityCal::getCityscore).average().getAsDouble()) / 20.0
+                    );
+                    sumCalResponse.getResultList().add(routeCalReponse);
 
                     //准备插入数据
-                    for (String area : routeCalRequest.getCitys()) {
+                    for (String area : cityRequestList) {
                         PassInfoDO passInfoDO = new PassInfoDO();
                         passInfoDO.setPathId(pathInfoDO.getId());
                         passInfoDO.setArea(area);
+                        passInfoDO.setType(routeCalRequest.getType());
+                        passInfoDO.setStart(routeCalRequest.getStart());
+                        passInfoDO.setEnd(routeCalRequest.getEnd());
+                        passInfoDO.setTitle(routeCalReponse.getTitle());
                         passInfoDO.setOrder(number);
                         passInfoDO.setDistance((int) routeCalRequest.getDistance());
                         passInfoDOList.add(passInfoDO);
                     }
                     number++;
                 }
+                sumCalResponse.setSumScore(NumberTool.doubleToStringWotH(sumCalResponse.getResultList().stream().mapToDouble(RouteCalReponse::getFinalscore).average().getAsDouble()));
+                pathResponse.getSumCalResponseList().add(sumCalResponse);
             }
 
             passInfoDOMapper.insertList(passInfoDOList);

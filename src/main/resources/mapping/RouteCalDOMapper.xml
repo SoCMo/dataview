@@ -104,17 +104,17 @@
     </if>
   </delete>
   <insert id="insertList" parameterType="java.util.List">
-    insert into routeCal (start, end,
+    insert into routeCal (`start`, `end`,
     type, score, date,
     time) values
-    <foreach collection="list" item="routeCalDO" index="index" separator=",">
+    <foreach collection="list" item="RouteCalDO" index="index" separator=",">
       (
-      #{routeCalDO.start},
-      #{routeCalDO.end},
-      #{routeCalDO.type},
-      #{routeCalDO.score},
-      #{routeCalDO.date},
-      #{routeCalDO.time}
+      #{RouteCalDO.start},
+      #{RouteCalDO.end},
+      #{RouteCalDO.type},
+      #{RouteCalDO.score},
+      #{RouteCalDO.date},
+      #{RouteCalDO.time}
       )
     </foreach>
   </insert>

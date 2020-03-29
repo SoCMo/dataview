@@ -10,7 +10,7 @@
     <result column="distance" property="distance" jdbcType="INTEGER"/>
     <result column="start" property="start" jdbcType="VARCHAR"/>
     <result column="end" property="end" jdbcType="VARCHAR"/>
-    <result column="title" property="title" jdbcType="INTEGER"/>
+    <result column="title" property="title" jdbcType="VARCHAR"/>
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -106,20 +106,20 @@
     </if>
   </delete>
   <insert id="insertList" parameterType="java.util.List">
-    insert into passInfo (id, path_id, area,
-    type, order, distance,
-    start, end, title)
+    insert into passInfo (path_id, area,
+    type, `order`, distance,
+    `start`, `end`, title)
     values
     <foreach collection="list" item="PassInfoDO" index="index" separator=",">
       (
-      #{routeCalDO.pathId},
-      #{routeCalDO.area},
-      #{routeCalDO.type},
-      #{routeCalDO.order},
-      #{routeCalDO.distance},
-      #{routeCalDO.start},
-      #{routeCalDO.end},
-      #{routeCalDO.title},
+      #{PassInfoDO.pathId},
+      #{PassInfoDO.area},
+      #{PassInfoDO.type},
+      #{PassInfoDO.order},
+      #{PassInfoDO.distance},
+      #{PassInfoDO.start},
+      #{PassInfoDO.end},
+      #{PassInfoDO.title}
       )
     </foreach>
   </insert>
@@ -129,7 +129,7 @@
     start, end, title)
     values (#{id,jdbcType=INTEGER}, #{pathId,jdbcType=INTEGER}, #{area,jdbcType=VARCHAR},
     #{type,jdbcType=INTEGER}, #{order,jdbcType=INTEGER}, #{distance,jdbcType=INTEGER},
-    #{start,jdbcType=VARCHAR}, #{end,jdbcType=VARCHAR}, #{title,jdbcType=INTEGER})
+    #{start,jdbcType=VARCHAR}, #{end,jdbcType=VARCHAR}, #{title,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.nCov.DataView.model.entity.PassInfoDO">
     insert into passInfo
@@ -188,7 +188,7 @@
         #{end,jdbcType=VARCHAR},
       </if>
       <if test="title != null">
-        #{title,jdbcType=INTEGER},
+        #{title,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -227,7 +227,7 @@
         end = #{record.end,jdbcType=VARCHAR},
       </if>
       <if test="record.title != null">
-        title = #{record.title,jdbcType=INTEGER},
+        title = #{record.title,jdbcType=VARCHAR},
       </if>
     </set>
     <if test="_parameter != null">
@@ -244,7 +244,7 @@
     distance = #{record.distance,jdbcType=INTEGER},
     start = #{record.start,jdbcType=VARCHAR},
     end = #{record.end,jdbcType=VARCHAR},
-    title = #{record.title,jdbcType=INTEGER}
+    title = #{record.title,jdbcType=VARCHAR}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause"/>
     </if>
@@ -274,7 +274,7 @@
         end = #{end,jdbcType=VARCHAR},
       </if>
       <if test="title != null">
-        title = #{title,jdbcType=INTEGER},
+        title = #{title,jdbcType=VARCHAR},
       </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
@@ -288,7 +288,7 @@
     distance = #{distance,jdbcType=INTEGER},
     start = #{start,jdbcType=VARCHAR},
     end = #{end,jdbcType=VARCHAR},
-    title = #{title,jdbcType=INTEGER}
+    title = #{title,jdbcType=VARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
 </mapper>
