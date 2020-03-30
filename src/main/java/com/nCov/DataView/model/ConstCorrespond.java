@@ -19,6 +19,18 @@ public class ConstCorrespond {
             "飞机"
     };
 
+    //用于查询路径后得到的交通种类与现存交通种类的转换
+    //1:火车,2:飞机,3:公交,4:驾车,5:步行,6:大巴,7:地铁
+    public final static Integer[] PATH_INFO_TYPE = {
+            3,
+            4,
+            0,
+            2,
+            2,
+            2,
+            1
+    };
+
     public final static double[] CLEAN_SCORE = {
             80,
             100,

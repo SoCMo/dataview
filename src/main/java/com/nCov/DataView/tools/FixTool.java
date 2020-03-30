@@ -148,7 +148,7 @@ public class FixTool {
                         CovData covData = new CovData();
                         covData.setIsprovince(1);
                         covData.setProvincename(provinceData.getString("provinceName"));
-                        covData.setAreaname(provinceData.getString("cityName"));
+                        covData.setAreaname(provinceData.getString("provinceName"));
                         covData.setDate(TimeTool.todayCreate().getTime());
                         covData.setTotalconfirm(provinceData.getInteger("confirmedCount"));
                         covData.setTotalsuspect(provinceData.getInteger("suspectedCount"));
@@ -195,7 +195,8 @@ public class FixTool {
                     }
                 }
             }
-            covDataMapper.insertList(covDataListInsert);
+            if (!covDataListInsert.isEmpty())
+                covDataMapper.insertList(covDataListInsert);
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
