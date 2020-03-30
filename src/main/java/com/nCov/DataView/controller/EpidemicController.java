@@ -18,7 +18,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import java.io.IOException;
-import java.util.logging.Logger;
 
 /**
  * program: AreaInfoController
@@ -109,11 +108,8 @@ public class EpidemicController {
      */
     @GetMapping("/allRouteCal")
     public Result allRouteCal() {
-
         return epidemicService.getAllRouteCal();
     }
-
-
 
     /**
      * @Description: 使用excel表格导入学生信息

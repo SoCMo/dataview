@@ -464,6 +464,13 @@ public class EpidemicServiceImpl implements EpidemicService {
         return ResultTool.success(responseList);
     }
 
+    /**
+     * @Description: 路线评估
+     * @Param: [routeCalRequestList]
+     * @return: com.nCov.DataView.model.response.info.SumCalResponse
+     * @Author: SoCMo
+     * @Date: 2020/3/30
+     */
     @Override
     public SumCalResponse getRouteCal(List<RouteCalRequest> routeCalRequestList) {
         try {

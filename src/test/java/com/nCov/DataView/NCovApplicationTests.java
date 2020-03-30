@@ -1,6 +1,6 @@
 package com.nCov.DataView;
 
-import com.nCov.DataView.service.EpidemicService;
+import com.nCov.DataView.tools.FixTool;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -10,11 +10,11 @@ import java.text.ParseException;
 @SpringBootTest
 class NCovApplicationTests {
     @Resource
-    EpidemicService epidemicService;
+    private FixTool fixTool;
 
     @Test
     void contextLoads() throws ParseException {
-        epidemicService.getAllRouteCal();
+        fixTool.dataFix();
     }
 
 }
