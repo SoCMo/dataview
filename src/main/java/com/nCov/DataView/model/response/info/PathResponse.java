@@ -6,7 +6,7 @@ import java.util.List;
 
 /**
  * program: PathResponse
- * description: 路径信息
+ * description: 多路径信息
  * author: SoCMo
  * create: 2020/3/29
  */

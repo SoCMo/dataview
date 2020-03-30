@@ -3,8 +3,8 @@ package com.nCov.DataView.controller;
 import com.nCov.DataView.exception.AllException;
 import com.nCov.DataView.model.request.AllAreaRequest;
 import com.nCov.DataView.model.request.AreaInfoRequest;
+import com.nCov.DataView.model.request.PathRequest;
 import com.nCov.DataView.model.request.RouteListRequest;
-import com.nCov.DataView.model.request.RouteStoreInfo;
 import com.nCov.DataView.model.response.Result;
 import com.nCov.DataView.service.EpidemicService;
 import com.nCov.DataView.tools.ResultTool;
@@ -135,7 +135,7 @@ public class EpidemicController {
      * @Date: 2020/3/29
      */
     @PostMapping("/routeStore")
-    public Result routeStore(@Validated @RequestBody RouteStoreInfo routeStoreInfo) {
-        return epidemicService.routeStore(routeStoreInfo);
+    public Result routeStore(@Validated @RequestBody PathRequest pathRequest) {
+        return epidemicService.routeStore(pathRequest);
     }
 }

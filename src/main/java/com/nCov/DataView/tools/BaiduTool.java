@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.nCov.DataView.exception.AllException;
 import com.nCov.DataView.exception.EmAllException;
+import com.nCov.DataView.model.request.PathRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -110,4 +111,39 @@ public class BaiduTool {
     }
 
 
+    /**
+     * @Description: 线路计算
+     * @Param: [start, end]
+     * @return: com.nCov.DataView.model.request.PathRequest
+     * @Author: SoCMo
+     * @Date: 2020/3/30
+     */
+    public PathRequest pathInfo(String start, String end) throws AllException, IOException {
+        int akNumber = 0;
+
+        while (akNumber < akList.size()) {
+            //api地址
+            String url = "http://api.map.baidu.com/direction/v2/transit?origin="
+                    + "40.056878,116.30815&destination=31.222965,121.505821&ak=hPqxQbVaEYtG9bGZe364ELO0x3BSk6VI&tactics_incity=5";
+            CloseableHttpClient httpClient = HttpClients.createDefault();
+            // 请求
+            HttpGet httpGet = new HttpGet(url);
+            CloseableHttpResponse response = null;
+
+            response = httpClient.execute(httpGet);
+            HttpEntity responseEntity = response.getEntity();
+            JSONObject jsonObject = JSON.parseObject(EntityUtils.toString(responseEntity));
+            if (jsonObject.getString("status").matches("3[0-9][0-9]")) {
+                akNumber++;
+            } else if (jsonObject.getInteger("status") == 0) {
+//                JSONObject location = jsonObject.getJSONArray("routes");
+                return null;
+            } else {
+                throw new AllException(EmAllException.BAIDU_REQUEST_FAILE, "百度api报错为" + jsonObject.getInteger("status"));
+            }
+            response.close();
+            httpClient.close();
+        }
+        throw new AllException(EmAllException.BAIDU_REQUEST_FAILE, "配额已到上限");
+    }
 }
