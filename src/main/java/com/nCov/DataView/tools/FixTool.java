@@ -15,6 +15,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -100,7 +101,7 @@ public class FixTool {
      * @Author: SoCMo
      * @Date: 2020/3/29
      */
-//    @Scheduled(cron = "0 0 0/3 * * *")
+    @Scheduled(cron = "0 0 0/3 * * *")
     public void dataFix() {
         //api地址
         String url = "http://lab.isaaclin.cn/nCoV/api/area?latest=1";
