@@ -7,11 +7,8 @@ import com.nCov.DataView.model.request.PathRequest;
 import com.nCov.DataView.model.request.RouteListRequest;
 import com.nCov.DataView.model.response.Result;
 import com.nCov.DataView.service.EpidemicService;
-import com.nCov.DataView.tools.ResultTool;
 import org.apache.ibatis.annotations.Param;
-import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -27,11 +24,8 @@ import java.io.IOException;
  */
 @CrossOrigin
 @RestController
-@EnableAsync
 @RequestMapping("/epidemic")
 public class EpidemicController {
-    private final org.slf4j.Logger logger = LoggerFactory.getLogger(getClass());
-
     @Resource
     private EpidemicService epidemicService;
 
@@ -120,11 +114,7 @@ public class EpidemicController {
      */
     @PostMapping("/informationByExcel")
     public Result InformationByExcel(@RequestBody MultipartFile file) throws AllException, IOException {
-        epidemicService.excelIn(file);
-
-        logger.info("=============>" + Thread.currentThread().getName());
-
-        return ResultTool.success("异步载入中....请稍等");
+        return epidemicService.excelIn(file);
     }
 
     /**
