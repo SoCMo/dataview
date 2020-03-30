@@ -463,6 +463,13 @@ public class EpidemicServiceImpl implements EpidemicService {
         return ResultTool.success(responseList);
     }
 
+    /**
+     * @Description: 路线评估
+     * @Param: [routeCalRequestList]
+     * @return: com.nCov.DataView.model.response.info.SumCalResponse
+     * @Author: SoCMo
+     * @Date: 2020/3/30
+     */
     @Override
     public SumCalResponse getRouteCal(List<RouteCalRequest> routeCalRequestList) {
         try {
@@ -584,7 +591,7 @@ public class EpidemicServiceImpl implements EpidemicService {
      */
     @Transactional
     @Override
-    public Result routeStore(RouteStoreInfo routeStoreInfo) {
+    public Result routeStore(PathRequest pathRequest) {
         try {
             //待返回的数据
             PathResponse pathResponse = new PathResponse();
@@ -594,7 +601,7 @@ public class EpidemicServiceImpl implements EpidemicService {
 
             //待插入的途径地区
             List<PassInfoDO> passInfoDOList = new ArrayList<>();
-            for (RouteListRequest routeListRequest : routeStoreInfo.getPathList()) {
+            for (RouteListRequest routeListRequest : pathRequest.getPathList()) {
                 //如果为type为-1,则知定义为空的元素，跳过
                 if (routeListRequest.getRouteCalRequestList().size() == 1) {
                     if (routeListRequest.getRouteCalRequestList().get(0).getType() == -1) {

@@ -16,8 +16,9 @@ public enum EmAllException implements CommonError {
 
     UNIFY_ERROR(400,"请保证Excel表格正确无误"),
 
-    BAD_FILE_TYPE(400, "文件格式错误");
+    BAD_FILE_TYPE(400, "文件格式错误"),
 
+    BAIDU_REQUEST_FAILE(401, "百度api请求失败");
 
     // 错误码
     private Integer code;
