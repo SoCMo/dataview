@@ -259,7 +259,7 @@ public class BaiduTool {
                             case 2: {
                                 //飞机路线
                                 routeCalRequest.setDistance(finalSteps.getInteger("distance"));
-                                routeCalRequest.setType(ConstCorrespond.PATH_INFO_TYPE[2]);
+                                routeCalRequest.setType(ConstCorrespond.PATH_INFO_TYPE[1]);
                                 List<String> cities = new ArrayList<>();
                                 JSONObject startJson = finalSteps.getJSONObject("start_location");
                                 JSONObject endJson = finalSteps.getJSONObject("end_location");
