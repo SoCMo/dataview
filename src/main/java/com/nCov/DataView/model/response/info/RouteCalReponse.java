@@ -6,7 +6,7 @@ import java.util.List;
 
 /**
  * program: RouteCalReponse
- * description: 路径评估返回
+ * description: 单条路段评估返回
  * author: SoCMo
  * create: 2020/3/26
  */

@@ -3,22 +3,18 @@ package com.nCov.DataView.controller;
 import com.nCov.DataView.exception.AllException;
 import com.nCov.DataView.model.request.AllAreaRequest;
 import com.nCov.DataView.model.request.AreaInfoRequest;
+import com.nCov.DataView.model.request.PathRequest;
 import com.nCov.DataView.model.request.RouteListRequest;
-import com.nCov.DataView.model.request.RouteStoreInfo;
 import com.nCov.DataView.model.response.Result;
 import com.nCov.DataView.service.EpidemicService;
-import com.nCov.DataView.tools.ResultTool;
 import org.apache.ibatis.annotations.Param;
-import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import java.io.IOException;
-import java.util.logging.Logger;
 
 /**
  * program: AreaInfoController
@@ -28,11 +24,8 @@ import java.util.logging.Logger;
  */
 @CrossOrigin
 @RestController
-@EnableAsync
 @RequestMapping("/epidemic")
 public class EpidemicController {
-    private final org.slf4j.Logger logger = LoggerFactory.getLogger(getClass());
-
     @Resource
     private EpidemicService epidemicService;
 
@@ -108,10 +101,8 @@ public class EpidemicController {
      * @Date: 2020/3/29
      */
     @GetMapping("/allRouteCal")
-    public Result allRouteCal(@RequestParam(value = "cur", defaultValue = "1") Integer cur,
-                              @RequestParam(value = "nums", defaultValue = "1") Integer nums) {
-
-        return epidemicService.getAllRouteCal(cur, nums);
+    public Result allRouteCal() {
+        return epidemicService.getAllRouteCal();
     }
 
     /**
@@ -123,11 +114,7 @@ public class EpidemicController {
      */
     @PostMapping("/informationByExcel")
     public Result InformationByExcel(@RequestBody MultipartFile file) throws AllException, IOException {
-        epidemicService.excelIn(file);
-
-        logger.info("=============>" + Thread.currentThread().getName());
-
-        return ResultTool.success("异步载入中....请稍等");
+        return epidemicService.excelIn(file);
     }
 
     /**
@@ -138,7 +125,7 @@ public class EpidemicController {
      * @Date: 2020/3/29
      */
     @PostMapping("/routeStore")
-    public Result routeStore(@Validated @RequestBody RouteStoreInfo routeStoreInfo) {
-        return epidemicService.routeStore(routeStoreInfo);
+    public Result routeStore(@Validated @RequestBody PathRequest pathRequest) {
+        return epidemicService.routeStore(pathRequest);
     }
 }

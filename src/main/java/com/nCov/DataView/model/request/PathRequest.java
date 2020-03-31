@@ -13,7 +13,7 @@ import java.util.List;
  * create: 2020/3/29
  */
 @Data
-public class RouteStoreInfo {
+public class PathRequest {
     @Valid
     @Size(min = 1, message = "至少应有一个路径")
     List<RouteListRequest> pathList;

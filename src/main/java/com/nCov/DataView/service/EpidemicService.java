@@ -3,8 +3,8 @@ package com.nCov.DataView.service;
 import com.nCov.DataView.exception.AllException;
 import com.nCov.DataView.model.request.AllAreaRequest;
 import com.nCov.DataView.model.request.AreaInfoRequest;
+import com.nCov.DataView.model.request.PathRequest;
 import com.nCov.DataView.model.request.RouteCalRequest;
-import com.nCov.DataView.model.request.RouteStoreInfo;
 import com.nCov.DataView.model.response.Result;
 import com.nCov.DataView.model.response.info.SumCalResponse;
 import org.springframework.web.multipart.MultipartFile;
@@ -80,7 +80,7 @@ public interface EpidemicService {
      * @Author: SoCMo
      * @Date: 2020/3/29
      */
-    public Result routeStore(RouteStoreInfo routeStoreInfo);
+    public Result routeStore(PathRequest pathRequest);
 
     /**
      * @Description: 对数据库中所有数据进行回校评估，并返回
