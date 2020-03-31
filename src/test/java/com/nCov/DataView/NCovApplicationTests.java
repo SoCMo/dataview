@@ -15,10 +15,7 @@ class NCovApplicationTests {
 
     @Test
     void contextLoads() throws IOException, AllException {
-//        RouteListRequest routeListRequest = baiduTool.pathInfo("昆明市官渡区五金机电精品市场c-6", "上海大学宝山校区", 1);
-//        System.out.println(routeListRequest.getRouteCalRequestList());
-
-        baiduTool.reverseGeoCoding(31.197603576031, 121.35369928996);
+        baiduTool.pathInfo("浙江省台州市天台县汇泉东街5-7", "上海大学宝山校区");
     }
 
 }
