@@ -708,6 +708,11 @@ public class EpidemicServiceImpl implements EpidemicService {
         }
     }
 
+    @Override
+    public Result getAllRouteCal() {
+        return null;
+    }
+
     /**
      * @Description: 使用excel表格导入学生信息
      * @Param: [file]
