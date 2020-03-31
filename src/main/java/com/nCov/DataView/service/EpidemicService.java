@@ -89,7 +89,7 @@ public interface EpidemicService {
      * @Author: pongshy
      * @Date: 2020/3/29
      */
-    public Result getAllRouteCal();
+    public Result getAllRouteCal(Integer cur, Integer nums);
 
     public SumCalResponse getRouteCal(List<RouteCalRequest> routeCalRequestList);
 }

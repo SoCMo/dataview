@@ -108,12 +108,11 @@ public class EpidemicController {
      * @Date: 2020/3/29
      */
     @GetMapping("/allRouteCal")
-    public Result allRouteCal() {
+    public Result allRouteCal(@RequestParam(value = "cur", defaultValue = "1") Integer cur,
+                              @RequestParam(value = "nums", defaultValue = "1") Integer nums) {
 
-        return epidemicService.getAllRouteCal();
+        return epidemicService.getAllRouteCal(cur, nums);
     }
-
-
 
     /**
      * @Description: 使用excel表格导入学生信息

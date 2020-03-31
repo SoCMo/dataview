@@ -1,5 +1,7 @@
 package com.nCov.DataView.service.Impl;
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.nCov.DataView.dao.*;
 import com.nCov.DataView.exception.AllException;
 import com.nCov.DataView.exception.EmAllException;
@@ -405,10 +407,13 @@ public class EpidemicServiceImpl implements EpidemicService {
      * @Date: 2020/3/29
      */
     @Override
-    public Result getAllRouteCal() {
+    public Result getAllRouteCal(Integer cur, Integer nums) {
         List<SumAllCalResponse> responseList = new ArrayList<>();
 
+        PageHelper.startPage(cur, nums);
         List<PathInfoDO> pathInfoDOList = pathInfoDOMapper.selectByExample(null);
+
+        System.out.println(pathInfoDOList.size());
         if (pathInfoDOList.size() == 0) {
             return ResultTool.error(500, "暂无数据");
         }
@@ -420,10 +425,12 @@ public class EpidemicServiceImpl implements EpidemicService {
 
             List<RouteCalRequest> routeCalRequestList = new ArrayList<>();
             for (PassInfoDO temp : orderList) {
-                PassInfoDOExample passInfoDOExample1 = new PassInfoDOExample();
-                passInfoDOExample1.createCriteria().andPathIdEqualTo(pathId).andOrderIdEqualTo(temp.getOrderId());
-                List<PassInfoDO> passInfoDOS = passInfoDOMapper.selectByExample(passInfoDOExample1);
-                passInfoDOExample1.clear();
+                passInfoDOExample.createCriteria()
+                        .andPathIdEqualTo(pathId)
+                        .andOrderIdEqualTo(temp.getOrderId())
+                        .andTypeNumEqualTo(pathInfoDO.getMainType());
+                List<PassInfoDO> passInfoDOS = passInfoDOMapper.selectByExample(passInfoDOExample);
+                passInfoDOExample.clear();
 
                 if (passInfoDOS.size() <= 0) {
                     continue;
@@ -447,7 +454,6 @@ public class EpidemicServiceImpl implements EpidemicService {
             if (routeCalRequestList.isEmpty()) {
                 continue;
             }
-
             SumCalResponse sumCalResponse = getRouteCal(routeCalRequestList);
 
             SumAllCalResponse sumAllCalResponse = new SumAllCalResponse();
@@ -457,8 +463,6 @@ public class EpidemicServiceImpl implements EpidemicService {
             sumAllCalResponse.setEndAddress(pathInfoDO.getEnd());
 
             responseList.add(sumAllCalResponse);
-
-            passInfoDOExample.clear();
         }
 
         return ResultTool.success(responseList);
