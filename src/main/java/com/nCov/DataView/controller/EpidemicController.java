@@ -1,10 +1,7 @@
 package com.nCov.DataView.controller;
 
 import com.nCov.DataView.exception.AllException;
-import com.nCov.DataView.model.request.AllAreaRequest;
-import com.nCov.DataView.model.request.AreaInfoRequest;
-import com.nCov.DataView.model.request.PathRequest;
-import com.nCov.DataView.model.request.RouteListRequest;
+import com.nCov.DataView.model.request.*;
 import com.nCov.DataView.model.response.Result;
 import com.nCov.DataView.service.EpidemicService;
 import com.nCov.DataView.tools.ResultTool;
@@ -132,5 +129,17 @@ public class EpidemicController {
     @PostMapping("/routeStore")
     public Result routeStore(@Validated @RequestBody PathRequest pathRequest) {
         return epidemicService.routeStore(pathRequest);
+    }
+
+    /**
+     * @Description: 前端向后端发送地址，后端对返校路径进行评估
+     * @Param: []
+     * @return: com.nCov.DataView.model.response.Result
+     * @Author: pongshy
+     * @Date: 2020/3/31
+     */
+    @PostMapping("/assessment")
+    public Result assessCal(@Validated @RequestBody AddressRequest data) {
+        return 
     }
 }
