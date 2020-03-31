@@ -226,7 +226,7 @@ public class BaiduTool {
                         switch (vehicle.getInteger("type")) {
                             //火车路线
                             case 1: {
-                                routeCalRequest.setType(ConstCorrespond.PATH_INFO_TYPE[1]);
+                                routeCalRequest.setType(ConstCorrespond.PATH_INFO_TYPE[0]);
                                 List<String> cities = new ArrayList<>();
                                 String path = finalSteps.getString("path");
                                 String[] points = path.split(";");

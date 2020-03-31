@@ -15,7 +15,7 @@ class NCovApplicationTests {
 
     @Test
     void contextLoads() throws IOException, AllException {
-        baiduTool.pathInfo("浙江省杭州市临安区碧桂园", "上海大学宝山校区");
+        baiduTool.pathInfo("中国甘肃金昌市永昌县中医院家属楼2号", "上海大学宝山校区");
     }
 
 }
