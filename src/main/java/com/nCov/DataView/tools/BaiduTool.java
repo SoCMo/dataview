@@ -151,7 +151,7 @@ public class BaiduTool {
     }
 
     /**
-     * @Description: 单类型跨城路线查询
+     * @Description: 单路线
      * @Param: [start, end]
      * @return: com.nCov.DataView.model.request.PathRequest
      * @Author: SoCMo

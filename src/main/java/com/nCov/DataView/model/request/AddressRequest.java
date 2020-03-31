@@ -6,13 +6,13 @@ import javax.validation.constraints.NotEmpty;
 import java.util.List;
 
 /**
- * program: AddressRequestRequest
- * description: 全部地区信息请求
- * author: SoCMo
- * create: 2020/2/23
+ * program: AddressRequest
+ * description: 起始地址
+ * author: pongshy
+ * create: 2020/3/31
  */
 @Data
 public class AddressRequest {
-    @NotEmpty(message = "地址数组不能为空")
+    @NotEmpty(message = "地址列表不能为空")
     private List<String> addressList;
 }

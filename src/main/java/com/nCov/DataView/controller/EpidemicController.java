@@ -102,6 +102,7 @@ public class EpidemicController {
      */
     @GetMapping("/allRouteCal")
     public Result allRouteCal() {
+
         return epidemicService.getAllRouteCal();
     }
 
@@ -132,14 +133,15 @@ public class EpidemicController {
     }
 
     /**
-     * @Description: 前端向后端发送地址，后端对返校路径进行评估
-     * @Param: []
+     * @Description: 前端发送地址信息，后端进行风险评估并返回分数
+     * @Param: [AddressRequest]
      * @return: com.nCov.DataView.model.response.Result
      * @Author: pongshy
      * @Date: 2020/3/31
      */
     @PostMapping("/assessment")
-    public Result assessCal(@Validated @RequestBody AddressRequest data) {
-        return 
+    public Result assessCal(@Validated @RequestBody AddressRequest data) throws IOException, AllException {
+        return epidemicService.getAssessment(data);
     }
+
 }

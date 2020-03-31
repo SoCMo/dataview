@@ -60,6 +60,9 @@ public class EpidemicServiceImpl implements EpidemicService {
     @Resource
     private PathInfoDOMapper pathInfoDOMapper;
 
+    @Resource
+    private BaiduTool baiduTool;
+
     /**
      * @Description: 获取地区信息
      * @Param: [areaName]
@@ -581,6 +584,45 @@ public class EpidemicServiceImpl implements EpidemicService {
         }
 
         return null;
+    }
+
+    /**
+     * @Description: 前端发送地址信息，后端进行风险评估并返回分数
+     * @Param: [AddressRequest]
+     * @return: com.nCov.DataView.model.response.Result
+     * @Author: pongshy
+     * @Date: 2020/3/31
+     */
+    @Override
+    public Result getAssessment(AddressRequest data) throws AllException, IOException {
+        List<String> addressList = data.getAddressList();
+        List<AssessmentAllResponse> list = new ArrayList<>();
+
+        try {
+            for (String startAddress : addressList) {
+                PathRequest pathRequest = baiduTool.pathInfo(startAddress, "上海大学报上校区");
+
+                AssessmentAllResponse assessmentAllResponse = new AssessmentAllResponse();
+                assessmentAllResponse.setStart(startAddress);
+                assessmentAllResponse.setEnd("上海大学宝山校区");
+
+                List<RouteListRequest> routeListRequests = pathRequest.getPathList();
+                List<SumCalResponse> sumCalResponseList = new ArrayList<>();
+                for (RouteListRequest routeListRequest : routeListRequests) {
+                    SumCalResponse sumCalResponse = getRouteCal(routeListRequest.getRouteCalRequestList());
+                    sumCalResponseList.add(sumCalResponse);
+                }
+                assessmentAllResponse.setSumCalResponseList(sumCalResponseList);
+
+                list.add(assessmentAllResponse);
+            }
+
+            return ResultTool.success(list);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+        return ResultTool.error(500,"error");
     }
 
     /**

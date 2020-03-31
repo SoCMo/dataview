@@ -1,12 +1,10 @@
 package com.nCov.DataView.service;
 
 import com.nCov.DataView.exception.AllException;
-import com.nCov.DataView.model.request.AllAreaRequest;
-import com.nCov.DataView.model.request.AreaInfoRequest;
-import com.nCov.DataView.model.request.PathRequest;
-import com.nCov.DataView.model.request.RouteCalRequest;
+import com.nCov.DataView.model.request.*;
 import com.nCov.DataView.model.response.Result;
 import com.nCov.DataView.model.response.info.SumCalResponse;
+import org.apache.xmlbeans.impl.xb.xsdschema.All;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -92,4 +90,13 @@ public interface EpidemicService {
     public Result getAllRouteCal();
 
     public SumCalResponse getRouteCal(List<RouteCalRequest> routeCalRequestList);
+
+    /**
+     * @Description: 前端发送地址信息，后端进行风险评估并返回分数
+     * @Param: [AddressRequest]
+     * @return: com.nCov.DataView.model.response.Result
+     * @Author: pongshy
+     * @Date: 2020/3/31
+     */
+    public Result getAssessment(AddressRequest data) throws AllException, IOException;
 }
