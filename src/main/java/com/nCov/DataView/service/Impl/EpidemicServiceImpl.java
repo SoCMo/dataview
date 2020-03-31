@@ -573,7 +573,13 @@ public class EpidemicServiceImpl implements EpidemicService {
                 routeCalDOMapper.insertList(routeCalDOList);
             }
 
+            int type = 0;
+            for (RouteCalRequest findMainType : routeCalRequestList) {
+                if (findMainType.getType() > type) type = findMainType.getType();
+            }
+
             SumCalResponse sumCalResponse = new SumCalResponse();
+            sumCalResponse.setType(ConstCorrespond.TRAN_TYPE[type]);
             sumCalResponse.setResultList(resultList);
             sumCalResponse.setSumScore(NumberTool.doubleToStringWotH(resultList.stream().mapToDouble(RouteCalReponse::getFinalscore).average().getAsDouble()));
             return sumCalResponse;
@@ -661,6 +667,7 @@ public class EpidemicServiceImpl implements EpidemicService {
                     if (findMainType.getType() > type) type = findMainType.getType();
                 }
 
+                sumCalResponse.setType(ConstCorrespond.TRAN_TYPE[type]);
                 pathInfoDOExample.createCriteria()
                         .andStartEqualTo(routeListRequest.getRouteCalRequestList().get(0).getStartAdressZone())
 //                            .andEndEqualTo("上海大学宝山校区")
