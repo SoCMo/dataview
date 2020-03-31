@@ -485,7 +485,6 @@ public class EpidemicServiceImpl implements EpidemicService {
             if (routeCalRequestList.isEmpty()) {
                 throw new AllException(EmAllException.DATABASE_ERROR, "参数不能为空");
             }
-
             List<RouteCalReponse> resultList = new ArrayList<>();
             List<RouteCalDO> routeCalDOList = new ArrayList<>();
             List<CovRankResponse> allAreaRequestList = allAreaCal(TimeTool.timeToDaySy(new Date()));
@@ -578,14 +577,14 @@ public class EpidemicServiceImpl implements EpidemicService {
                 routeCalDOMapper.insertList(routeCalDOList);
             }
 
+            SumCalResponse sumCalResponse = new SumCalResponse();
+            sumCalResponse.setResultList(resultList);
+
             int type = 0;
             for (RouteCalRequest findMainType : routeCalRequestList) {
                 if (findMainType.getType() > type) type = findMainType.getType();
             }
-
-            SumCalResponse sumCalResponse = new SumCalResponse();
             sumCalResponse.setType(ConstCorrespond.TRAN_TYPE[type]);
-            sumCalResponse.setResultList(resultList);
             sumCalResponse.setSumScore(NumberTool.doubleToStringWotH(resultList.stream().mapToDouble(RouteCalReponse::getFinalscore).average().getAsDouble()));
             return sumCalResponse;
         } catch (AllException e) {
@@ -607,11 +606,15 @@ public class EpidemicServiceImpl implements EpidemicService {
     @Override
     public Result getAssessment(AddressRequest data) throws AllException, IOException {
         List<String> addressList = data.getAddressList();
+        List<String> errorAddressList = new ArrayList<>();
         List<AssessmentAllResponse> list = new ArrayList<>();
 
-        try {
-            for (String startAddress : addressList) {
-                PathRequest pathRequest = baiduTool.pathInfo(startAddress, "上海大学报上校区");
+        final String endAddress = "上海大学宝山校区";
+
+        SumAssessmentResponse sumAssessmentResponse = new SumAssessmentResponse();
+        for (String startAddress : addressList) {
+            try {
+                PathRequest pathRequest = baiduTool.pathInfo(startAddress, endAddress);
 
                 AssessmentAllResponse assessmentAllResponse = new AssessmentAllResponse();
                 assessmentAllResponse.setStart(startAddress);
@@ -627,13 +630,35 @@ public class EpidemicServiceImpl implements EpidemicService {
 
                 list.add(assessmentAllResponse);
             }
+            catch (Exception e) {
+                try {
+                    PathRequest pathRequest = baiduTool.pathInfo(startAddress.substring(0, startAddress.indexOf("路") + 1), endAddress);
 
-            return ResultTool.success(list);
+                    AssessmentAllResponse assessmentAllResponse = new AssessmentAllResponse();
+                    assessmentAllResponse.setStart(startAddress);
+                    assessmentAllResponse.setEnd("上海大学宝山校区");
+
+                    List<RouteListRequest> routeListRequests = pathRequest.getPathList();
+                    List<SumCalResponse> sumCalResponseList = new ArrayList<>();
+                    for (RouteListRequest routeListRequest : routeListRequests) {
+                        SumCalResponse sumCalResponse = getRouteCal(routeListRequest.getRouteCalRequestList());
+                        sumCalResponseList.add(sumCalResponse);
+                    }
+                    assessmentAllResponse.setSumCalResponseList(sumCalResponseList);
+
+                    list.add(assessmentAllResponse);
+                }
+                catch (Exception ex) {
+                    ex.printStackTrace();
+                    log.info("地址：" + startAddress + "查询失败");
+                    errorAddressList.add(startAddress);
+                }
+            }
         }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
-        return ResultTool.error(500,"error");
+        sumAssessmentResponse.setAssessmentList(list);
+        sumAssessmentResponse.setErrorAddress(errorAddressList);
+
+        return ResultTool.success(sumAssessmentResponse);
     }
 
     /**
