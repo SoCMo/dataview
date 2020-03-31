@@ -12,6 +12,7 @@ import java.util.List;
  */
 @Data
 public class AssessmentAllResponse {
+    //多个不同的线路
     private List<SumCalResponse> sumCalResponseList;
 
     private String start;

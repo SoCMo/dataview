@@ -1,8 +1,11 @@
 package com.nCov.DataView.service;
 
 import com.nCov.DataView.exception.AllException;
+import com.nCov.DataView.model.entity.PathInfoDO;
 import com.nCov.DataView.model.request.*;
 import com.nCov.DataView.model.response.Result;
+import com.nCov.DataView.model.response.info.AssessmentAllResponse;
+import com.nCov.DataView.model.response.info.SumAllCalResponse;
 import com.nCov.DataView.model.response.info.SumCalResponse;
 import org.apache.xmlbeans.impl.xb.xsdschema.All;
 import org.springframework.web.multipart.MultipartFile;
@@ -81,13 +84,21 @@ public interface EpidemicService {
     public Result routeStore(PathRequest pathRequest);
 
     /**
-     * @Description: 对数据库中所有数据进行回校评估，并返回
+     * @Description: 同一终点和起点的不同路径进行计算
      * @Param: []
      * @return: com.nCov.DataView.model.response.Result
      * @Author: pongshy
      * @Date: 2020/3/29
      */
-    public Result getAllRouteCal();
+    public List<SumCalResponse> getAllRouteCal(List<PathInfoDO> pathInfoDOList) throws AllException;
+
+    /**
+     * @Description: 数据库中存在一条线路进行分数计算
+     * @Param: []
+     * @return: com.nCov.DataView.model.response.Result
+     * @Author: pongshy
+     * @Date: 2020/3/29
+     */
 
     public SumCalResponse getRouteCal(List<RouteCalRequest> routeCalRequestList);
 
@@ -99,4 +110,13 @@ public interface EpidemicService {
      * @Date: 2020/3/31
      */
     public Result getAssessment(AddressRequest data) throws AllException, IOException;
+
+    /**
+     * @Description: 使用百度api查询该地址回校路径，并插入数据库中
+     * @Param: []
+     * @return: com.nCov.DataView.model.response.Result
+     * @Author: pongshy
+     * @Date: 2020/3/31
+     */
+    public AssessmentAllResponse getScoreAndInsert(String startAddress, String start, String endAddress) throws AllException, IOException;
 }

@@ -13,6 +13,7 @@ import com.nCov.DataView.tools.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.xmlbeans.impl.xb.xsdschema.All;
 import org.springframework.beans.BeanUtils;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.scheduling.annotation.Async;
@@ -23,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.annotation.Resource;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Path;
 import java.text.ParseException;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -404,37 +406,37 @@ public class EpidemicServiceImpl implements EpidemicService {
         }
     }
 
-
-
     /**
-     * @Description: 对数据库中所有数据进行回校评估，并返回
-     * @Param: []
+     * @Description: 同一终点和起点的不同路径进行计算
+     * @Param: [PathInfoDO]
      * @return:
      * @Author: pongshy
      * @Date: 2020/3/29
      */
     @Override
-    public Result getAllRouteCal() {
-        List<SumAllCalResponse> responseList = new ArrayList<>();
+    public List<SumCalResponse> getAllRouteCal(List<PathInfoDO> pathInfoDOList) throws AllException {
+        List<SumCalResponse> list = new ArrayList<>();
+        List<RouteCalRequest> routeCalRequestList = new ArrayList<>();
 
-        List<PathInfoDO> pathInfoDOList = pathInfoDOMapper.selectByExample(null);
-        if (pathInfoDOList.size() == 0) {
-            return ResultTool.error(500, "暂无数据");
-        }
-
-        PassInfoDOExample passInfoDOExample = new PassInfoDOExample();
         for (PathInfoDO pathInfoDO : pathInfoDOList) {
+            //对每一条线路进行评估
             Integer pathId = pathInfoDO.getId();
+
+            //order表示各个路段
             List<PassInfoDO> orderList = passInfoDOMapper.selectByPathId(pathId);
 
-            List<RouteCalRequest> routeCalRequestList = new ArrayList<>();
+            if (orderList.size() == 0) {
+                return null;
+            }
             for (PassInfoDO temp : orderList) {
                 PassInfoDOExample passInfoDOExample1 = new PassInfoDOExample();
-                passInfoDOExample1.createCriteria().andPathIdEqualTo(pathId).andOrderIdEqualTo(temp.getOrderId());
+                passInfoDOExample1.createCriteria()
+                        .andPathIdEqualTo(pathId)
+                        .andOrderIdEqualTo(temp.getOrderId());
                 List<PassInfoDO> passInfoDOS = passInfoDOMapper.selectByExample(passInfoDOExample1);
                 passInfoDOExample1.clear();
 
-                if (passInfoDOS.size() <= 0) {
+                if (passInfoDOS.size() == 0) {
                     continue;
                 }
                 PassInfoDO passInfoDO = passInfoDOS.get(0);
@@ -452,24 +454,20 @@ public class EpidemicServiceImpl implements EpidemicService {
                 routeCalRequest.setEnd(passInfoDO.getEndAddress());
 
                 routeCalRequestList.add(routeCalRequest);
+
             }
             if (routeCalRequestList.isEmpty()) {
-                continue;
+                return null;
             }
-
             SumCalResponse sumCalResponse = getRouteCal(routeCalRequestList);
+            sumCalResponse.setType(ConstCorrespond.TRAN_TYPE[pathInfoDO.getMainType()]);
+            sumCalResponse.setSumScore(sumCalResponse.getSumScore());
+            sumCalResponse.setResultList(sumCalResponse.getResultList());
 
-            SumAllCalResponse sumAllCalResponse = new SumAllCalResponse();
-            sumAllCalResponse.setSumScore(sumCalResponse.getSumScore());
-            sumAllCalResponse.setResultList(sumCalResponse.getResultList());
-            sumAllCalResponse.setStartAddress(pathInfoDO.getStart());
-            sumAllCalResponse.setEndAddress(pathInfoDO.getEnd());
-            responseList.add(sumAllCalResponse);
-
-            passInfoDOExample.clear();
+            list.add(sumCalResponse);
         }
 
-        return ResultTool.success(responseList);
+        return list;
     }
 
     /**
@@ -612,46 +610,37 @@ public class EpidemicServiceImpl implements EpidemicService {
         final String endAddress = "上海大学宝山校区";
 
         SumAssessmentResponse sumAssessmentResponse = new SumAssessmentResponse();
+        PathInfoDOExample pathInfoDOExample = new PathInfoDOExample();
         for (String startAddress : addressList) {
-            try {
-                PathRequest pathRequest = baiduTool.pathInfo(startAddress, endAddress);
+            pathInfoDOExample.createCriteria().andStartEqualTo(startAddress);
+            List<PathInfoDO> pathInfoDOList = pathInfoDOMapper.selectByExample(pathInfoDOExample);
+            pathInfoDOExample.clear();
+
+            //如果数据库中存在
+            if (pathInfoDOList.size() >= 1) {
+
+                List<SumCalResponse> sumCalResponseList = getAllRouteCal(pathInfoDOList);
 
                 AssessmentAllResponse assessmentAllResponse = new AssessmentAllResponse();
                 assessmentAllResponse.setStart(startAddress);
-                assessmentAllResponse.setEnd("上海大学宝山校区");
-
-                List<RouteListRequest> routeListRequests = pathRequest.getPathList();
-                List<SumCalResponse> sumCalResponseList = new ArrayList<>();
-                for (RouteListRequest routeListRequest : routeListRequests) {
-                    SumCalResponse sumCalResponse = getRouteCal(routeListRequest.getRouteCalRequestList());
-                    sumCalResponseList.add(sumCalResponse);
-                }
+                assessmentAllResponse.setEnd(endAddress);
                 assessmentAllResponse.setSumCalResponseList(sumCalResponseList);
 
                 list.add(assessmentAllResponse);
-            }
-            catch (Exception e) {
+            } else {
+                //如果数据库中不存在该地址信息
                 try {
-                    PathRequest pathRequest = baiduTool.pathInfo(startAddress.substring(0, startAddress.indexOf("路") + 1), endAddress);
-
-                    AssessmentAllResponse assessmentAllResponse = new AssessmentAllResponse();
-                    assessmentAllResponse.setStart(startAddress);
-                    assessmentAllResponse.setEnd("上海大学宝山校区");
-
-                    List<RouteListRequest> routeListRequests = pathRequest.getPathList();
-                    List<SumCalResponse> sumCalResponseList = new ArrayList<>();
-                    for (RouteListRequest routeListRequest : routeListRequests) {
-                        SumCalResponse sumCalResponse = getRouteCal(routeListRequest.getRouteCalRequestList());
-                        sumCalResponseList.add(sumCalResponse);
-                    }
-                    assessmentAllResponse.setSumCalResponseList(sumCalResponseList);
-
+                    AssessmentAllResponse assessmentAllResponse = getScoreAndInsert(startAddress, startAddress, endAddress);
                     list.add(assessmentAllResponse);
-                }
-                catch (Exception ex) {
-                    ex.printStackTrace();
-                    log.info("地址：" + startAddress + "查询失败");
-                    errorAddressList.add(startAddress);
+                } catch (Exception e) {
+                    try {
+                        AssessmentAllResponse assessmentAllResponse = getScoreAndInsert(startAddress, startAddress.substring(0, startAddress.indexOf("路") + 1), endAddress);
+                        list.add(assessmentAllResponse);
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                        log.info("地址：" + startAddress + "查询失败");
+                        errorAddressList.add(startAddress);
+                    }
                 }
             }
         }
@@ -660,6 +649,75 @@ public class EpidemicServiceImpl implements EpidemicService {
 
         return ResultTool.success(sumAssessmentResponse);
     }
+
+    /**
+     * @Description: 使用百度api查询该地址回校路径，并插入数据库中
+     * @Param: []
+     * @return: com.nCov.DataView.model.response.Result
+     * @Author: pongshy
+     * @Date: 2020/3/31
+     */
+    @Override
+    public AssessmentAllResponse getScoreAndInsert(String startAddress, String start,String endAddress) throws AllException, IOException {
+        PathRequest pathRequest = baiduTool.pathInfo(start, endAddress);
+
+        AssessmentAllResponse assessmentAllResponse = new AssessmentAllResponse();
+        assessmentAllResponse.setStart(startAddress);
+        assessmentAllResponse.setEnd(endAddress);
+
+        //n条路线
+        List<RouteListRequest> routeListRequests = pathRequest.getPathList();
+
+        PathInfoDO record = new PathInfoDO();
+        record.setStart(startAddress);
+        record.setEnd(endAddress);
+
+        List<SumCalResponse> sumCalResponseList = new ArrayList<>();
+        PathInfoDOExample pathInfoDOExample = new PathInfoDOExample();
+
+        //每一条路径信息，存入数据库
+
+        for (RouteListRequest routeListRequest : routeListRequests) {
+            //每一条路线
+            int pathId = 0;
+            int routeNum = 0;
+
+                record.setMainType(routeNum);
+                pathInfoDOMapper.insertSelective(record);
+                pathInfoDOExample.createCriteria().andStartEqualTo(startAddress).andMainTypeEqualTo(routeNum);
+                pathId = pathInfoDOMapper.selectByExample(pathInfoDOExample).get(0).getId();
+                pathInfoDOExample.clear();
+
+            SumCalResponse sumCalResponse = getRouteCal(routeListRequest.getRouteCalRequestList());
+
+            int order_num = 0;
+            for (RouteCalRequest routeCalRequest : routeListRequest.getRouteCalRequestList()) {
+                List<PassInfoDO> passInfoDOList = new ArrayList<>();
+
+                for (String city : routeCalRequest.getCitys()) {
+                    PassInfoDO passInfoDO_record = new PassInfoDO();
+                    passInfoDO_record.setArea(city);
+                    passInfoDO_record.setDistance((int)routeCalRequest.getDistance());
+                    passInfoDO_record.setOrderId(order_num);
+                    passInfoDO_record.setStartAddress(routeCalRequest.getStart());
+                    passInfoDO_record.setEndAddress(routeCalRequest.getEnd());
+                    passInfoDO_record.setTitle(routeCalRequest.getTitle());
+                    passInfoDO_record.setPathId(pathId);
+                    passInfoDO_record.setTypeNum(routeCalRequest.getType());
+
+                    passInfoDOList.add(passInfoDO_record);
+                }
+                passInfoDOMapper.insertList(passInfoDOList);
+                ++order_num;
+            }
+            ++routeNum;
+            sumCalResponseList.add(sumCalResponse);
+        }
+        assessmentAllResponse.setSumCalResponseList(sumCalResponseList);
+
+        return assessmentAllResponse;
+    }
+
 
     /**
      * @Description: 路径存储兼查询
