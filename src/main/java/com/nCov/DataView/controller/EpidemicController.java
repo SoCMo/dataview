@@ -116,7 +116,6 @@ public class EpidemicController {
     @PostMapping("/informationByExcel")
     public Result InformationByExcel(@RequestBody MultipartFile file) throws AllException, IOException {
         epidemicService.excelIn(file);
-
         return ResultTool.success("导入成功");
     }
 
