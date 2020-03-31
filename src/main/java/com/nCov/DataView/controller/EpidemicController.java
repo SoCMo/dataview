@@ -102,7 +102,6 @@ public class EpidemicController {
      */
     @GetMapping("/allRouteCal")
     public Result allRouteCal() {
-
         return epidemicService.getAllRouteCal();
     }
 
