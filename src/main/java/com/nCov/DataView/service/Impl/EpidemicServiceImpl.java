@@ -15,6 +15,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.springframework.beans.BeanUtils;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -711,6 +712,7 @@ public class EpidemicServiceImpl implements EpidemicService {
      * @Author: pongshy
      * @Date: 2020/3/28
      */
+    @Async
     @Override
     public Result excelIn(MultipartFile file) throws AllException, IOException {
         if (file == null) {
