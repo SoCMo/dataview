@@ -279,7 +279,7 @@ public class BaiduTool {
                                     routeCalRequest.setType(ConstCorrespond.PATH_INFO_TYPE[6]);
                                 } else {
                                     //按公交车处理
-                                    routeCalRequest.setType(ConstCorrespond.PATH_INFO_TYPE[3]);
+                                    routeCalRequest.setType(ConstCorrespond.PATH_INFO_TYPE[2]);
                                 }
                                 routeCalRequest.setDistance(finalSteps.getInteger("distance"));
                                 JSONObject detail = vehicle.getJSONObject("detail");
