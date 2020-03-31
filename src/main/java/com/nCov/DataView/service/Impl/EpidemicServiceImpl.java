@@ -596,11 +596,15 @@ public class EpidemicServiceImpl implements EpidemicService {
     @Override
     public Result getAssessment(AddressRequest data) throws AllException, IOException {
         List<String> addressList = data.getAddressList();
+        List<String> errorAddressList = new ArrayList<>();
         List<AssessmentAllResponse> list = new ArrayList<>();
 
-        try {
-            for (String startAddress : addressList) {
-                PathRequest pathRequest = baiduTool.pathInfo(startAddress, "上海大学报上校区");
+        final String endAddress = "上海大学宝山校区";
+
+        SumAssessmentResponse sumAssessmentResponse = new SumAssessmentResponse();
+        for (String startAddress : addressList) {
+            try {
+                PathRequest pathRequest = baiduTool.pathInfo(startAddress, endAddress);
 
                 AssessmentAllResponse assessmentAllResponse = new AssessmentAllResponse();
                 assessmentAllResponse.setStart(startAddress);
@@ -616,13 +620,35 @@ public class EpidemicServiceImpl implements EpidemicService {
 
                 list.add(assessmentAllResponse);
             }
+            catch (Exception e) {
+                try {
+                    PathRequest pathRequest = baiduTool.pathInfo(startAddress.substring(0, startAddress.indexOf("路") + 1), endAddress);
 
-            return ResultTool.success(list);
+                    AssessmentAllResponse assessmentAllResponse = new AssessmentAllResponse();
+                    assessmentAllResponse.setStart(startAddress);
+                    assessmentAllResponse.setEnd("上海大学宝山校区");
+
+                    List<RouteListRequest> routeListRequests = pathRequest.getPathList();
+                    List<SumCalResponse> sumCalResponseList = new ArrayList<>();
+                    for (RouteListRequest routeListRequest : routeListRequests) {
+                        SumCalResponse sumCalResponse = getRouteCal(routeListRequest.getRouteCalRequestList());
+                        sumCalResponseList.add(sumCalResponse);
+                    }
+                    assessmentAllResponse.setSumCalResponseList(sumCalResponseList);
+
+                    list.add(assessmentAllResponse);
+                }
+                catch (Exception ex) {
+                    ex.printStackTrace();
+                    log.info("地址：" + startAddress + "查询失败");
+                    errorAddressList.add(startAddress);
+                }
+            }
         }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
-        return ResultTool.error(500,"error");
+        sumAssessmentResponse.setAssessmentList(list);
+        sumAssessmentResponse.setErrorAddress(errorAddressList);
+
+        return ResultTool.success(sumAssessmentResponse);
     }
 
     /**
