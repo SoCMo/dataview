@@ -7,8 +7,10 @@ import com.nCov.DataView.model.request.PathRequest;
 import com.nCov.DataView.model.request.RouteListRequest;
 import com.nCov.DataView.model.response.Result;
 import com.nCov.DataView.service.EpidemicService;
+import com.nCov.DataView.tools.ResultTool;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -23,6 +25,7 @@ import java.io.IOException;
  * create: 2020/2/21
  */
 @CrossOrigin
+@EnableAsync
 @RestController
 @RequestMapping("/epidemic")
 public class EpidemicController {
@@ -114,7 +117,9 @@ public class EpidemicController {
      */
     @PostMapping("/informationByExcel")
     public Result InformationByExcel(@RequestBody MultipartFile file) throws AllException, IOException {
-        return epidemicService.excelIn(file);
+        epidemicService.excelIn(file);
+
+        return ResultTool.success("导入成功");
     }
 
     /**
