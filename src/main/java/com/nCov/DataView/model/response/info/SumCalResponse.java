@@ -15,4 +15,6 @@ public class SumCalResponse {
     List<RouteCalReponse> resultList;
 
     String sumScore;
+
+    String Type;
 }

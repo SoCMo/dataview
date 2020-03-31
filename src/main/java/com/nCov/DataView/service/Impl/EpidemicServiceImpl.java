@@ -387,6 +387,12 @@ public class EpidemicServiceImpl implements EpidemicService {
 
             SumCalResponse sumCalResponse = new SumCalResponse();
             sumCalResponse.setResultList(resultList);
+
+            int type = 0;
+            for (RouteCalRequest findMainType : routeCalRequestList) {
+                if (findMainType.getType() > type) type = findMainType.getType();
+            }
+            sumCalResponse.setType(ConstCorrespond.TRAN_TYPE[type]);
             sumCalResponse.setSumScore(NumberTool.doubleToStringWotH(resultList.stream().mapToDouble(RouteCalReponse::getFinalscore).average().getAsDouble()));
             return ResultTool.success(sumCalResponse);
         } catch (AllException e) {
@@ -434,11 +440,11 @@ public class EpidemicServiceImpl implements EpidemicService {
                 PassInfoDO passInfoDO = passInfoDOS.get(0);
 
                 RouteCalRequest routeCalRequest = new RouteCalRequest();
-                List<String> citys = new ArrayList<>();
+                List<String> cities = new ArrayList<>();
                 for (PassInfoDO temp_city : passInfoDOS) {
-                    citys.add(temp_city.getArea());
+                    cities.add(temp_city.getArea());
                 }
-                routeCalRequest.setCitys(citys);
+                routeCalRequest.setCitys(cities);
                 routeCalRequest.setDistance(passInfoDO.getDistance());
                 routeCalRequest.setType(passInfoDO.getTypeNum());
                 routeCalRequest.setTitle(passInfoDO.getTitle());
@@ -458,7 +464,6 @@ public class EpidemicServiceImpl implements EpidemicService {
             sumAllCalResponse.setResultList(sumCalResponse.getResultList());
             sumAllCalResponse.setStartAddress(pathInfoDO.getStart());
             sumAllCalResponse.setEndAddress(pathInfoDO.getEnd());
-
             responseList.add(sumAllCalResponse);
 
             passInfoDOExample.clear();
@@ -573,7 +578,13 @@ public class EpidemicServiceImpl implements EpidemicService {
                 routeCalDOMapper.insertList(routeCalDOList);
             }
 
+            int type = 0;
+            for (RouteCalRequest findMainType : routeCalRequestList) {
+                if (findMainType.getType() > type) type = findMainType.getType();
+            }
+
             SumCalResponse sumCalResponse = new SumCalResponse();
+            sumCalResponse.setType(ConstCorrespond.TRAN_TYPE[type]);
             sumCalResponse.setResultList(resultList);
             sumCalResponse.setSumScore(NumberTool.doubleToStringWotH(resultList.stream().mapToDouble(RouteCalReponse::getFinalscore).average().getAsDouble()));
             return sumCalResponse;
@@ -687,6 +698,7 @@ public class EpidemicServiceImpl implements EpidemicService {
                     if (findMainType.getType() > type) type = findMainType.getType();
                 }
 
+                sumCalResponse.setType(ConstCorrespond.TRAN_TYPE[type]);
                 pathInfoDOExample.createCriteria()
                         .andStartEqualTo(routeListRequest.getRouteCalRequestList().get(0).getStartAdressZone())
 //                            .andEndEqualTo("上海大学宝山校区")
