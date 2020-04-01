@@ -136,7 +136,7 @@ public class BaiduTool {
             exist = true;
         }
 
-        RouteListRequest train = routeListInfo(start, end, 0);
+        RouteListRequest train = routeListInfo(start, end, 1);
         if (train.getRouteCalRequestList().get(0).getType() != -1) {
             exist = true;
         }
@@ -226,7 +226,7 @@ public class BaiduTool {
                         switch (vehicle.getInteger("type")) {
                             //火车路线
                             case 1: {
-                                routeCalRequest.setType(ConstCorrespond.PATH_INFO_TYPE[1]);
+                                routeCalRequest.setType(ConstCorrespond.PATH_INFO_TYPE[0]);
                                 List<String> cities = new ArrayList<>();
                                 String path = finalSteps.getString("path");
                                 String[] points = path.split(";");
@@ -259,7 +259,7 @@ public class BaiduTool {
                             case 2: {
                                 //飞机路线
                                 routeCalRequest.setDistance(finalSteps.getInteger("distance"));
-                                routeCalRequest.setType(ConstCorrespond.PATH_INFO_TYPE[2]);
+                                routeCalRequest.setType(ConstCorrespond.PATH_INFO_TYPE[1]);
                                 List<String> cities = new ArrayList<>();
                                 JSONObject startJson = finalSteps.getJSONObject("start_location");
                                 JSONObject endJson = finalSteps.getJSONObject("end_location");
