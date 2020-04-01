@@ -131,12 +131,12 @@ public class BaiduTool {
         pathRequest.setPathList(new ArrayList<>());
         boolean exist = false;
 
-        RouteListRequest aircraft = routeListInfo(start, end, 0);
+        RouteListRequest aircraft = routeListInfo(start, end, 1);
         if (aircraft.getRouteCalRequestList().get(0).getType() != -1) {
             exist = true;
         }
 
-        RouteListRequest train = routeListInfo(start, end, 1);
+        RouteListRequest train = routeListInfo(start, end, 0);
         if (train.getRouteCalRequestList().get(0).getType() != -1) {
             exist = true;
         }
