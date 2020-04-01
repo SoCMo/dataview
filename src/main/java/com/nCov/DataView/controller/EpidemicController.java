@@ -14,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import java.io.IOException;
+import java.text.ParseException;
 
 /**
  * program: AreaInfoController
@@ -126,7 +127,7 @@ public class EpidemicController {
      * @Date: 2020/3/31
      */
     @PostMapping("/assessment")
-    public Result assessCal(@Validated @RequestBody AddressRequest data) throws IOException, AllException {
+    public Result assessCal(@Validated @RequestBody AddressRequest data) throws IOException, AllException, ParseException {
         return epidemicService.getAssessment(data);
     }
 
