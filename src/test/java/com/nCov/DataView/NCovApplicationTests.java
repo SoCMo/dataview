@@ -1,7 +1,6 @@
 package com.nCov.DataView;
 
 import com.nCov.DataView.exception.AllException;
-import com.nCov.DataView.model.request.RouteListRequest;
 import com.nCov.DataView.tools.BaiduTool;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -16,11 +15,7 @@ class NCovApplicationTests {
 
     @Test
     void contextLoads() throws IOException, AllException {
-        int i = 1;
-        for (RouteListRequest routeListRequest : baiduTool.pathInfo("昆明长水机场", "上海大学宝山校区").getPathList()) {
-            System.out.println(i++);
-            System.out.println(routeListRequest);
-        }
+        baiduTool.pathInfo("浙江省杭州市临安区碧桂园", "上海大学宝山校区");
     }
 
 }

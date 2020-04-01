@@ -178,6 +178,8 @@ public class BaiduTool {
             JSONObject jsonObject = JSON.parseObject(EntityUtils.toString(responseEntity));
             if (jsonObject.getString("status").matches("3[0-9][0-9]")) {
                 akNumber++;
+            } else if (jsonObject.getString("status").matches("1001")) {
+                throw new AllException(EmAllException.BAIDU_REQUEST_FAILE, "没有公交方案");
             } else if (jsonObject.getInteger("status") == 0) {
                 JSONArray jsonArray = jsonObject.getJSONObject("result").getJSONArray("routes");
                 JSONArray steps = jsonArray.getJSONObject(0).getJSONArray("steps");
