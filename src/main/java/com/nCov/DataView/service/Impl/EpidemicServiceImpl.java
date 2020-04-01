@@ -631,10 +631,18 @@ public class EpidemicServiceImpl implements EpidemicService {
                 //如果数据库中不存在该地址信息
                 try {
                     AssessmentAllResponse assessmentAllResponse = getScoreAndInsert(startAddress, startAddress, endAddress);
+
+                    if (assessmentAllResponse.getSumCalResponseList().isEmpty()) {
+                        errorAddressList.add(startAddress);
+                    }
                     list.add(assessmentAllResponse);
                 } catch (Exception e) {
                     try {
                         AssessmentAllResponse assessmentAllResponse = getScoreAndInsert(startAddress, startAddress.substring(0, startAddress.indexOf("路") + 1), endAddress);
+
+                        if (assessmentAllResponse.getSumCalResponseList().isEmpty()) {
+                            errorAddressList.add(startAddress);
+                        }
                         list.add(assessmentAllResponse);
                     } catch (Exception ex) {
                         ex.printStackTrace();
