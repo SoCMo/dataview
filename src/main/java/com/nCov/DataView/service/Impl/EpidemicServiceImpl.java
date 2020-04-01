@@ -632,7 +632,7 @@ public class EpidemicServiceImpl implements EpidemicService {
                 try {
                     AssessmentAllResponse assessmentAllResponse = getScoreAndInsert(startAddress, startAddress, endAddress);
 
-                    if (assessmentAllResponse.getSumCalResponseList().isEmpty() || assessmentAllResponse == null) {
+                    if (assessmentAllResponse == null || assessmentAllResponse.getSumCalResponseList().isEmpty()) {
                         errorAddressList.add(startAddress);
                     }
                     list.add(assessmentAllResponse);
@@ -640,7 +640,7 @@ public class EpidemicServiceImpl implements EpidemicService {
                     try {
                         AssessmentAllResponse assessmentAllResponse = getScoreAndInsert(startAddress, startAddress.substring(0, startAddress.indexOf("路") + 1), endAddress);
 
-                        if (assessmentAllResponse.getSumCalResponseList().isEmpty() || assessmentAllResponse == null) {
+                        if (assessmentAllResponse == null || assessmentAllResponse.getSumCalResponseList().isEmpty()) {
                             errorAddressList.add(startAddress);
                         }
                         list.add(assessmentAllResponse);
