@@ -744,6 +744,8 @@ public class EpidemicServiceImpl implements EpidemicService {
             ++routeNum;
             pathInfoDO.setMainType(main_type);
             pathInfoDOMapper.updateByPrimaryKeySelective(pathInfoDO);
+
+            sumCalResponse.setType(ConstCorrespond.TRAN_TYPE[main_type]);
             sumCalResponseList.add(sumCalResponse);
         }
         assessmentAllResponse.setSumCalResponseList(sumCalResponseList);
