@@ -13,7 +13,6 @@ import com.nCov.DataView.tools.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.xmlbeans.impl.xb.xsdschema.All;
 import org.springframework.beans.BeanUtils;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.scheduling.annotation.Async;
@@ -24,7 +23,6 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.annotation.Resource;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Path;
 import java.text.ParseException;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -64,6 +62,8 @@ public class EpidemicServiceImpl implements EpidemicService {
 
     @Resource
     private BaiduTool baiduTool;
+
+    private final static Integer lock = 1;
 
     /**
      * @Description: 获取地区信息
@@ -1104,7 +1104,15 @@ public class EpidemicServiceImpl implements EpidemicService {
         for (ImpAreaDO impAreaDO : impAreaDOList) {
             impAreaDO.setDate(TimeTool.stringToDay(date));
         }
-        impAreaDOMapper.insertList(impAreaDOList);
+
+        synchronized (lock) {
+            impAreaDOList = null;
+            impAreaDOList = impAreaDOMapper.selectByExample(impAreaDOExample);
+            if (!impAreaDOList.isEmpty()) {
+                return this.allAreaCal(date);
+            }
+            impAreaDOMapper.insertList(impAreaDOList);
+        }
 
         return impAreaDOList.stream().map(impAreaDO -> {
             CovRankResponse covRankResponse = new CovRankResponse();
