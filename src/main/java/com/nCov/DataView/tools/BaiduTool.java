@@ -136,7 +136,7 @@ public class BaiduTool {
             exist = true;
         }
 
-        RouteListRequest train = routeListInfo(start, end, 0);
+        RouteListRequest train = routeListInfo(start, end, 1);
         if (train.getRouteCalRequestList().get(0).getType() != -1) {
             exist = true;
         }
