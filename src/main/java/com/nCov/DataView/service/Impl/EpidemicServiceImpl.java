@@ -632,7 +632,7 @@ public class EpidemicServiceImpl implements EpidemicService {
                 try {
                     AssessmentAllResponse assessmentAllResponse = getScoreAndInsert(startAddress, startAddress, endAddress);
 
-                    if (assessmentAllResponse.getSumCalResponseList().isEmpty()) {
+                    if (assessmentAllResponse.getSumCalResponseList().isEmpty() || assessmentAllResponse == null) {
                         errorAddressList.add(startAddress);
                     }
                     list.add(assessmentAllResponse);
@@ -640,7 +640,7 @@ public class EpidemicServiceImpl implements EpidemicService {
                     try {
                         AssessmentAllResponse assessmentAllResponse = getScoreAndInsert(startAddress, startAddress.substring(0, startAddress.indexOf("路") + 1), endAddress);
 
-                        if (assessmentAllResponse.getSumCalResponseList().isEmpty()) {
+                        if (assessmentAllResponse.getSumCalResponseList().isEmpty() || assessmentAllResponse == null) {
                             errorAddressList.add(startAddress);
                         }
                         list.add(assessmentAllResponse);
@@ -668,13 +668,15 @@ public class EpidemicServiceImpl implements EpidemicService {
     @Override
     public AssessmentAllResponse getScoreAndInsert(String startAddress, String start, String endAddress) throws AllException, IOException {
         PathRequest pathRequest = baiduTool.pathInfo(start, endAddress);
+        //n条路线
+        List<RouteListRequest> routeListRequests = pathRequest.getPathList();
+        if (routeListRequests.isEmpty()) {
+            return null;
+        }
 
         AssessmentAllResponse assessmentAllResponse = new AssessmentAllResponse();
         assessmentAllResponse.setStart(startAddress);
         assessmentAllResponse.setEnd(endAddress);
-
-        //n条路线
-        List<RouteListRequest> routeListRequests = pathRequest.getPathList();
 
         PathInfoDO record = new PathInfoDO();
         record.setStart(startAddress);
