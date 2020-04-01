@@ -658,7 +658,7 @@ public class EpidemicServiceImpl implements EpidemicService {
      * @Date: 2020/3/31
      */
     @Override
-    public AssessmentAllResponse getScoreAndInsert(String startAddress, String start,String endAddress) throws AllException, IOException {
+    public AssessmentAllResponse getScoreAndInsert(String startAddress, String start, String endAddress) throws AllException, IOException {
         PathRequest pathRequest = baiduTool.pathInfo(start, endAddress);
 
         AssessmentAllResponse assessmentAllResponse = new AssessmentAllResponse();
@@ -676,21 +676,22 @@ public class EpidemicServiceImpl implements EpidemicService {
         PathInfoDOExample pathInfoDOExample = new PathInfoDOExample();
 
         //每一条路径信息，存入数据库
-
         for (RouteListRequest routeListRequest : routeListRequests) {
             //每一条路线
             int pathId = 0;
             int routeNum = 0;
 
-                record.setMainType(routeNum);
-                pathInfoDOMapper.insertSelective(record);
-                pathInfoDOExample.createCriteria().andStartEqualTo(startAddress).andMainTypeEqualTo(routeNum);
-                pathId = pathInfoDOMapper.selectByExample(pathInfoDOExample).get(0).getId();
-                pathInfoDOExample.clear();
+            record.setMainType(routeNum);
+            pathInfoDOMapper.insertSelective(record);
+            pathInfoDOExample.createCriteria().andStartEqualTo(startAddress).andMainTypeEqualTo(routeNum);
+            PathInfoDO pathInfoDO = pathInfoDOMapper.selectByExample(pathInfoDOExample).get(routeNum);
+            pathId = pathInfoDO.getId();
+            pathInfoDOExample.clear();
 
             SumCalResponse sumCalResponse = getRouteCal(routeListRequest.getRouteCalRequestList());
 
             int order_num = 0;
+            int main_type = 0;
             for (RouteCalRequest routeCalRequest : routeListRequest.getRouteCalRequestList()) {
                 List<PassInfoDO> passInfoDOList = new ArrayList<>();
 
@@ -707,10 +708,15 @@ public class EpidemicServiceImpl implements EpidemicService {
 
                     passInfoDOList.add(passInfoDO_record);
                 }
+                if (routeCalRequest.getType() > main_type) {
+                    main_type = routeCalRequest.getType();
+                }
                 passInfoDOMapper.insertList(passInfoDOList);
                 ++order_num;
             }
             ++routeNum;
+            pathInfoDO.setMainType(main_type);
+            pathInfoDOMapper.updateByPrimaryKeySelective(pathInfoDO);
             sumCalResponseList.add(sumCalResponse);
         }
         assessmentAllResponse.setSumCalResponseList(sumCalResponseList);
