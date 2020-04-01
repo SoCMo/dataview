@@ -190,7 +190,7 @@ public class BaiduTool {
                         for (int z = 0; z < childSteps.size(); z++) {
                             JSONObject finalSteps = childSteps.getJSONObject(z);
                             JSONObject vehicle = finalSteps.getJSONObject("vehicle_info");
-                            if (vehicle.getInteger("type") == (type == 0 ? 2 : 1)) {
+                            if (vehicle.getInteger("type") == type + 1) {
                                 exist = true;
                                 break;
                             }
