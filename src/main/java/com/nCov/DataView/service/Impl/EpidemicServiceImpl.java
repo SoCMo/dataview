@@ -1108,9 +1108,8 @@ public class EpidemicServiceImpl implements EpidemicService {
         }
 
         synchronized (lock) {
-            impAreaDOList = null;
-            impAreaDOList = impAreaDOMapper.selectByExample(impAreaDOExample);
-            if (!impAreaDOList.isEmpty()) {
+            List<ImpAreaDO> impAreaListTemp = impAreaDOMapper.selectByExample(impAreaDOExample);
+            if (!impAreaListTemp.isEmpty()) {
                 return this.allAreaCal(date);
             }
             impAreaDOMapper.insertList(impAreaDOList);
