@@ -11,6 +11,7 @@ import org.apache.xmlbeans.impl.xb.xsdschema.All;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.List;
 
 /**
@@ -90,7 +91,7 @@ public interface EpidemicService {
      * @Author: pongshy
      * @Date: 2020/3/29
      */
-    public List<SumCalResponse> getAllRouteCal(List<PathInfoDO> pathInfoDOList) throws AllException;
+    public List<SumCalResponse> getAllRouteCal(List<PathInfoDO> pathInfoDOList) throws AllException, ParseException;
 
     /**
      * @Description: 数据库中存在一条线路进行分数计算
@@ -109,7 +110,7 @@ public interface EpidemicService {
      * @Author: pongshy
      * @Date: 2020/3/31
      */
-    public Result getAssessment(AddressRequest data) throws AllException, IOException;
+    public Result getAssessment(AddressRequest data) throws AllException, IOException, ParseException;
 
     /**
      * @Description: 使用百度api查询该地址回校路径，并插入数据库中
@@ -118,5 +119,14 @@ public interface EpidemicService {
      * @Author: pongshy
      * @Date: 2020/3/31
      */
-    public AssessmentAllResponse getScoreAndInsert(String startAddress, String start, String endAddress) throws AllException, IOException;
+    public AssessmentAllResponse getScoreAndInsert(String startAddress, String start, String endAddress) throws AllException, IOException, ParseException;
+
+    /**
+     * @Description: 传入路径信息，计算分数
+     * @Param: []
+     * @return: com.nCov.DataView.model.response.Result
+     * @Author: pongshy
+     * @Date: 2020/3/31
+     */
+    public SumCalResponse calculate(List<RouteCalRequest> routeCalRequestList) throws AllException, ParseException;
 }

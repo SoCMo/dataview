@@ -414,7 +414,7 @@ public class EpidemicServiceImpl implements EpidemicService {
      * @Date: 2020/3/29
      */
     @Override
-    public List<SumCalResponse> getAllRouteCal(List<PathInfoDO> pathInfoDOList) throws AllException {
+    public List<SumCalResponse> getAllRouteCal(List<PathInfoDO> pathInfoDOList) throws AllException, ParseException {
         List<SumCalResponse> list = new ArrayList<>();
         List<RouteCalRequest> routeCalRequestList = new ArrayList<>();
 
@@ -459,7 +459,8 @@ public class EpidemicServiceImpl implements EpidemicService {
             if (routeCalRequestList.isEmpty()) {
                 return null;
             }
-            SumCalResponse sumCalResponse = getRouteCal(routeCalRequestList);
+            SumCalResponse sumCalResponse = calculate(routeCalRequestList);
+
             sumCalResponse.setType(ConstCorrespond.TRAN_TYPE[pathInfoDO.getMainType()]);
             sumCalResponse.setSumScore(sumCalResponse.getSumScore());
             sumCalResponse.setResultList(sumCalResponse.getResultList());
@@ -602,7 +603,7 @@ public class EpidemicServiceImpl implements EpidemicService {
      * @Date: 2020/3/31
      */
     @Override
-    public Result getAssessment(AddressRequest data) throws AllException, IOException {
+    public Result getAssessment(AddressRequest data) throws AllException, IOException, ParseException {
         List<String> addressList = data.getAddressList();
         List<String> errorAddressList = new ArrayList<>();
         List<AssessmentAllResponse> list = new ArrayList<>();
@@ -612,6 +613,7 @@ public class EpidemicServiceImpl implements EpidemicService {
         SumAssessmentResponse sumAssessmentResponse = new SumAssessmentResponse();
         PathInfoDOExample pathInfoDOExample = new PathInfoDOExample();
         for (String startAddress : addressList) {
+
             pathInfoDOExample.createCriteria().andStartEqualTo(startAddress);
             List<PathInfoDO> pathInfoDOList = pathInfoDOMapper.selectByExample(pathInfoDOExample);
             pathInfoDOExample.clear();
@@ -638,7 +640,20 @@ public class EpidemicServiceImpl implements EpidemicService {
                     list.add(assessmentAllResponse);
                 } catch (Exception e) {
                     try {
-                        AssessmentAllResponse assessmentAllResponse = getScoreAndInsert(startAddress, startAddress.substring(0, startAddress.indexOf("路") + 1), endAddress);
+                        String start_temp = null;
+                        if (startAddress.contains("路")) {
+                            start_temp = startAddress.substring(0, startAddress.indexOf("路") + 1);
+                        }
+                        else {
+                            if (startAddress.contains("区")) {
+                                start_temp = startAddress.substring(0, startAddress.indexOf("路") + 1);
+                            }
+                            else {
+                                start_temp = startAddress.substring(0, startAddress.indexOf("区") + 1);
+                            }
+                        }
+
+                        AssessmentAllResponse assessmentAllResponse = getScoreAndInsert(startAddress, start_temp, endAddress);
 
                         if (assessmentAllResponse == null || assessmentAllResponse.getSumCalResponseList().isEmpty()) {
                             errorAddressList.add(startAddress);
@@ -666,7 +681,7 @@ public class EpidemicServiceImpl implements EpidemicService {
      * @Date: 2020/3/31
      */
     @Override
-    public AssessmentAllResponse getScoreAndInsert(String startAddress, String start, String endAddress) throws AllException, IOException {
+    public AssessmentAllResponse getScoreAndInsert(String startAddress, String start, String endAddress) throws AllException, IOException, ParseException {
         PathRequest pathRequest = baiduTool.pathInfo(start, endAddress);
         //n条路线
         List<RouteListRequest> routeListRequests = pathRequest.getPathList();
@@ -678,27 +693,29 @@ public class EpidemicServiceImpl implements EpidemicService {
         assessmentAllResponse.setStart(startAddress);
         assessmentAllResponse.setEnd(endAddress);
 
-        PathInfoDO record = new PathInfoDO();
-        record.setStart(startAddress);
-        record.setEnd(endAddress);
+
 
         List<SumCalResponse> sumCalResponseList = new ArrayList<>();
         PathInfoDOExample pathInfoDOExample = new PathInfoDOExample();
 
         //每一条路径信息，存入数据库
+        int routeNum = 0;
         for (RouteListRequest routeListRequest : routeListRequests) {
             //每一条路线
             int pathId = 0;
-            int routeNum = 0;
+            PathInfoDO record = new PathInfoDO();
 
+            record.setStart(startAddress);
+            record.setEnd(endAddress);
             record.setMainType(routeNum);
             pathInfoDOMapper.insertSelective(record);
+
             pathInfoDOExample.createCriteria().andStartEqualTo(startAddress).andMainTypeEqualTo(routeNum);
-            PathInfoDO pathInfoDO = pathInfoDOMapper.selectByExample(pathInfoDOExample).get(routeNum);
+            PathInfoDO pathInfoDO = pathInfoDOMapper.selectByExample(pathInfoDOExample).get(0);
             pathId = pathInfoDO.getId();
             pathInfoDOExample.clear();
 
-            SumCalResponse sumCalResponse = getRouteCal(routeListRequest.getRouteCalRequestList());
+            SumCalResponse sumCalResponse = calculate(routeListRequest.getRouteCalRequestList());
 
             int order_num = 0;
             int main_type = 0;
@@ -727,11 +744,65 @@ public class EpidemicServiceImpl implements EpidemicService {
             ++routeNum;
             pathInfoDO.setMainType(main_type);
             pathInfoDOMapper.updateByPrimaryKeySelective(pathInfoDO);
+
+            sumCalResponse.setType(ConstCorrespond.TRAN_TYPE[main_type]);
             sumCalResponseList.add(sumCalResponse);
         }
         assessmentAllResponse.setSumCalResponseList(sumCalResponseList);
 
         return assessmentAllResponse;
+    }
+
+    /**
+     * @Description: 传入路径信息，计算分数
+     * @Param: []
+     * @return: com.nCov.DataView.model.response.Result
+     * @Author: pongshy
+     * @Date: 2020/3/31
+     */
+    @Override
+    public SumCalResponse calculate(List<RouteCalRequest> routeCalRequestList) throws AllException, ParseException {
+        SumCalResponse sumCalResponse = new SumCalResponse();
+        sumCalResponse.setResultList(new ArrayList<>());
+        List<CovRankResponse> covRankResponseList = allAreaCal(TimeTool.timeToDaySy(new Date()));
+        for (RouteCalRequest routeCalRequest : routeCalRequestList) {
+
+            RouteCalReponse routeCalReponse = new RouteCalReponse();
+
+            //算出总分
+            //得到城市分数列表
+            List<String> cityRequestList = new ArrayList<>(new HashSet<String>(routeCalRequest.getCitys()));
+            List<CityCal> cityCalList = covRankResponseList.stream()
+                    .filter(covRankResponse -> {
+                        for (String areaName : cityRequestList) {
+                            if (areaName.contains(covRankResponse.getName()))
+                                return true;
+                        }
+                        return false;
+                    })
+                    .map(covRankResponse -> {
+                        CityCal cityCal = new CityCal();
+                        cityCal.setCityname(covRankResponse.getName());
+                        cityCal.setCityscore((int) covRankResponse.getSumScore());
+                        return cityCal;
+                    }).collect(Collectors.toList());
+
+            //赋值与计算
+            double time = routeCalRequest.getDistance() / 1000.0 / ConstCorrespond.SPEED[routeCalRequest.getType()];
+            BeanUtils.copyProperties(routeCalRequest, routeCalReponse);
+            routeCalReponse.setTime(TimeTool.timeSlotToString(time));
+            routeCalReponse.setCity(cityCalList);
+            routeCalReponse.setFinalscore(
+                    (ConstCorrespond.ROUTE_WEIGHT[0] * ConstCorrespond.CROWD[routeCalRequest.getType()]
+                            + ConstCorrespond.ROUTE_WEIGHT[1] * (time >= 24 ? 100 : (time / 24.0 * 100))
+                            + ConstCorrespond.ROUTE_WEIGHT[2] * ConstCorrespond.CLEAN_SCORE[routeCalRequest.getType()]
+                            + ConstCorrespond.ROUTE_WEIGHT[3] * cityCalList.stream().mapToDouble(CityCal::getCityscore).average().getAsDouble()) / 20.0
+            );
+            sumCalResponse.getResultList().add(routeCalReponse);
+            sumCalResponse.setSumScore(NumberTool.doubleToStringWotH(sumCalResponse.getResultList().stream().mapToDouble(RouteCalReponse::getFinalscore).average().getAsDouble()));
+        }
+
+        return sumCalResponse;
     }
 
 
