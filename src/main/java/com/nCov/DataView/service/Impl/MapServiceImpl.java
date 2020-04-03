@@ -150,14 +150,17 @@ public class MapServiceImpl implements MapService {
 
                         DayInfo dayInfo = new DayInfo();
                         dayInfo.setDate(TimeTool.timeToDaySy(calendar.getTime()));
-                        dayInfo.setConfirm(covData.getTotalconfirm());
+                        int remain = covData.getTotalconfirm() - covData.getTotalheal() - covData.getTotaldead();
+                        dayInfo.setConfirm(Math.max(remain, 0));
                         provinceInfoResponse.getDayInfoList().add(dayInfo);
                     }
                     calendar.add(Calendar.DATE, 1);
                 } else {
                     DayInfo dayInfo = new DayInfo();
                     dayInfo.setDate(TimeTool.timeToDaySy(calendar.getTime()));
-                    dayInfo.setConfirm(tempProList.get(TimeTool.timeToDaySy(calendar.getTime())).getTotalconfirm());
+                    CovData covData = tempProList.get(TimeTool.timeToDaySy(calendar.getTime()));
+                    int remain = covData.getTotalconfirm() - covData.getTotalheal() - covData.getTotaldead();
+                    dayInfo.setConfirm(remain);
                     provinceInfoResponse.getDayInfoList().add(dayInfo);
                     temp = tempProList.get(TimeTool.timeToDaySy(calendar.getTime()));
                     if (areaName == null) areaName = temp.getProvincename();
