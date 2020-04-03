@@ -138,7 +138,8 @@ public class MapServiceImpl implements MapService {
 
                         DayInfo dayInfo = new DayInfo();
                         dayInfo.setDate(TimeTool.timeToDaySy(calendar.getTime()));
-                        dayInfo.setConfirm(covData.getTotalconfirm());
+                        int remain = covData.getTotalconfirm() - covData.getTotalheal() - covData.getTotaldead();
+                        dayInfo.setConfirm(Math.max(remain, 0));
                         provinceInfoResponse.getDayInfoList().add(dayInfo);
                     } else {
                         CovData covData = new CovData();
