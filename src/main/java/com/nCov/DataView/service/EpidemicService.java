@@ -129,4 +129,22 @@ public interface EpidemicService {
      * @Date: 2020/3/31
      */
     public SumCalResponse calculate(List<RouteCalRequest> routeCalRequestList) throws AllException, ParseException;
+
+    /**
+     * @Description: 读取数据库中存储的信息
+     * @Param: [cur, nums]
+     * @return: com.nCov.DataView.model.response.Result
+     * @Author: pongshy
+     * @Date: 2020/4/4
+     */
+    public Result getSpecifiedNumber(Integer cur, Integer nums) throws AllException;
+
+    /**
+     * @Description: 读取excel表格中的信息，并存储到数据库中
+     * @Param: [file]
+     * @return: com.nCov.DataView.model.response.Result
+     * @Author: pongshy
+     * @Date: 2020/4/4
+     */
+    public Result setInDataBase(MultipartFile file) throws AllException, IOException, ParseException;
 }

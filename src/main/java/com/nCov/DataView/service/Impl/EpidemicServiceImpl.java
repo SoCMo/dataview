@@ -1,5 +1,7 @@
 package com.nCov.DataView.service.Impl;
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.nCov.DataView.dao.*;
 import com.nCov.DataView.exception.AllException;
 import com.nCov.DataView.exception.EmAllException;
@@ -13,6 +15,7 @@ import com.nCov.DataView.tools.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.xmlbeans.impl.xb.xsdschema.All;
 import org.springframework.beans.BeanUtils;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.scheduling.annotation.Async;
@@ -25,6 +28,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -613,14 +618,12 @@ public class EpidemicServiceImpl implements EpidemicService {
         SumAssessmentResponse sumAssessmentResponse = new SumAssessmentResponse();
         PathInfoDOExample pathInfoDOExample = new PathInfoDOExample();
         for (String startAddress : addressList) {
-
             pathInfoDOExample.createCriteria().andStartEqualTo(startAddress);
             List<PathInfoDO> pathInfoDOList = pathInfoDOMapper.selectByExample(pathInfoDOExample);
             pathInfoDOExample.clear();
 
             //如果数据库中存在
             if (pathInfoDOList.size() >= 1) {
-
                 List<SumCalResponse> sumCalResponseList = getAllRouteCal(pathInfoDOList);
 
                 AssessmentAllResponse assessmentAllResponse = new AssessmentAllResponse();
@@ -692,8 +695,6 @@ public class EpidemicServiceImpl implements EpidemicService {
         AssessmentAllResponse assessmentAllResponse = new AssessmentAllResponse();
         assessmentAllResponse.setStart(startAddress);
         assessmentAllResponse.setEnd(endAddress);
-
-
 
         List<SumCalResponse> sumCalResponseList = new ArrayList<>();
         PathInfoDOExample pathInfoDOExample = new PathInfoDOExample();
@@ -803,6 +804,165 @@ public class EpidemicServiceImpl implements EpidemicService {
         }
 
         return sumCalResponse;
+    }
+
+    /**
+     * @Description: 读取数据库中存储的信息
+     * @Param: [cur, nums]
+     * @return: com.nCov.DataView.model.response.Result
+     * @Author: pongshy
+     * @Date: 2020/4/4
+     */
+    @Override
+    public Result getSpecifiedNumber(Integer cur, Integer nums) throws AllException {
+        List<AssessmentAllResponse> list = new ArrayList<>();
+        final String endAddress = "上海大学宝山校区";
+        ReadFromDBResponse readFromDBResponse = new ReadFromDBResponse();
+        try {
+            PageHelper.startPage(cur, nums);
+            List<PathInfoDO> pathInfoDOList = pathInfoDOMapper.selectDistinctByStart();
+            PathInfoDOExample pathInfoDOExample = new PathInfoDOExample();
+
+            for (PathInfoDO pathInfoDO : pathInfoDOList) {
+                String startAddress = pathInfoDO.getStart();
+
+                pathInfoDOExample.createCriteria().andStartEqualTo(startAddress);
+                List<PathInfoDO> pathInfoDOS = pathInfoDOMapper.selectByExample(pathInfoDOExample);
+                pathInfoDOExample.clear();
+
+                if (pathInfoDOS.size() >= 1) {
+                    List<SumCalResponse> sumCalResponseList = getAllRouteCal(pathInfoDOS);
+                    AssessmentAllResponse assessmentAllResponse = new AssessmentAllResponse();
+                    assessmentAllResponse.setSumCalResponseList(sumCalResponseList);
+                    assessmentAllResponse.setStart(startAddress);
+                    assessmentAllResponse.setEnd(endAddress);
+
+                    list.add(assessmentAllResponse);
+                } else {
+                    throw new AllException(EmAllException.DATABASE_ERROR);
+                }
+            }
+
+            PageInfo pageInfo = new PageInfo(pathInfoDOList);
+            int total = (int)pageInfo.getTotal();
+            readFromDBResponse.setTotal(total);
+            readFromDBResponse.setAssessmentAllResponseList(list);
+
+            return ResultTool.success(readFromDBResponse);
+        }
+        catch (Exception e) {
+            throw new AllException(EmAllException.DATABASE_ERROR);
+        }
+    }
+
+    /**
+     * @Description: 读取excel表格中的信息，并存储到数据库中
+     * @Param: [file]
+     * @return: com.nCov.DataView.model.response.Result
+     * @Author: pongshy
+     * @Date: 2020/4/4
+     */
+    @Async
+    @Override
+    public Result setInDataBase(MultipartFile file) throws AllException, IOException, ParseException {
+        List<String> errorList = new ArrayList<>();
+        if (file == null) {
+            throw new AllException(EmAllException.BAD_REQUEST, "上传文件为空");
+        }
+        final String endAddress = "上海大学宝山校区";
+        InputStream in = file.getInputStream();
+        Sheet sheet = ImportExcel.getBankListByExcel(in, file.getOriginalFilename());
+
+        PathInfoDOExample pathInfoDOExample = new PathInfoDOExample();
+        for (int i = 1; i <= sheet.getLastRowNum(); ++i) {
+            Row row = sheet.getRow(i);
+            String tempAddress = "";
+            StringBuilder temp_start = new StringBuilder();
+            String startAddress = "";
+
+            tempAddress = row.getCell(9).getStringCellValue()
+                         + row.getCell(10).getStringCellValue()
+                         + row.getCell(11).getStringCellValue()
+                         + row.getCell(12).getStringCellValue()
+                         + row.getCell(13).getStringCellValue();
+            tempAddress.replaceAll("\\s*", "");
+            //使用正则去除空格和非法字符
+            String regex = "[a-zA-Z0-9\\u4e00-\\u9fa5-]";
+            Pattern pattern = Pattern.compile(regex);
+            Matcher matcher = pattern.matcher(tempAddress);
+            while (matcher.find()) {
+                temp_start.append(matcher.group());
+            }
+            startAddress = temp_start.toString();
+            pathInfoDOExample.createCriteria().andStartEqualTo(startAddress);
+            int num = pathInfoDOMapper.countByExample(pathInfoDOExample);
+            pathInfoDOExample.clear();
+
+            if (num == 0) {
+                try {
+                    PathRequest pathRequest = baiduTool.pathInfo(startAddress, endAddress);
+                    //n条路线
+                    List<RouteListRequest> routeListRequests = pathRequest.getPathList();
+                    if (routeListRequests.isEmpty()) {
+                        return null;
+                    }
+                    List<SumCalResponse> sumCalResponseList = new ArrayList<>();
+                    //每一条路径信息，存入数据库
+                    int routeNum = 0;
+                    for (RouteListRequest routeListRequest : routeListRequests) {
+                        //每一条路线
+                        int pathId = 0;
+                        PathInfoDO record = new PathInfoDO();
+
+                        record.setStart(startAddress);
+                        record.setEnd(endAddress);
+                        record.setMainType(routeNum);
+                        pathInfoDOMapper.insertSelective(record);
+
+                        pathInfoDOExample.createCriteria().andStartEqualTo(startAddress).andMainTypeEqualTo(routeNum);
+                        PathInfoDO pathInfoDO = pathInfoDOMapper.selectByExample(pathInfoDOExample).get(0);
+                        pathId = pathInfoDO.getId();
+                        pathInfoDOExample.clear();
+
+                        int order_num = 0;
+                        int main_type = 0;
+                        for (RouteCalRequest routeCalRequest : routeListRequest.getRouteCalRequestList()) {
+                            List<PassInfoDO> passInfoDOList = new ArrayList<>();
+
+                            for (String city : routeCalRequest.getCitys()) {
+                                PassInfoDO passInfoDO_record = new PassInfoDO();
+                                passInfoDO_record.setArea(city);
+                                passInfoDO_record.setDistance((int) routeCalRequest.getDistance());
+                                passInfoDO_record.setOrderId(order_num);
+                                passInfoDO_record.setStartAddress(routeCalRequest.getStart());
+                                passInfoDO_record.setEndAddress(routeCalRequest.getEnd());
+                                passInfoDO_record.setTitle(routeCalRequest.getTitle());
+                                passInfoDO_record.setPathId(pathId);
+                                passInfoDO_record.setTypeNum(routeCalRequest.getType());
+
+                                passInfoDOList.add(passInfoDO_record);
+                            }
+                            if (routeCalRequest.getType() > main_type) {
+                                main_type = routeCalRequest.getType();
+                            }
+                            passInfoDOMapper.insertList(passInfoDOList);
+                            ++order_num;
+                        }
+                        ++routeNum;
+                        pathInfoDO.setMainType(main_type);
+                        pathInfoDOMapper.updateByPrimaryKeySelective(pathInfoDO);
+                    }
+                }
+                catch (Exception e) {
+                    e.printStackTrace();
+                    log.info("地址:" + startAddress + "无法读入数据库中");
+                    errorList.add(startAddress);
+                    System.out.println(startAddress);
+                }
+            }
+        }
+
+        return ResultTool.success(errorList);
     }
 
 

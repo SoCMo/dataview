@@ -131,4 +131,36 @@ public class EpidemicController {
         return epidemicService.getAssessment(data);
     }
 
+    /**
+     * @Description: 读取数据库中存储的信息
+     * @Param: [cur, nums]
+     * @return: com.nCov.DataView.model.response.Result
+     * @Author: pongshy
+     * @Date: 2020/4/4
+     */
+    @GetMapping("/getDetails")
+    public Result getDetails(@RequestParam(value = "cur", defaultValue = "1") Integer cur,
+                             @RequestParam(value = "nums", defaultValue = "1") Integer nums) throws AllException {
+        if (cur == 1 && nums == 1) {
+            return ResultTool.error(500, "输入有误");
+        }
+
+        return epidemicService.getSpecifiedNumber(cur, nums);
+    }
+
+    /**
+     * @Description: 读取excel表格中的信息，并存储到数据库中
+     * @Param: [file]
+     * @return: com.nCov.DataView.model.response.Result
+     * @Author: pongshy
+     * @Date: 2020/4/4
+     */
+    @PostMapping("/storeByExcel")
+    public Result storeByExcel(@RequestBody MultipartFile file) throws AllException, IOException, ParseException {
+        epidemicService.setInDataBase(file);
+        String msg = "上传成功，正在读取请稍后";
+
+        return ResultTool.success(msg);
+    }
+
 }
