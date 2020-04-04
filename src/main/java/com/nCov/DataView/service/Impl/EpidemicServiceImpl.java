@@ -57,6 +57,9 @@ public class EpidemicServiceImpl implements EpidemicService {
     private ImpAreaDOMapper impAreaDOMapper;
 
     @Resource
+    private AbroadInputDOMapper abroadInputDOMapper;
+
+    @Resource
     private FixTool fixTool;
 
     @Resource
@@ -1159,6 +1162,14 @@ public class EpidemicServiceImpl implements EpidemicService {
             }).collect(Collectors.toList());
         }
 
+        if (!date.matches("^[0-9]{4}-[0-9]+-[0-9]+")) {
+            throw new AllException(EmAllException.BAD_REQUEST, "日期格式出错!");
+        }
+        Map<String, AbroadInputDO> abroadInputMap = abroadInputDOMapper.getInfoByDate(date);
+        if (abroadInputMap.isEmpty()) {
+            throw new AllException(EmAllException.DATABASE_ERROR, date + "的境外输入数据不存在");
+        }
+
         Map<String, AreaDO> cityMap = areaDOMapper.getCityMap();
         if (cityMap.isEmpty()) {
             throw new AllException(EmAllException.DATABASE_ERROR, "地区数据为空");
@@ -1192,7 +1203,31 @@ public class EpidemicServiceImpl implements EpidemicService {
             covDataMapper.insertList(new ArrayList<>(covDataMapNow.values()));
         }
 
-        calendar.add(Calendar.DATE, -13);
+        calendar.add(Calendar.DATE, -7);
+        //防止日期在1月24日前
+        while (calendar.getTime().before(TimeTool.stringToDay("2020-01-24"))) {
+            calendar.add(Calendar.DATE, 1);
+        }
+
+        calendarTemp.setTime(calendar.getTime());
+        Map<String, CovData> covDataMapWeek = covDataMapper.getInfoByDate(TimeTool.timeToDaySy(calendar.getTime()));
+        //找到有数据的那天，添加
+        if (covDataMapWeek.isEmpty()) {
+            while (covDataMapWeek.isEmpty() && !calendarTemp.getTime().before(TimeTool.stringToDay("2020-01-24"))) {
+                calendarTemp.add(Calendar.DATE, -1);
+                covDataMapWeek = covDataMapper.getInfoByDate(TimeTool.timeToDaySy(calendarTemp.getTime()));
+            }
+            if (calendarTemp.getTime().before(TimeTool.stringToDay("2020-01-24"))) {
+                throw new AllException(EmAllException.DATABASE_ERROR, "暂无疫情数据");
+            }
+            for (CovData covData : covDataMapWeek.values()) {
+                covData.setId(null);
+                covData.setDate(calendar.getTime());
+            }
+            covDataMapper.insertList(new ArrayList<>(covDataMapWeek.values()));
+        }
+
+        calendar.add(Calendar.DATE, -6);
         //防止日期在1月24日前
         while (calendar.getTime().before(TimeTool.stringToDay("2020-01-24"))) {
             calendar.add(Calendar.DATE, 1);
@@ -1223,6 +1258,8 @@ public class EpidemicServiceImpl implements EpidemicService {
 
             CovData covDataNow;
             CovData covDataThr;
+            CovData covDataWeek;
+
             if ((covDataNow = covDataMapNow.get(areaDO.getName())) == null) {
                 List<CovData> listNow = covDataMapNow.values()
                         .stream()
@@ -1250,18 +1287,94 @@ public class EpidemicServiceImpl implements EpidemicService {
                     covDataThr = listThr.get(0);
                 }
             }
+
+            if ((covDataWeek = covDataMapWeek.get(areaDO.getName())) == null) {
+                List<CovData> listNow = covDataMapWeek.values()
+                        .stream()
+                        .filter(covData -> covData.getAreaname().contains(areaDO.getName()))
+                        .collect(Collectors.toList());
+                if (listNow.isEmpty()) {
+                    if ((covDataWeek = fixTool.fixCovDate(TimeTool.timeToDaySy(calendar.getTime()), areaDO.getName())) == null) {
+                        continue;
+                    }
+                } else {
+                    covDataWeek = listNow.get(0);
+                }
+            }
+
             double RemainConfirm = Double.parseDouble(NumberTool.doubleToStringWotH(NumberTool.intDivision(covDataNow.getTotalconfirm() - covDataNow.getTotaldead() - covDataNow.getTotalheal(), areaDO.getPopulation()) * 1000000));
             impAreaDO.setRemainConfirm(Math.max(RemainConfirm, 0));
             int count = covDataNow.getTotalconfirm() - covDataNow.getTotalheal() - covDataNow.getTotaldead();
             impAreaDO.setRemainCount(Math.max(count, 0));
             int growth = covDataNow.getTotalconfirm() - covDataThr.getTotalconfirm();
             impAreaDO.setGrowth(Math.max(growth, 0));
+            double weekGrowth = NumberTool.intDivision(covDataNow.getTotalconfirm(), covDataWeek.getTotalconfirm());
+            impAreaDO.setWeekGrowth(weekGrowth);
+
+            AbroadInputDO abroadInputDO = abroadInputMap.get(fixTool.provinceUni(impAreaDO.getProvinceName()));
+            if (abroadInputDO == null) {
+                log.info(impAreaDO.getProvinceName() + "名称可能无法标准化");
+                for (AbroadInputDO abroadInputDOTRA : abroadInputMap.values()) {
+                    if (impAreaDO.getProvinceName().contains(abroadInputDOTRA.getProvincename())) {
+                        abroadInputDO = abroadInputDOTRA;
+                    }
+                }
+                if (abroadInputDO == null) {
+                    abroadInputDO = new AbroadInputDO();
+                    abroadInputDO.setDate(TimeTool.stringToDay(date));
+                    abroadInputDO.setThenumber(0);
+                    abroadInputDO.setProvincename(fixTool.provinceUni(impAreaDO.getProvinceName()));
+                    abroadInputDOMapper.insertSelective(abroadInputDO);
+                }
+            }
+
+            impAreaDO.setAbroadInput(abroadInputDO.getThenumber());
             impAreaDOList.add(impAreaDO);
         }
 
-        impAreaDOList.sort(Comparator.comparing(ImpAreaDO::getRemainConfirm).reversed());
+        impAreaDOList.sort(Comparator.comparing(ImpAreaDO::getAbroadInput).reversed());
         int number = 1;
         double last = 0;
+        for (int i = 0; i < impAreaDOList.size(); i++) {
+            if (i == 0) {
+                last = impAreaDOList.get(0).getAbroadInput();
+                impAreaDOList.get(0).setAbroadInputRank(number++);
+            } else if (last == impAreaDOList.get(i).getAbroadInput()) {
+                impAreaDOList.get(i).setAbroadInputRank(impAreaDOList.get(i - 1).getAbroadInputRank());
+                number++;
+            } else {
+                last = impAreaDOList.get(i).getAbroadInput();
+                impAreaDOList.get(i).setAbroadInputRank(number++);
+            }
+        }
+        int lastRank = impAreaDOList.get(impAreaDOList.size() - 1).getAbroadInputRank();
+        for (ImpAreaDO covRank : impAreaDOList) {
+            covRank.setAbroadInputScore(NumberTool.Score(covRank.getAbroadInputRank(), lastRank));
+        }
+
+        impAreaDOList.sort(Comparator.comparing(ImpAreaDO::getWeekGrowth).reversed());
+        number = 1;
+        last = 0;
+        for (int i = 0; i < impAreaDOList.size(); i++) {
+            if (i == 0) {
+                last = impAreaDOList.get(0).getWeekGrowth();
+                impAreaDOList.get(0).setWeekGrowthRank(number++);
+            } else if (last == impAreaDOList.get(i).getWeekGrowth()) {
+                impAreaDOList.get(i).setWeekGrowthRank(impAreaDOList.get(i - 1).getWeekGrowthRank());
+                number++;
+            } else {
+                last = impAreaDOList.get(i).getWeekGrowth();
+                impAreaDOList.get(i).setWeekGrowthRank(number++);
+            }
+        }
+        lastRank = impAreaDOList.get(impAreaDOList.size() - 1).getWeekGrowthRank();
+        for (ImpAreaDO covRank : impAreaDOList) {
+            covRank.setWeekScore(NumberTool.Score(covRank.getWeekGrowthRank(), lastRank));
+        }
+
+        impAreaDOList.sort(Comparator.comparing(ImpAreaDO::getRemainConfirm).reversed());
+        number = 1;
+        last = 0;
         for (int i = 0; i < impAreaDOList.size(); i++) {
             if (i == 0) {
                 last = impAreaDOList.get(0).getRemainConfirm();
@@ -1274,7 +1387,7 @@ public class EpidemicServiceImpl implements EpidemicService {
                 impAreaDOList.get(i).setRemainConfirmRank(number++);
             }
         }
-        int lastRank = impAreaDOList.get(impAreaDOList.size() - 1).getRemainConfirmRank();
+        lastRank = impAreaDOList.get(impAreaDOList.size() - 1).getRemainConfirmRank();
         for (ImpAreaDO covRank : impAreaDOList) {
             covRank.setRemainScore(NumberTool.Score(covRank.getRemainConfirmRank(), lastRank));
         }
@@ -1316,7 +1429,12 @@ public class EpidemicServiceImpl implements EpidemicService {
 
         for (ImpAreaDO impAreaDO : impAreaDOList) {
             impAreaDO.setGrowthScore(NumberTool.Score(impAreaDO.getGrowthRank(), impAreaDOList.get(impAreaDOList.size() - 1).getGrowthRank()));
-            impAreaDO.setSumScore(impAreaDO.getRemainCountScore() * 0.3 + impAreaDO.getRemainScore() * 0.3 + impAreaDO.getGrowthScore() * 0.4);
+            impAreaDO.setSumScore(impAreaDO.getRemainCountScore() * 0.3
+                    + impAreaDO.getRemainScore() * 0.3
+                    + impAreaDO.getGrowthScore() * 0.2
+                    + impAreaDO.getWeekScore() * 0.15
+                    + impAreaDO.getAbroadInput() * 0.05
+            );
         }
 
         impAreaDOList.sort(Comparator.comparing(ImpAreaDO::getSumScore).reversed());
@@ -1351,6 +1469,7 @@ public class EpidemicServiceImpl implements EpidemicService {
             BeanUtils.copyProperties(impAreaDO, covRankResponse);
             covRankResponse.setProvincename(impAreaDO.getProvinceName());
             covRankResponse.setAllRank(impAreaDO.getAllrank());
+            covRankResponse.setWeekGrowth(NumberTool.doubleToStringWithH(impAreaDO.getWeekGrowth()));
             return covRankResponse;
         }).collect(Collectors.toList());
     }

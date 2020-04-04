@@ -20,17 +20,29 @@ public class CovRankResponse {
 
     private int growthRank;
 
+    private int abroadInputRank;
+
+    private int weekGrowthRank;
+
     private double remainConfirm;
 
     private int remainCount;
 
     private int growth;
 
+    private int abroadInput;
+
+    private String weekGrowth;
+
     private int remainScore;
 
     private int remainCountScore;
 
     private int growthScore;
+
+    private int abroadInputScore;
+
+    private int weekGrowthScore;
 
     private double sumScore;
 
