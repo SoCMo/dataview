@@ -7,10 +7,16 @@
     <result column="name" property="name" jdbcType="VARCHAR"/>
     <result column="remain_confirm_rank" property="remainConfirmRank" jdbcType="INTEGER"/>
     <result column="remain_count_rank" property="remainCountRank" jdbcType="INTEGER"/>
+    <result column="abroad_input_rank" property="abroadInputRank" jdbcType="INTEGER"/>
+    <result column="week_growth_rank" property="weekGrowthRank" jdbcType="INTEGER"/>
     <result column="growth_rank" property="growthRank" jdbcType="INTEGER"/>
     <result column="remain_confirm" property="remainConfirm" jdbcType="DOUBLE"/>
     <result column="remain_count" property="remainCount" jdbcType="INTEGER"/>
+    <result column="week_growth" property="weekGrowth" jdbcType="DOUBLE"/>
+    <result column="abroad_input" property="abroadInput" jdbcType="INTEGER"/>
     <result column="growth" property="growth" jdbcType="INTEGER"/>
+    <result column="week_score" property="weekScore" jdbcType="INTEGER"/>
+    <result column="abroad_input_score" property="abroadInputScore" jdbcType="INTEGER"/>
     <result column="remain_score" property="remainScore" jdbcType="INTEGER"/>
     <result column="remain_count_score" property="remainCountScore" jdbcType="INTEGER"/>
     <result column="growth_score" property="growthScore" jdbcType="INTEGER"/>
@@ -77,9 +83,10 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, province_name, name, remain_confirm_rank, remain_count_rank, growth_rank, remain_confirm,
-    remain_count, growth, remain_score, remain_count_score, growth_score, sum_score,
-    allRank, date
+    id, province_name, name, remain_confirm_rank, remain_count_rank, abroad_input_rank,
+    week_growth_rank, growth_rank, remain_confirm, remain_count, week_growth, abroad_input,
+    growth, week_score, abroad_input_score, remain_score, remain_count_score, growth_score,
+    sum_score, allRank, date
   </sql>
   <select id="selectByExample" resultMap="BaseResultMap"
           parameterType="com.nCov.DataView.model.entity.ImpAreaDOExample">
@@ -113,27 +120,54 @@
       <include refid="Example_Where_Clause"/>
     </if>
   </delete>
+  <insert id="insert" parameterType="com.nCov.DataView.model.entity.ImpAreaDO">
+    insert into impArea (id, province_name, name,
+    remain_confirm_rank, remain_count_rank, abroad_input_rank,
+    week_growth_rank, growth_rank, remain_confirm,
+    remain_count, week_growth, abroad_input,
+    growth, week_score, abroad_input_score,
+    remain_score, remain_count_score, growth_score,
+    sum_score, allRank, date
+    )
+    values (#{id,jdbcType=INTEGER}, #{provinceName,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR},
+    #{remainConfirmRank,jdbcType=INTEGER}, #{remainCountRank,jdbcType=INTEGER}, #{abroadInputRank,jdbcType=INTEGER},
+    #{weekGrowthRank,jdbcType=INTEGER}, #{growthRank,jdbcType=INTEGER}, #{remainConfirm,jdbcType=DOUBLE},
+    #{remainCount,jdbcType=INTEGER}, #{weekGrowth,jdbcType=DOUBLE}, #{abroadInput,jdbcType=INTEGER},
+    #{growth,jdbcType=INTEGER}, #{weekScore,jdbcType=INTEGER}, #{abroadInputScore,jdbcType=INTEGER},
+    #{remainScore,jdbcType=INTEGER}, #{remainCountScore,jdbcType=INTEGER}, #{growthScore,jdbcType=INTEGER},
+    #{sumScore,jdbcType=DOUBLE}, #{allrank,jdbcType=INTEGER}, #{date,jdbcType=DATE}
+    )
+  </insert>
   <insert id="insertList" parameterType="java.util.List">
     <selectKey resultType="java.lang.Integer" keyProperty="id"
                order="AFTER">
       SELECT LAST_INSERT_ID()
     </selectKey>
     insert into impArea (province_name, name,
-    remain_confirm_rank, remain_count_rank, growth_rank,
-    remain_confirm, remain_count, growth,
+    remain_confirm_rank, remain_count_rank, abroad_input_rank,
+    week_growth_rank, growth_rank, remain_confirm,
+    remain_count, week_growth, abroad_input,
+    growth, week_score, abroad_input_score,
     remain_score, remain_count_score, growth_score,
     sum_score, allRank, date
-    ) values
+    )
+    values
     <foreach collection="list" item="ImpAreaDO" index="index" separator=",">
       (
       #{ImpAreaDO.provinceName},
       #{ImpAreaDO.name},
       #{ImpAreaDO.remainConfirmRank},
       #{ImpAreaDO.remainCountRank},
+      #{ImpAreaDO.abroadInputRank},
+      #{ImpAreaDO.remainCountRank},
       #{ImpAreaDO.growthRank},
       #{ImpAreaDO.remainConfirm},
       #{ImpAreaDO.remainCount},
+      #{ImpAreaDO.weekGrowth},
+      #{ImpAreaDO.abroadInput},
       #{ImpAreaDO.growth},
+      #{ImpAreaDO.weekScore},
+      #{ImpAreaDO.abroadInputScore},
       #{ImpAreaDO.remainScore},
       #{ImpAreaDO.remainCountScore},
       #{ImpAreaDO.growthScore},
@@ -142,20 +176,6 @@
       #{ImpAreaDO.date}
       )
     </foreach>
-  </insert>
-  <insert id="insert" parameterType="com.nCov.DataView.model.entity.ImpAreaDO">
-    insert into impArea (id, province_name, name,
-    remain_confirm_rank, remain_count_rank, growth_rank,
-    remain_confirm, remain_count, growth,
-    remain_score, remain_count_score, growth_score,
-    sum_score, allRank, date
-    )
-    values (#{id,jdbcType=INTEGER}, #{provinceName,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR},
-    #{remainConfirmRank,jdbcType=INTEGER}, #{remainCountRank,jdbcType=INTEGER}, #{growthRank,jdbcType=INTEGER},
-    #{remainConfirm,jdbcType=DOUBLE}, #{remainCount,jdbcType=INTEGER}, #{growth,jdbcType=INTEGER},
-    #{remainScore,jdbcType=INTEGER}, #{remainCountScore,jdbcType=INTEGER}, #{growthScore,jdbcType=INTEGER},
-    #{sumScore,jdbcType=DOUBLE}, #{allrank,jdbcType=INTEGER}, #{date,jdbcType=DATE}
-    )
   </insert>
   <insert id="insertSelective" parameterType="com.nCov.DataView.model.entity.ImpAreaDO">
     insert into impArea
@@ -175,6 +195,12 @@
       <if test="remainCountRank != null">
         remain_count_rank,
       </if>
+      <if test="abroadInputRank != null">
+        abroad_input_rank,
+      </if>
+      <if test="weekGrowthRank != null">
+        week_growth_rank,
+      </if>
       <if test="growthRank != null">
         growth_rank,
       </if>
@@ -184,8 +210,20 @@
       <if test="remainCount != null">
         remain_count,
       </if>
+      <if test="weekGrowth != null">
+        week_growth,
+      </if>
+      <if test="abroadInput != null">
+        abroad_input,
+      </if>
       <if test="growth != null">
         growth,
+      </if>
+      <if test="weekScore != null">
+        week_score,
+      </if>
+      <if test="abroadInputScore != null">
+        abroad_input_score,
       </if>
       <if test="remainScore != null">
         remain_score,
@@ -222,6 +260,12 @@
       <if test="remainCountRank != null">
         #{remainCountRank,jdbcType=INTEGER},
       </if>
+      <if test="abroadInputRank != null">
+        #{abroadInputRank,jdbcType=INTEGER},
+      </if>
+      <if test="weekGrowthRank != null">
+        #{weekGrowthRank,jdbcType=INTEGER},
+      </if>
       <if test="growthRank != null">
         #{growthRank,jdbcType=INTEGER},
       </if>
@@ -231,8 +275,20 @@
       <if test="remainCount != null">
         #{remainCount,jdbcType=INTEGER},
       </if>
+      <if test="weekGrowth != null">
+        #{weekGrowth,jdbcType=DOUBLE},
+      </if>
+      <if test="abroadInput != null">
+        #{abroadInput,jdbcType=INTEGER},
+      </if>
       <if test="growth != null">
         #{growth,jdbcType=INTEGER},
+      </if>
+      <if test="weekScore != null">
+        #{weekScore,jdbcType=INTEGER},
+      </if>
+      <if test="abroadInputScore != null">
+        #{abroadInputScore,jdbcType=INTEGER},
       </if>
       <if test="remainScore != null">
         #{remainScore,jdbcType=INTEGER},
@@ -279,6 +335,12 @@
       <if test="record.remainCountRank != null">
         remain_count_rank = #{record.remainCountRank,jdbcType=INTEGER},
       </if>
+      <if test="record.abroadInputRank != null">
+        abroad_input_rank = #{record.abroadInputRank,jdbcType=INTEGER},
+      </if>
+      <if test="record.weekGrowthRank != null">
+        week_growth_rank = #{record.weekGrowthRank,jdbcType=INTEGER},
+      </if>
       <if test="record.growthRank != null">
         growth_rank = #{record.growthRank,jdbcType=INTEGER},
       </if>
@@ -288,8 +350,20 @@
       <if test="record.remainCount != null">
         remain_count = #{record.remainCount,jdbcType=INTEGER},
       </if>
+      <if test="record.weekGrowth != null">
+        week_growth = #{record.weekGrowth,jdbcType=DOUBLE},
+      </if>
+      <if test="record.abroadInput != null">
+        abroad_input = #{record.abroadInput,jdbcType=INTEGER},
+      </if>
       <if test="record.growth != null">
         growth = #{record.growth,jdbcType=INTEGER},
+      </if>
+      <if test="record.weekScore != null">
+        week_score = #{record.weekScore,jdbcType=INTEGER},
+      </if>
+      <if test="record.abroadInputScore != null">
+        abroad_input_score = #{record.abroadInputScore,jdbcType=INTEGER},
       </if>
       <if test="record.remainScore != null">
         remain_score = #{record.remainScore,jdbcType=INTEGER},
@@ -321,10 +395,16 @@
     name = #{record.name,jdbcType=VARCHAR},
     remain_confirm_rank = #{record.remainConfirmRank,jdbcType=INTEGER},
     remain_count_rank = #{record.remainCountRank,jdbcType=INTEGER},
+    abroad_input_rank = #{record.abroadInputRank,jdbcType=INTEGER},
+    week_growth_rank = #{record.weekGrowthRank,jdbcType=INTEGER},
     growth_rank = #{record.growthRank,jdbcType=INTEGER},
     remain_confirm = #{record.remainConfirm,jdbcType=DOUBLE},
     remain_count = #{record.remainCount,jdbcType=INTEGER},
+    week_growth = #{record.weekGrowth,jdbcType=DOUBLE},
+    abroad_input = #{record.abroadInput,jdbcType=INTEGER},
     growth = #{record.growth,jdbcType=INTEGER},
+    week_score = #{record.weekScore,jdbcType=INTEGER},
+    abroad_input_score = #{record.abroadInputScore,jdbcType=INTEGER},
     remain_score = #{record.remainScore,jdbcType=INTEGER},
     remain_count_score = #{record.remainCountScore,jdbcType=INTEGER},
     growth_score = #{record.growthScore,jdbcType=INTEGER},
@@ -350,6 +430,12 @@
       <if test="remainCountRank != null">
         remain_count_rank = #{remainCountRank,jdbcType=INTEGER},
       </if>
+      <if test="abroadInputRank != null">
+        abroad_input_rank = #{abroadInputRank,jdbcType=INTEGER},
+      </if>
+      <if test="weekGrowthRank != null">
+        week_growth_rank = #{weekGrowthRank,jdbcType=INTEGER},
+      </if>
       <if test="growthRank != null">
         growth_rank = #{growthRank,jdbcType=INTEGER},
       </if>
@@ -359,8 +445,20 @@
       <if test="remainCount != null">
         remain_count = #{remainCount,jdbcType=INTEGER},
       </if>
+      <if test="weekGrowth != null">
+        week_growth = #{weekGrowth,jdbcType=DOUBLE},
+      </if>
+      <if test="abroadInput != null">
+        abroad_input = #{abroadInput,jdbcType=INTEGER},
+      </if>
       <if test="growth != null">
         growth = #{growth,jdbcType=INTEGER},
+      </if>
+      <if test="weekScore != null">
+        week_score = #{weekScore,jdbcType=INTEGER},
+      </if>
+      <if test="abroadInputScore != null">
+        abroad_input_score = #{abroadInputScore,jdbcType=INTEGER},
       </if>
       <if test="remainScore != null">
         remain_score = #{remainScore,jdbcType=INTEGER},
@@ -389,10 +487,16 @@
     name = #{name,jdbcType=VARCHAR},
     remain_confirm_rank = #{remainConfirmRank,jdbcType=INTEGER},
     remain_count_rank = #{remainCountRank,jdbcType=INTEGER},
+    abroad_input_rank = #{abroadInputRank,jdbcType=INTEGER},
+    week_growth_rank = #{weekGrowthRank,jdbcType=INTEGER},
     growth_rank = #{growthRank,jdbcType=INTEGER},
     remain_confirm = #{remainConfirm,jdbcType=DOUBLE},
     remain_count = #{remainCount,jdbcType=INTEGER},
+    week_growth = #{weekGrowth,jdbcType=DOUBLE},
+    abroad_input = #{abroadInput,jdbcType=INTEGER},
     growth = #{growth,jdbcType=INTEGER},
+    week_score = #{weekScore,jdbcType=INTEGER},
+    abroad_input_score = #{abroadInputScore,jdbcType=INTEGER},
     remain_score = #{remainScore,jdbcType=INTEGER},
     remain_count_score = #{remainCountScore,jdbcType=INTEGER},
     growth_score = #{growthScore,jdbcType=INTEGER},

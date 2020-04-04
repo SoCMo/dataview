@@ -452,6 +452,126 @@ public class ImpAreaDOExample {
             return (Criteria) this;
         }
 
+        public Criteria andAbroadInputRankIsNull() {
+            addCriterion("abroad_input_rank is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAbroadInputRankIsNotNull() {
+            addCriterion("abroad_input_rank is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAbroadInputRankEqualTo(Integer value) {
+            addCriterion("abroad_input_rank =", value, "abroadInputRank");
+            return (Criteria) this;
+        }
+
+        public Criteria andAbroadInputRankNotEqualTo(Integer value) {
+            addCriterion("abroad_input_rank <>", value, "abroadInputRank");
+            return (Criteria) this;
+        }
+
+        public Criteria andAbroadInputRankGreaterThan(Integer value) {
+            addCriterion("abroad_input_rank >", value, "abroadInputRank");
+            return (Criteria) this;
+        }
+
+        public Criteria andAbroadInputRankGreaterThanOrEqualTo(Integer value) {
+            addCriterion("abroad_input_rank >=", value, "abroadInputRank");
+            return (Criteria) this;
+        }
+
+        public Criteria andAbroadInputRankLessThan(Integer value) {
+            addCriterion("abroad_input_rank <", value, "abroadInputRank");
+            return (Criteria) this;
+        }
+
+        public Criteria andAbroadInputRankLessThanOrEqualTo(Integer value) {
+            addCriterion("abroad_input_rank <=", value, "abroadInputRank");
+            return (Criteria) this;
+        }
+
+        public Criteria andAbroadInputRankIn(List<Integer> values) {
+            addCriterion("abroad_input_rank in", values, "abroadInputRank");
+            return (Criteria) this;
+        }
+
+        public Criteria andAbroadInputRankNotIn(List<Integer> values) {
+            addCriterion("abroad_input_rank not in", values, "abroadInputRank");
+            return (Criteria) this;
+        }
+
+        public Criteria andAbroadInputRankBetween(Integer value1, Integer value2) {
+            addCriterion("abroad_input_rank between", value1, value2, "abroadInputRank");
+            return (Criteria) this;
+        }
+
+        public Criteria andAbroadInputRankNotBetween(Integer value1, Integer value2) {
+            addCriterion("abroad_input_rank not between", value1, value2, "abroadInputRank");
+            return (Criteria) this;
+        }
+
+        public Criteria andWeekGrowthRankIsNull() {
+            addCriterion("week_growth_rank is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andWeekGrowthRankIsNotNull() {
+            addCriterion("week_growth_rank is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andWeekGrowthRankEqualTo(Integer value) {
+            addCriterion("week_growth_rank =", value, "weekGrowthRank");
+            return (Criteria) this;
+        }
+
+        public Criteria andWeekGrowthRankNotEqualTo(Integer value) {
+            addCriterion("week_growth_rank <>", value, "weekGrowthRank");
+            return (Criteria) this;
+        }
+
+        public Criteria andWeekGrowthRankGreaterThan(Integer value) {
+            addCriterion("week_growth_rank >", value, "weekGrowthRank");
+            return (Criteria) this;
+        }
+
+        public Criteria andWeekGrowthRankGreaterThanOrEqualTo(Integer value) {
+            addCriterion("week_growth_rank >=", value, "weekGrowthRank");
+            return (Criteria) this;
+        }
+
+        public Criteria andWeekGrowthRankLessThan(Integer value) {
+            addCriterion("week_growth_rank <", value, "weekGrowthRank");
+            return (Criteria) this;
+        }
+
+        public Criteria andWeekGrowthRankLessThanOrEqualTo(Integer value) {
+            addCriterion("week_growth_rank <=", value, "weekGrowthRank");
+            return (Criteria) this;
+        }
+
+        public Criteria andWeekGrowthRankIn(List<Integer> values) {
+            addCriterion("week_growth_rank in", values, "weekGrowthRank");
+            return (Criteria) this;
+        }
+
+        public Criteria andWeekGrowthRankNotIn(List<Integer> values) {
+            addCriterion("week_growth_rank not in", values, "weekGrowthRank");
+            return (Criteria) this;
+        }
+
+        public Criteria andWeekGrowthRankBetween(Integer value1, Integer value2) {
+            addCriterion("week_growth_rank between", value1, value2, "weekGrowthRank");
+            return (Criteria) this;
+        }
+
+        public Criteria andWeekGrowthRankNotBetween(Integer value1, Integer value2) {
+            addCriterion("week_growth_rank not between", value1, value2, "weekGrowthRank");
+            return (Criteria) this;
+        }
+
         public Criteria andGrowthRankIsNull() {
             addCriterion("growth_rank is null");
             return (Criteria) this;
@@ -632,6 +752,126 @@ public class ImpAreaDOExample {
             return (Criteria) this;
         }
 
+        public Criteria andWeekGrowthIsNull() {
+            addCriterion("week_growth is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andWeekGrowthIsNotNull() {
+            addCriterion("week_growth is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andWeekGrowthEqualTo(Double value) {
+            addCriterion("week_growth =", value, "weekGrowth");
+            return (Criteria) this;
+        }
+
+        public Criteria andWeekGrowthNotEqualTo(Double value) {
+            addCriterion("week_growth <>", value, "weekGrowth");
+            return (Criteria) this;
+        }
+
+        public Criteria andWeekGrowthGreaterThan(Double value) {
+            addCriterion("week_growth >", value, "weekGrowth");
+            return (Criteria) this;
+        }
+
+        public Criteria andWeekGrowthGreaterThanOrEqualTo(Double value) {
+            addCriterion("week_growth >=", value, "weekGrowth");
+            return (Criteria) this;
+        }
+
+        public Criteria andWeekGrowthLessThan(Double value) {
+            addCriterion("week_growth <", value, "weekGrowth");
+            return (Criteria) this;
+        }
+
+        public Criteria andWeekGrowthLessThanOrEqualTo(Double value) {
+            addCriterion("week_growth <=", value, "weekGrowth");
+            return (Criteria) this;
+        }
+
+        public Criteria andWeekGrowthIn(List<Double> values) {
+            addCriterion("week_growth in", values, "weekGrowth");
+            return (Criteria) this;
+        }
+
+        public Criteria andWeekGrowthNotIn(List<Double> values) {
+            addCriterion("week_growth not in", values, "weekGrowth");
+            return (Criteria) this;
+        }
+
+        public Criteria andWeekGrowthBetween(Double value1, Double value2) {
+            addCriterion("week_growth between", value1, value2, "weekGrowth");
+            return (Criteria) this;
+        }
+
+        public Criteria andWeekGrowthNotBetween(Double value1, Double value2) {
+            addCriterion("week_growth not between", value1, value2, "weekGrowth");
+            return (Criteria) this;
+        }
+
+        public Criteria andAbroadInputIsNull() {
+            addCriterion("abroad_input is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAbroadInputIsNotNull() {
+            addCriterion("abroad_input is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAbroadInputEqualTo(Integer value) {
+            addCriterion("abroad_input =", value, "abroadInput");
+            return (Criteria) this;
+        }
+
+        public Criteria andAbroadInputNotEqualTo(Integer value) {
+            addCriterion("abroad_input <>", value, "abroadInput");
+            return (Criteria) this;
+        }
+
+        public Criteria andAbroadInputGreaterThan(Integer value) {
+            addCriterion("abroad_input >", value, "abroadInput");
+            return (Criteria) this;
+        }
+
+        public Criteria andAbroadInputGreaterThanOrEqualTo(Integer value) {
+            addCriterion("abroad_input >=", value, "abroadInput");
+            return (Criteria) this;
+        }
+
+        public Criteria andAbroadInputLessThan(Integer value) {
+            addCriterion("abroad_input <", value, "abroadInput");
+            return (Criteria) this;
+        }
+
+        public Criteria andAbroadInputLessThanOrEqualTo(Integer value) {
+            addCriterion("abroad_input <=", value, "abroadInput");
+            return (Criteria) this;
+        }
+
+        public Criteria andAbroadInputIn(List<Integer> values) {
+            addCriterion("abroad_input in", values, "abroadInput");
+            return (Criteria) this;
+        }
+
+        public Criteria andAbroadInputNotIn(List<Integer> values) {
+            addCriterion("abroad_input not in", values, "abroadInput");
+            return (Criteria) this;
+        }
+
+        public Criteria andAbroadInputBetween(Integer value1, Integer value2) {
+            addCriterion("abroad_input between", value1, value2, "abroadInput");
+            return (Criteria) this;
+        }
+
+        public Criteria andAbroadInputNotBetween(Integer value1, Integer value2) {
+            addCriterion("abroad_input not between", value1, value2, "abroadInput");
+            return (Criteria) this;
+        }
+
         public Criteria andGrowthIsNull() {
             addCriterion("growth is null");
             return (Criteria) this;
@@ -689,6 +929,126 @@ public class ImpAreaDOExample {
 
         public Criteria andGrowthNotBetween(Integer value1, Integer value2) {
             addCriterion("growth not between", value1, value2, "growth");
+            return (Criteria) this;
+        }
+
+        public Criteria andWeekScoreIsNull() {
+            addCriterion("week_score is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andWeekScoreIsNotNull() {
+            addCriterion("week_score is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andWeekScoreEqualTo(Integer value) {
+            addCriterion("week_score =", value, "weekScore");
+            return (Criteria) this;
+        }
+
+        public Criteria andWeekScoreNotEqualTo(Integer value) {
+            addCriterion("week_score <>", value, "weekScore");
+            return (Criteria) this;
+        }
+
+        public Criteria andWeekScoreGreaterThan(Integer value) {
+            addCriterion("week_score >", value, "weekScore");
+            return (Criteria) this;
+        }
+
+        public Criteria andWeekScoreGreaterThanOrEqualTo(Integer value) {
+            addCriterion("week_score >=", value, "weekScore");
+            return (Criteria) this;
+        }
+
+        public Criteria andWeekScoreLessThan(Integer value) {
+            addCriterion("week_score <", value, "weekScore");
+            return (Criteria) this;
+        }
+
+        public Criteria andWeekScoreLessThanOrEqualTo(Integer value) {
+            addCriterion("week_score <=", value, "weekScore");
+            return (Criteria) this;
+        }
+
+        public Criteria andWeekScoreIn(List<Integer> values) {
+            addCriterion("week_score in", values, "weekScore");
+            return (Criteria) this;
+        }
+
+        public Criteria andWeekScoreNotIn(List<Integer> values) {
+            addCriterion("week_score not in", values, "weekScore");
+            return (Criteria) this;
+        }
+
+        public Criteria andWeekScoreBetween(Integer value1, Integer value2) {
+            addCriterion("week_score between", value1, value2, "weekScore");
+            return (Criteria) this;
+        }
+
+        public Criteria andWeekScoreNotBetween(Integer value1, Integer value2) {
+            addCriterion("week_score not between", value1, value2, "weekScore");
+            return (Criteria) this;
+        }
+
+        public Criteria andAbroadInputScoreIsNull() {
+            addCriterion("abroad_input_score is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAbroadInputScoreIsNotNull() {
+            addCriterion("abroad_input_score is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAbroadInputScoreEqualTo(Integer value) {
+            addCriterion("abroad_input_score =", value, "abroadInputScore");
+            return (Criteria) this;
+        }
+
+        public Criteria andAbroadInputScoreNotEqualTo(Integer value) {
+            addCriterion("abroad_input_score <>", value, "abroadInputScore");
+            return (Criteria) this;
+        }
+
+        public Criteria andAbroadInputScoreGreaterThan(Integer value) {
+            addCriterion("abroad_input_score >", value, "abroadInputScore");
+            return (Criteria) this;
+        }
+
+        public Criteria andAbroadInputScoreGreaterThanOrEqualTo(Integer value) {
+            addCriterion("abroad_input_score >=", value, "abroadInputScore");
+            return (Criteria) this;
+        }
+
+        public Criteria andAbroadInputScoreLessThan(Integer value) {
+            addCriterion("abroad_input_score <", value, "abroadInputScore");
+            return (Criteria) this;
+        }
+
+        public Criteria andAbroadInputScoreLessThanOrEqualTo(Integer value) {
+            addCriterion("abroad_input_score <=", value, "abroadInputScore");
+            return (Criteria) this;
+        }
+
+        public Criteria andAbroadInputScoreIn(List<Integer> values) {
+            addCriterion("abroad_input_score in", values, "abroadInputScore");
+            return (Criteria) this;
+        }
+
+        public Criteria andAbroadInputScoreNotIn(List<Integer> values) {
+            addCriterion("abroad_input_score not in", values, "abroadInputScore");
+            return (Criteria) this;
+        }
+
+        public Criteria andAbroadInputScoreBetween(Integer value1, Integer value2) {
+            addCriterion("abroad_input_score between", value1, value2, "abroadInputScore");
+            return (Criteria) this;
+        }
+
+        public Criteria andAbroadInputScoreNotBetween(Integer value1, Integer value2) {
+            addCriterion("abroad_input_score not between", value1, value2, "abroadInputScore");
             return (Criteria) this;
         }
 

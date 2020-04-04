@@ -68,6 +68,31 @@ public class FixTool {
     }
 
     /**
+     * @Description: 省级名称统一工具，去后缀
+     * @Param: [area]
+     * @return: java.lang.String
+     * @Author: SoCMo
+     * @Date: 2020/4/4
+     */
+    public String provinceUni(String area) {
+        String regex = "(.+)[市省]$";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(area);
+        if (matcher.find()) {
+            return matcher.group(1);
+        }
+
+        regex = "(.+)自治区$";
+        pattern = Pattern.compile(regex);
+        matcher = pattern.matcher(area);
+        if (matcher.find()) {
+            return matcher.group(1);
+        }
+
+        return area;
+    }
+
+    /**
      * @Description: 地级市名称统一，去除后缀工具
      * @Param: [area]
      * @return: java.lang.String

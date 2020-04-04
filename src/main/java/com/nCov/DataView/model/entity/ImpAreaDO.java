@@ -13,13 +13,25 @@ public class ImpAreaDO {
 
     private Integer remainCountRank;
 
+    private Integer abroadInputRank;
+
+    private Integer weekGrowthRank;
+
     private Integer growthRank;
 
     private Double remainConfirm;
 
     private Integer remainCount;
 
+    private Double weekGrowth;
+
+    private Integer abroadInput;
+
     private Integer growth;
+
+    private Integer weekScore;
+
+    private Integer abroadInputScore;
 
     private Integer remainScore;
 
@@ -73,6 +85,22 @@ public class ImpAreaDO {
         this.remainCountRank = remainCountRank;
     }
 
+    public Integer getAbroadInputRank() {
+        return abroadInputRank;
+    }
+
+    public void setAbroadInputRank(Integer abroadInputRank) {
+        this.abroadInputRank = abroadInputRank;
+    }
+
+    public Integer getWeekGrowthRank() {
+        return weekGrowthRank;
+    }
+
+    public void setWeekGrowthRank(Integer weekGrowthRank) {
+        this.weekGrowthRank = weekGrowthRank;
+    }
+
     public Integer getGrowthRank() {
         return growthRank;
     }
@@ -97,12 +125,44 @@ public class ImpAreaDO {
         this.remainCount = remainCount;
     }
 
+    public Double getWeekGrowth() {
+        return weekGrowth;
+    }
+
+    public void setWeekGrowth(Double weekGrowth) {
+        this.weekGrowth = weekGrowth;
+    }
+
+    public Integer getAbroadInput() {
+        return abroadInput;
+    }
+
+    public void setAbroadInput(Integer abroadInput) {
+        this.abroadInput = abroadInput;
+    }
+
     public Integer getGrowth() {
         return growth;
     }
 
     public void setGrowth(Integer growth) {
         this.growth = growth;
+    }
+
+    public Integer getWeekScore() {
+        return weekScore;
+    }
+
+    public void setWeekScore(Integer weekScore) {
+        this.weekScore = weekScore;
+    }
+
+    public Integer getAbroadInputScore() {
+        return abroadInputScore;
+    }
+
+    public void setAbroadInputScore(Integer abroadInputScore) {
+        this.abroadInputScore = abroadInputScore;
     }
 
     public Integer getRemainScore() {
