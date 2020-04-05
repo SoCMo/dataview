@@ -424,9 +424,9 @@ public class EpidemicServiceImpl implements EpidemicService {
     @Override
     public List<SumCalResponse> getAllRouteCal(List<PathInfoDO> pathInfoDOList) throws AllException, ParseException {
         List<SumCalResponse> list = new ArrayList<>();
-        List<RouteCalRequest> routeCalRequestList = new ArrayList<>();
 
         for (PathInfoDO pathInfoDO : pathInfoDOList) {
+            List<RouteCalRequest> routeCalRequestList = new ArrayList<>();
             //对每一条线路进行评估
             Integer pathId = pathInfoDO.getId();
 
@@ -462,7 +462,6 @@ public class EpidemicServiceImpl implements EpidemicService {
                 routeCalRequest.setEnd(passInfoDO.getEndAddress());
 
                 routeCalRequestList.add(routeCalRequest);
-
             }
             if (routeCalRequestList.isEmpty()) {
                 return null;
@@ -883,6 +882,10 @@ public class EpidemicServiceImpl implements EpidemicService {
             StringBuilder temp_start = new StringBuilder();
             String startAddress = "";
 
+            if (!row.getCell(9).getStringCellValue().equals("中国")) {
+                continue;
+            }
+
             tempAddress = row.getCell(9).getStringCellValue()
                          + row.getCell(10).getStringCellValue()
                          + row.getCell(11).getStringCellValue()
@@ -909,9 +912,7 @@ public class EpidemicServiceImpl implements EpidemicService {
                     if (routeListRequests.isEmpty()) {
                         return null;
                     }
-                    List<SumCalResponse> sumCalResponseList = new ArrayList<>();
                     //每一条路径信息，存入数据库
-                    int routeNum = 0;
                     for (RouteListRequest routeListRequest : routeListRequests) {
                         //每一条路线
                         int pathId = 0;
@@ -919,13 +920,9 @@ public class EpidemicServiceImpl implements EpidemicService {
 
                         record.setStart(startAddress);
                         record.setEnd(endAddress);
-                        record.setMainType(routeNum);
+                        record.setMainType(-1);
                         pathInfoDOMapper.insertSelective(record);
-
-                        pathInfoDOExample.createCriteria().andStartEqualTo(startAddress).andMainTypeEqualTo(routeNum);
-                        PathInfoDO pathInfoDO = pathInfoDOMapper.selectByExample(pathInfoDOExample).get(0);
-                        pathId = pathInfoDO.getId();
-                        pathInfoDOExample.clear();
+                        pathId = record.getId();
 
                         int order_num = 0;
                         int main_type = 0;
@@ -951,9 +948,8 @@ public class EpidemicServiceImpl implements EpidemicService {
                             passInfoDOMapper.insertList(passInfoDOList);
                             ++order_num;
                         }
-                        ++routeNum;
-                        pathInfoDO.setMainType(main_type);
-                        pathInfoDOMapper.updateByPrimaryKeySelective(pathInfoDO);
+                        record.setMainType(main_type);
+                        pathInfoDOMapper.updateByPrimaryKeySelective(record);
                     }
                 }
                 catch (Exception e) {

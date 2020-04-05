@@ -139,10 +139,10 @@ public class EpidemicController {
      * @Date: 2020/4/4
      */
     @GetMapping("/getDetails")
-    public Result getDetails(@RequestParam(value = "cur", defaultValue = "1") Integer cur,
-                             @RequestParam(value = "nums", defaultValue = "1") Integer nums) throws AllException {
-        if (cur == 1 && nums == 1) {
-            return ResultTool.error(500, "输入有误");
+    public Result getDetails(@RequestParam(value = "cur", defaultValue = "-1") Integer cur,
+                             @RequestParam(value = "nums", defaultValue = "-1") Integer nums) throws AllException {
+        if (cur == -1 || nums == -1) {
+            return ResultTool.error(500, "传参有误 ");
         }
 
         return epidemicService.getSpecifiedNumber(cur, nums);
