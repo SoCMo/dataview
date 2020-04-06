@@ -28,4 +28,6 @@ public interface PathInfoDOMapper {
     int updateByPrimaryKeySelective(PathInfoDO record);
 
     int updateByPrimaryKey(PathInfoDO record);
+
+    List<PathInfoDO> selectDistinctByStart();
 }

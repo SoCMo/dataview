@@ -199,4 +199,7 @@
         main_Type = #{mainType,jdbcType=INTEGER}
         where id = #{id,jdbcType=INTEGER}
     </update>
+    <select id="selectDistinctByStart" resultMap="BaseResultMap">
+        select distinct `start` from pathInfo
+    </select>
 </mapper>
