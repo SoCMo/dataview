@@ -200,6 +200,6 @@
         where id = #{id,jdbcType=INTEGER}
     </update>
     <select id="selectDistinctByStart" resultMap="BaseResultMap" parameterType="java.lang.String">
-        select distinct `start` from pathInfo where `start` like #{provinceName,jdbcType=STRING}
+        select distinct `start` from pathInfo where `start` like #{provinceName,jdbcType=VARCHAR}
     </select>
 </mapper>
