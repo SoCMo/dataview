@@ -140,7 +140,7 @@ public class EpidemicController {
      */
     @GetMapping("/getDetails")
     public Result getDetails(@RequestParam(value = "cur", defaultValue = "-1") Integer cur,
-                             @RequestParam(value = "nums", defaultValue = "-1") Integer nums) throws AllException {
+                             @RequestParam(value = "nums", defaultValue = "-1") Integer nums) throws AllException, ParseException {
         if (cur == -1 || nums == -1) {
             return ResultTool.error(500, "传参有误 ");
         }

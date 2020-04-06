@@ -137,7 +137,7 @@ public interface EpidemicService {
      * @Author: pongshy
      * @Date: 2020/4/4
      */
-    public Result getSpecifiedNumber(Integer cur, Integer nums) throws AllException;
+    public Result getSpecifiedNumber(Integer cur, Integer nums) throws AllException, ParseException;
 
     /**
      * @Description: 读取excel表格中的信息，并存储到数据库中

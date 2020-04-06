@@ -816,7 +816,7 @@ public class EpidemicServiceImpl implements EpidemicService {
      * @Date: 2020/4/4
      */
     @Override
-    public Result getSpecifiedNumber(Integer cur, Integer nums) throws AllException {
+    public Result getSpecifiedNumber(Integer cur, Integer nums) throws AllException, ParseException {
         List<AssessmentAllResponse> list = new ArrayList<>();
         final String endAddress = "上海大学宝山校区";
         ReadFromDBResponse readFromDBResponse = new ReadFromDBResponse();
@@ -866,7 +866,7 @@ public class EpidemicServiceImpl implements EpidemicService {
      */
     @Async
     @Override
-    public Result setInDataBase(MultipartFile file) throws AllException, IOException, ParseException {
+    public Result setInDataBase(MultipartFile file) throws AllException, IOException {
         List<String> errorList = new ArrayList<>();
         if (file == null) {
             throw new AllException(EmAllException.BAD_REQUEST, "上传文件为空");
