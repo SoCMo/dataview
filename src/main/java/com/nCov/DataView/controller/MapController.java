@@ -2,6 +2,7 @@ package com.nCov.DataView.controller;
 
 import com.nCov.DataView.model.response.Result;
 import com.nCov.DataView.service.MapService;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,6 +31,7 @@ public class MapController {
      * @Author: SoCMo
      * @Date: 2020/2/28
      */
+    @Cacheable(key = "provinceInfo")
     @GetMapping("/provinceInfo")
     public Result provinceInfo() {
         return mapService.provinceInfo();
@@ -42,6 +44,7 @@ public class MapController {
      * @Author: SoCMo
      * @Date: 2020/2/28
      */
+    @Cacheable(key = "dateInfo")
     @GetMapping("/dateInfo")
     public Result dateInfo() {
         return mapService.dateInfo();

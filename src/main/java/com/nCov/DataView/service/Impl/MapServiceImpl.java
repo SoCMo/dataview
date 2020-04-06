@@ -160,7 +160,7 @@ public class MapServiceImpl implements MapService {
                     dayInfo.setDate(TimeTool.timeToDaySy(calendar.getTime()));
                     CovData covData = tempProList.get(TimeTool.timeToDaySy(calendar.getTime()));
                     int remain = covData.getTotalconfirm() - covData.getTotalheal() - covData.getTotaldead();
-                    dayInfo.setConfirm(remain);
+                    dayInfo.setConfirm(Math.max(remain, 0));
                     provinceInfoResponse.getDayInfoList().add(dayInfo);
                     temp = tempProList.get(TimeTool.timeToDaySy(calendar.getTime()));
                     if (areaName == null) areaName = temp.getProvincename();

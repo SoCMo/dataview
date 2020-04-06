@@ -1,6 +1,7 @@
 package com.nCov.DataView.model.response.info;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.springframework.beans.BeanUtils;
 
 /**
@@ -10,6 +11,7 @@ import org.springframework.beans.BeanUtils;
  * create: 2020/2/24
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 public class DateInfoResponse extends AreaInfoResponse {
     private String date;
 

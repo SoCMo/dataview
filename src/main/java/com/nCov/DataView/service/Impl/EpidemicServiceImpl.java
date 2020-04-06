@@ -15,7 +15,6 @@ import com.nCov.DataView.tools.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.xmlbeans.impl.xb.xsdschema.All;
 import org.springframework.beans.BeanUtils;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.scheduling.annotation.Async;
@@ -1154,6 +1153,8 @@ public class EpidemicServiceImpl implements EpidemicService {
                 BeanUtils.copyProperties(impAreaDO, covRankResponse);
                 covRankResponse.setProvincename(impAreaDO.getProvinceName());
                 covRankResponse.setAllRank(impAreaDO.getAllrank());
+                covRankResponse.setWeekGrowth(NumberTool.doubleToStringWithH(impAreaDO.getWeekGrowth()));
+                covRankResponse.setWeekGrowthScore(impAreaDO.getWeekScore());
                 return covRankResponse;
             }).collect(Collectors.toList());
         }
@@ -1305,7 +1306,7 @@ public class EpidemicServiceImpl implements EpidemicService {
             int growth = covDataNow.getTotalconfirm() - covDataThr.getTotalconfirm();
             impAreaDO.setGrowth(Math.max(growth, 0));
             double weekGrowth = NumberTool.intDivision(covDataNow.getTotalconfirm(), covDataWeek.getTotalconfirm());
-            impAreaDO.setWeekGrowth(weekGrowth);
+            impAreaDO.setWeekGrowth(Math.max(weekGrowth, 1));
 
             AbroadInputDO abroadInputDO = abroadInputMap.get(fixTool.provinceUni(impAreaDO.getProvinceName()));
             if (abroadInputDO == null) {
@@ -1425,10 +1426,10 @@ public class EpidemicServiceImpl implements EpidemicService {
 
         for (ImpAreaDO impAreaDO : impAreaDOList) {
             impAreaDO.setGrowthScore(NumberTool.Score(impAreaDO.getGrowthRank(), impAreaDOList.get(impAreaDOList.size() - 1).getGrowthRank()));
-            impAreaDO.setSumScore(impAreaDO.getRemainCountScore() * 0.3
+            impAreaDO.setSumScore(impAreaDO.getRemainCountScore() * 0.35
                     + impAreaDO.getRemainScore() * 0.3
                     + impAreaDO.getGrowthScore() * 0.2
-                    + impAreaDO.getWeekScore() * 0.15
+                    + impAreaDO.getWeekScore() * 0.1
                     + impAreaDO.getAbroadInput() * 0.05
             );
         }
@@ -1466,6 +1467,7 @@ public class EpidemicServiceImpl implements EpidemicService {
             covRankResponse.setProvincename(impAreaDO.getProvinceName());
             covRankResponse.setAllRank(impAreaDO.getAllrank());
             covRankResponse.setWeekGrowth(NumberTool.doubleToStringWithH(impAreaDO.getWeekGrowth()));
+            covRankResponse.setWeekGrowthScore(impAreaDO.getWeekScore());
             return covRankResponse;
         }).collect(Collectors.toList());
     }
