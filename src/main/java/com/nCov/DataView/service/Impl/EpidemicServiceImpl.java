@@ -998,6 +998,8 @@ public class EpidemicServiceImpl implements EpidemicService {
                 BeanUtils.copyProperties(impAreaDO, covRankResponse);
                 covRankResponse.setProvincename(impAreaDO.getProvinceName());
                 covRankResponse.setAllRank(impAreaDO.getAllrank());
+                covRankResponse.setWeekGrowth(NumberTool.doubleToStringWithH(impAreaDO.getWeekGrowth()));
+                covRankResponse.setWeekGrowthScore(impAreaDO.getWeekScore());
                 return covRankResponse;
             }).collect(Collectors.toList());
         }
@@ -1310,6 +1312,7 @@ public class EpidemicServiceImpl implements EpidemicService {
             covRankResponse.setProvincename(impAreaDO.getProvinceName());
             covRankResponse.setAllRank(impAreaDO.getAllrank());
             covRankResponse.setWeekGrowth(NumberTool.doubleToStringWithH(impAreaDO.getWeekGrowth()));
+            covRankResponse.setWeekGrowthScore(impAreaDO.getWeekScore());
             return covRankResponse;
         }).collect(Collectors.toList());
     }
