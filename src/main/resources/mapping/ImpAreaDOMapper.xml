@@ -159,7 +159,7 @@
       #{ImpAreaDO.remainConfirmRank},
       #{ImpAreaDO.remainCountRank},
       #{ImpAreaDO.abroadInputRank},
-      #{ImpAreaDO.remainCountRank},
+      #{ImpAreaDO.weekGrowthRank},
       #{ImpAreaDO.growthRank},
       #{ImpAreaDO.remainConfirm},
       #{ImpAreaDO.remainCount},
