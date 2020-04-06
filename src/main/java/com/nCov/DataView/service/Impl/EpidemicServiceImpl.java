@@ -1306,7 +1306,7 @@ public class EpidemicServiceImpl implements EpidemicService {
             int growth = covDataNow.getTotalconfirm() - covDataThr.getTotalconfirm();
             impAreaDO.setGrowth(Math.max(growth, 0));
             double weekGrowth = NumberTool.intDivision(covDataNow.getTotalconfirm(), covDataWeek.getTotalconfirm());
-            impAreaDO.setWeekGrowth(weekGrowth);
+            impAreaDO.setWeekGrowth(Math.max(weekGrowth, 1));
 
             AbroadInputDO abroadInputDO = abroadInputMap.get(fixTool.provinceUni(impAreaDO.getProvinceName()));
             if (abroadInputDO == null) {
