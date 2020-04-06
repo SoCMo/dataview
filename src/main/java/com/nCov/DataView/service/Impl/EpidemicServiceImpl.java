@@ -815,13 +815,13 @@ public class EpidemicServiceImpl implements EpidemicService {
      * @Date: 2020/4/4
      */
     @Override
-    public Result getSpecifiedNumber(Integer cur, Integer nums) throws AllException, ParseException {
+    public Result getSpecifiedNumber(Integer cur, Integer nums, String provinceName) throws AllException, ParseException {
         List<AssessmentAllResponse> list = new ArrayList<>();
         final String endAddress = "上海大学宝山校区";
         ReadFromDBResponse readFromDBResponse = new ReadFromDBResponse();
         try {
             PageHelper.startPage(cur, nums);
-            List<PathInfoDO> pathInfoDOList = pathInfoDOMapper.selectDistinctByStart();
+            List<PathInfoDO> pathInfoDOList = pathInfoDOMapper.selectDistinctByStart("%" + provinceName + "%");
             PathInfoDOExample pathInfoDOExample = new PathInfoDOExample();
 
             for (PathInfoDO pathInfoDO : pathInfoDOList) {

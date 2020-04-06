@@ -29,5 +29,5 @@ public interface PathInfoDOMapper {
 
     int updateByPrimaryKey(PathInfoDO record);
 
-    List<PathInfoDO> selectDistinctByStart();
+    List<PathInfoDO> selectDistinctByStart(String provinceName);
 }
