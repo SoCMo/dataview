@@ -155,6 +155,9 @@ public class EpidemicController {
             else if (province.contains("市")) {
                 temp = province.replace("市", "");
             }
+            else {
+                temp = province;
+            }
             provinceName.append(temp);
         } else {
             provinceName.append(province);
