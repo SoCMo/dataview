@@ -148,7 +148,13 @@ public class EpidemicController {
         StringBuilder provinceName = new StringBuilder();
         if (province.length() <= 4) {
             provinceName.append("中国");
-            String temp = province.replace("省", "");
+            String temp = "";
+            if (province.contains("省")) {
+                temp = province.replace("省", "");
+            }
+            else if (province.contains("市")) {
+                temp = province.replace("市", "");
+            }
             provinceName.append(temp);
         } else {
             provinceName.append(province);
