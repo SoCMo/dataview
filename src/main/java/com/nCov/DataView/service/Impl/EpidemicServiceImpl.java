@@ -800,6 +800,8 @@ public class EpidemicServiceImpl implements EpidemicService {
                             + ConstCorrespond.ROUTE_WEIGHT[2] * ConstCorrespond.CLEAN_SCORE[routeCalRequest.getType()]
                             + ConstCorrespond.ROUTE_WEIGHT[3] * cityCalList.stream().mapToDouble(CityCal::getCityscore).average().getAsDouble()) / 20.0
             );
+            routeCalReponse.setTimeScore(NumberTool.doubleToStringWotH(time >= 12 ? 100 : (time / 12.0 * 100)));
+            routeCalReponse.setTransportScore(NumberTool.doubleToStringWotH(1.0 / 3 * ConstCorrespond.CROWD[routeCalRequest.getType()] + 2.0 / 3 * ConstCorrespond.CLEAN_SCORE[routeCalRequest.getType()]));
             sumCalResponse.getResultList().add(routeCalReponse);
             sumCalResponse.setSumScore(NumberTool.doubleToStringWotH(sumCalResponse.getResultList().stream().mapToDouble(RouteCalReponse::getFinalscore).average().getAsDouble()));
         }

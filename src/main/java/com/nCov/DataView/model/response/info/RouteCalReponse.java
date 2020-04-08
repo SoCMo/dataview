@@ -12,17 +12,21 @@ import java.util.List;
  */
 @Data
 public class RouteCalReponse {
-    int type;
+    private int type;
 
-    String time;
+    private String time;
 
-    String start;
+    private String start;
 
-    String end;
+    private String end;
 
-    String title;
+    private String title;
 
-    List<CityCal> city;
+    private List<CityCal> city;
 
-    double finalscore;
+    private String timeScore;
+
+    private String transportScore;
+
+    private double finalscore;
 }
