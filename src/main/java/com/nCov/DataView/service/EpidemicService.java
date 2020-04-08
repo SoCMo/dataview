@@ -5,9 +5,7 @@ import com.nCov.DataView.model.entity.PathInfoDO;
 import com.nCov.DataView.model.request.*;
 import com.nCov.DataView.model.response.Result;
 import com.nCov.DataView.model.response.info.AssessmentAllResponse;
-import com.nCov.DataView.model.response.info.SumAllCalResponse;
 import com.nCov.DataView.model.response.info.SumCalResponse;
-import org.apache.xmlbeans.impl.xb.xsdschema.All;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -147,4 +145,13 @@ public interface EpidemicService {
      * @Date: 2020/4/4
      */
     public Result setInDataBase(MultipartFile file) throws AllException, IOException, ParseException;
+
+    /**
+     * @Description: 单个城市风险查询
+     * @Param: [city]
+     * @return: com.nCov.DataView.model.response.Result
+     * @Author: SoCMo
+     * @Date: 2020/4/8
+     */
+    public Result cityQuery(CityRiskRequest cityRiskRequest);
 }

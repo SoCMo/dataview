@@ -54,7 +54,7 @@ public class NumberTool {
      */
     public static int Score(Integer rank, Integer sum) {
         int site = (int) (NumberTool.intDivision(rank, sum) * 100 + 0.99);
-        int[] score = {1, 2, 3, 4, 10, 10, 10, 10, 10, 10, 10, 10, 4, 3, 2, 1};
+        int[] score = {5, 6, 7, 7, 7, 8, 10, 10, 10, 10, 10, 4, 3, 2, 1};
         int number = 0;
         while (site - score[number] > 0) {
             site -= score[number++];
