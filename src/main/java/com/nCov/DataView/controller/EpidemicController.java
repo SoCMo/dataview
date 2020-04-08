@@ -140,12 +140,33 @@ public class EpidemicController {
      */
     @GetMapping("/getDetails")
     public Result getDetails(@RequestParam(value = "cur", defaultValue = "-1") Integer cur,
-                             @RequestParam(value = "nums", defaultValue = "-1") Integer nums) throws AllException {
-        if (cur == -1 || nums == -1) {
+                             @RequestParam(value = "nums", defaultValue = "-1") Integer nums,
+                             @RequestParam(value = "province", defaultValue = "1") String province) throws AllException, ParseException {
+        if (cur <= 0 || nums <= 0 || province.equals("1")) {
             return ResultTool.error(500, "传参有误 ");
         }
+        
+        StringBuilder provinceName = new StringBuilder();
+        if (province.length() <= 4) {
+            provinceName.append("中国");
+            String temp = "";
+            if (province.contains("省")) {
+                temp = province.replace("省", "");
+            }
+            else if (province.contains("市")) {
+                temp = province.replace("市", "");
+            }
+            else {
+                temp = province;
+            }
+            provinceName.append(temp);
+        } else {
+            provinceName.append(province);
+        }
+        System.out.println(1);
+        System.out.println(provinceName.toString());
 
-        return epidemicService.getSpecifiedNumber(cur, nums);
+        return epidemicService.getSpecifiedNumber(cur, nums, provinceName.toString());
     }
 
     /**

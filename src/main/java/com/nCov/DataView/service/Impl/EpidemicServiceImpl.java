@@ -815,13 +815,13 @@ public class EpidemicServiceImpl implements EpidemicService {
      * @Date: 2020/4/4
      */
     @Override
-    public Result getSpecifiedNumber(Integer cur, Integer nums) throws AllException {
+    public Result getSpecifiedNumber(Integer cur, Integer nums, String provinceNamae) throws AllException, ParseException {
         List<AssessmentAllResponse> list = new ArrayList<>();
         final String endAddress = "上海大学宝山校区";
         ReadFromDBResponse readFromDBResponse = new ReadFromDBResponse();
         try {
             PageHelper.startPage(cur, nums);
-            List<PathInfoDO> pathInfoDOList = pathInfoDOMapper.selectDistinctByStart();
+            List<PathInfoDO> pathInfoDOList = pathInfoDOMapper.selectDistinctByStart("%" + provinceNamae + "%");
             PathInfoDOExample pathInfoDOExample = new PathInfoDOExample();
 
             for (PathInfoDO pathInfoDO : pathInfoDOList) {
@@ -865,7 +865,7 @@ public class EpidemicServiceImpl implements EpidemicService {
      */
     @Async
     @Override
-    public Result setInDataBase(MultipartFile file) throws AllException, IOException, ParseException {
+    public Result setInDataBase(MultipartFile file) throws AllException, IOException {
         List<String> errorList = new ArrayList<>();
         if (file == null) {
             throw new AllException(EmAllException.BAD_REQUEST, "上传文件为空");
@@ -875,7 +875,7 @@ public class EpidemicServiceImpl implements EpidemicService {
         Sheet sheet = ImportExcel.getBankListByExcel(in, file.getOriginalFilename());
 
         PathInfoDOExample pathInfoDOExample = new PathInfoDOExample();
-        for (int i = 1; i <= sheet.getLastRowNum(); ++i) {
+        for (int i = 9362; i <= sheet.getLastRowNum(); ++i) {
             Row row = sheet.getRow(i);
             String tempAddress = "";
             StringBuilder temp_start = new StringBuilder();
@@ -955,11 +955,12 @@ public class EpidemicServiceImpl implements EpidemicService {
                     e.printStackTrace();
                     log.info("地址:" + startAddress + "无法读入数据库中");
                     errorList.add(startAddress);
+                    System.out.println(errorList.size());
                     System.out.println(startAddress);
                 }
             }
         }
-
+        System.out.println("finish!");
         return ResultTool.success(errorList);
     }
 
