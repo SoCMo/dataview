@@ -964,6 +964,40 @@ public class EpidemicServiceImpl implements EpidemicService {
         return ResultTool.success(errorList);
     }
 
+    /**
+     * @Description: 单个城市风险查询
+     * @Param: [city]
+     * @return: com.nCov.DataView.model.response.Result
+     * @Author: SoCMo
+     * @Date: 2020/4/8
+     */
+    @Override
+    public Result cityQuery(CityRiskRequest cityRiskRequest) {
+        try {
+            ImpAreaDOExample impAreaDOExample = new ImpAreaDOExample();
+            impAreaDOExample.createCriteria()
+                    .andProvinceNameLike(fixTool.provinceUni(cityRiskRequest.getProvince()) + "%")
+                    .andNameLike(fixTool.areaUni(cityRiskRequest.getName()) + "%")
+                    .andDateEqualTo(TimeTool.stringToDay(cityRiskRequest.getDate()));
+            List<ImpAreaDO> impAreaDOList = impAreaDOMapper.selectByExample(impAreaDOExample);
+            if (impAreaDOList.isEmpty()) {
+                allAreaCal(cityRiskRequest.getDate());
+                impAreaDOList = null;
+                impAreaDOList = impAreaDOMapper.selectByExample(impAreaDOExample);
+            }
+            if (impAreaDOList.size() != 1) {
+                throw new AllException(EmAllException.DATABASE_ERROR, cityRiskRequest.getProvince() + cityRiskRequest.getName() + "的" + cityRiskRequest.getDate() + "数据有误");
+            }
+            return ResultTool.success(impAreaDOList.get(0));
+        } catch (AllException e) {
+            log.error(e.getMsg());
+            return ResultTool.error(500, e.getMsg());
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return ResultTool.error(500, e.getMessage());
+        }
+    }
+
 
     /**
      * @Description: 路径存储兼查询

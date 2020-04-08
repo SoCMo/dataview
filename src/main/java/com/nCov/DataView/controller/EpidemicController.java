@@ -184,4 +184,15 @@ public class EpidemicController {
         return ResultTool.success(msg);
     }
 
+    /**
+     * @Description: 单个城市风险查询
+     * @Param: [cityRiskRequest]
+     * @return: com.nCov.DataView.model.response.Result
+     * @Author: SoCMo
+     * @Date: 2020/4/8
+     */
+    @PostMapping("/cityQuery")
+    public Result cityQuery(@Validated @RequestBody CityRiskRequest cityRiskRequest) {
+        return epidemicService.cityQuery(cityRiskRequest);
+    }
 }
