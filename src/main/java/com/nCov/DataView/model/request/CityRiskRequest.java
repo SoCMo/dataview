@@ -12,7 +12,6 @@ import javax.validation.constraints.NotBlank;
  */
 @Data
 public class CityRiskRequest {
-    @NotBlank(message = "省名不能为空")
     private String province;
 
     @NotBlank(message = "市名不能为空")
