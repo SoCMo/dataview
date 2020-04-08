@@ -565,7 +565,7 @@ public class EpidemicServiceImpl implements EpidemicService {
                     routeCalDO.setDate(new Date());
                     routeCalDO.setScore(
                             (ConstCorrespond.ROUTE_WEIGHT[0] * ConstCorrespond.CROWD[routeCalRequest.getType()]
-                                    + ConstCorrespond.ROUTE_WEIGHT[1] * (time >= 24 ? 100 : (time / 24.0 * 100))
+                                    + ConstCorrespond.ROUTE_WEIGHT[1] * (time >= 12 ? 100 : (time / 12.0 * 100))
                                     + ConstCorrespond.ROUTE_WEIGHT[2] * ConstCorrespond.CLEAN_SCORE[routeCalRequest.getType()]
                                     + ConstCorrespond.ROUTE_WEIGHT[3] * sum.getAverage()) / 20.0
                     );
@@ -575,6 +575,16 @@ public class EpidemicServiceImpl implements EpidemicService {
                     routeCalReponse.setTime(routeCalDO.getTime());
                     routeCalReponse.setFinalscore(routeCalDO.getScore());
                     routeCalReponse.setCity(cityCalList);
+                    routeCalReponse.setTimeScore(NumberTool.doubleToStringWotH(time >= 12 ? 100 : (time / 12.0 * 100)));
+                    routeCalReponse.setTransportScore(
+                            NumberTool.doubleToStringWotH(
+                                    ConstCorrespond.ROUTE_WEIGHT[0] / (ConstCorrespond.ROUTE_WEIGHT[0] + ConstCorrespond.ROUTE_WEIGHT[2])
+                                            * ConstCorrespond.CROWD[routeCalRequest.getType()]
+                                            + ConstCorrespond.ROUTE_WEIGHT[2] / (ConstCorrespond.ROUTE_WEIGHT[0] + ConstCorrespond.ROUTE_WEIGHT[2])
+                                            * ConstCorrespond.CLEAN_SCORE[routeCalRequest.getType()]
+                            )
+                    );
+
                     resultList.add(routeCalReponse);
                 }
             }
@@ -801,7 +811,14 @@ public class EpidemicServiceImpl implements EpidemicService {
                             + ConstCorrespond.ROUTE_WEIGHT[3] * cityCalList.stream().mapToDouble(CityCal::getCityscore).average().getAsDouble()) / 20.0
             );
             routeCalReponse.setTimeScore(NumberTool.doubleToStringWotH(time >= 12 ? 100 : (time / 12.0 * 100)));
-            routeCalReponse.setTransportScore(NumberTool.doubleToStringWotH(1.0 / 3 * ConstCorrespond.CROWD[routeCalRequest.getType()] + 2.0 / 3 * ConstCorrespond.CLEAN_SCORE[routeCalRequest.getType()]));
+            routeCalReponse.setTransportScore(
+                    NumberTool.doubleToStringWotH(
+                            ConstCorrespond.ROUTE_WEIGHT[0] / (ConstCorrespond.ROUTE_WEIGHT[0] + ConstCorrespond.ROUTE_WEIGHT[2])
+                                    * ConstCorrespond.CROWD[routeCalRequest.getType()]
+                                    + ConstCorrespond.ROUTE_WEIGHT[2] / (ConstCorrespond.ROUTE_WEIGHT[0] + ConstCorrespond.ROUTE_WEIGHT[2])
+                                    * ConstCorrespond.CLEAN_SCORE[routeCalRequest.getType()]
+                    )
+            );
             sumCalResponse.getResultList().add(routeCalReponse);
             sumCalResponse.setSumScore(NumberTool.doubleToStringWotH(sumCalResponse.getResultList().stream().mapToDouble(RouteCalReponse::getFinalscore).average().getAsDouble()));
         }
