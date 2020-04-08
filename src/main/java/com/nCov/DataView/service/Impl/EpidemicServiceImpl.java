@@ -1426,11 +1426,11 @@ public class EpidemicServiceImpl implements EpidemicService {
 
         for (ImpAreaDO impAreaDO : impAreaDOList) {
             impAreaDO.setGrowthScore(NumberTool.Score(impAreaDO.getGrowthRank(), impAreaDOList.get(impAreaDOList.size() - 1).getGrowthRank()));
-            impAreaDO.setSumScore(impAreaDO.getRemainCountScore() * 0.35
-                    + impAreaDO.getRemainScore() * 0.3
-                    + impAreaDO.getGrowthScore() * 0.2
-                    + impAreaDO.getWeekScore() * 0.1
-                    + impAreaDO.getAbroadInput() * 0.05
+            impAreaDO.setSumScore(impAreaDO.getRemainCountScore() * ConstCorrespond.CITY_WEIGHT[0]
+                    + impAreaDO.getRemainScore() * ConstCorrespond.CITY_WEIGHT[1]
+                    + impAreaDO.getGrowthScore() * ConstCorrespond.CITY_WEIGHT[2]
+                    + impAreaDO.getWeekScore() * ConstCorrespond.CITY_WEIGHT[3]
+                    + impAreaDO.getAbroadInput() * ConstCorrespond.CITY_WEIGHT[4]
             );
         }
 

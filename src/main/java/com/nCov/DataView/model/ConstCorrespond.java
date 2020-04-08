@@ -63,4 +63,13 @@ public class ConstCorrespond {
             30,
             100
     };
+
+    //总剩余确诊，百万人剩余确诊, 14日增长, 周增长率, 境外输入数
+    public final static double[] CITY_WEIGHT = {
+            0.175,
+            0.15,
+            0.6,
+            0.05,
+            0.025
+    };
 }
