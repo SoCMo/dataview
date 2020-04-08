@@ -17,6 +17,5 @@ public class CityRiskRequest {
     @NotBlank(message = "市名不能为空")
     private String name;
 
-    @NotBlank(message = "日期不能为空")
     private String date;
 }

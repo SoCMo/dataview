@@ -5,6 +5,7 @@ import com.nCov.DataView.model.request.*;
 import com.nCov.DataView.model.response.Result;
 import com.nCov.DataView.service.EpidemicService;
 import com.nCov.DataView.tools.ResultTool;
+import com.nCov.DataView.tools.TimeTool;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.scheduling.annotation.EnableAsync;
@@ -15,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.annotation.Resource;
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.Date;
 
 /**
  * program: AreaInfoController
@@ -193,6 +195,9 @@ public class EpidemicController {
      */
     @PostMapping("/cityQuery")
     public Result cityQuery(@Validated @RequestBody CityRiskRequest cityRiskRequest) {
+        if (cityRiskRequest.getDate().isBlank()) {
+            cityRiskRequest.setDate(TimeTool.timeToDaySy(new Date()));
+        }
         return epidemicService.cityQuery(cityRiskRequest);
     }
 }
