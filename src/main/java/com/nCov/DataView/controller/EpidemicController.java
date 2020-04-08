@@ -145,7 +145,7 @@ public class EpidemicController {
         if (cur <= 0 || nums <= 0 || province.equals("1")) {
             return ResultTool.error(500, "传参有误 ");
         }
-        
+
         StringBuilder provinceName = new StringBuilder();
         if (province.length() <= 4) {
             provinceName.append("中国");

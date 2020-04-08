@@ -875,7 +875,7 @@ public class EpidemicServiceImpl implements EpidemicService {
         Sheet sheet = ImportExcel.getBankListByExcel(in, file.getOriginalFilename());
 
         PathInfoDOExample pathInfoDOExample = new PathInfoDOExample();
-        for (int i = 9362; i <= sheet.getLastRowNum(); ++i) {
+        for (int i = 861; i <= sheet.getLastRowNum(); ++i) {
             Row row = sheet.getRow(i);
             String tempAddress = "";
             StringBuilder temp_start = new StringBuilder();
@@ -951,7 +951,12 @@ public class EpidemicServiceImpl implements EpidemicService {
                         pathInfoDOMapper.updateByPrimaryKeySelective(record);
                     }
                 }
-                catch (Exception e) {
+                catch (AllException e) {
+                    if (e.getMsg().equals("配额已到上限")) {
+                        System.out.println("配额已到上限");
+                        System.out.println(i);
+                        return ResultTool.error(500, "配额已到上限");
+                    }
                     e.printStackTrace();
                     log.info("地址:" + startAddress + "无法读入数据库中");
                     errorList.add(startAddress);
