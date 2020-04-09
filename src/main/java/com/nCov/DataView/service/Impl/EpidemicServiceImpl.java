@@ -362,6 +362,16 @@ public class EpidemicServiceImpl implements EpidemicService {
                     BeanUtils.copyProperties(routeCalRequest, routeCalReponse);
                     routeCalReponse.setTime(routeCalDataList.get(0).getTime());
                     routeCalReponse.setFinalscore(routeCalDataList.get(0).getScore());
+                    double time = TimeTool.stringToHour(routeCalDataList.get(0).getTime());
+                    routeCalReponse.setTimeScore(NumberTool.doubleToStringWotH(time >= 12 ? 100 : (time / 12.0 * 100)));
+                    routeCalReponse.setTransportScore(
+                            NumberTool.doubleToStringWotH(
+                                    ConstCorrespond.ROUTE_WEIGHT[0] / (ConstCorrespond.ROUTE_WEIGHT[0] + ConstCorrespond.ROUTE_WEIGHT[2])
+                                            * ConstCorrespond.CROWD[routeCalDataList.get(0).getType()]
+                                            + ConstCorrespond.ROUTE_WEIGHT[2] / (ConstCorrespond.ROUTE_WEIGHT[0] + ConstCorrespond.ROUTE_WEIGHT[2])
+                                            * ConstCorrespond.CLEAN_SCORE[routeCalDataList.get(0).getType()]
+                            )
+                    );
                     routeCalReponse.setCity(cityCalList);
                     resultList.add(routeCalReponse);
                 } else if (routeCalDataList.isEmpty()) {
@@ -384,6 +394,15 @@ public class EpidemicServiceImpl implements EpidemicService {
                     routeCalDO.setId(null);
 
                     routeCalDOList.add(routeCalDO);
+                    routeCalReponse.setTimeScore(NumberTool.doubleToStringWotH(time >= 12 ? 100 : (time / 12.0 * 100)));
+                    routeCalReponse.setTransportScore(
+                            NumberTool.doubleToStringWotH(
+                                    ConstCorrespond.ROUTE_WEIGHT[0] / (ConstCorrespond.ROUTE_WEIGHT[0] + ConstCorrespond.ROUTE_WEIGHT[2])
+                                            * ConstCorrespond.CROWD[routeCalRequest.getType()]
+                                            + ConstCorrespond.ROUTE_WEIGHT[2] / (ConstCorrespond.ROUTE_WEIGHT[0] + ConstCorrespond.ROUTE_WEIGHT[2])
+                                            * ConstCorrespond.CLEAN_SCORE[routeCalRequest.getType()]
+                            )
+                    );
                     routeCalReponse.setTime(routeCalDO.getTime());
                     routeCalReponse.setFinalscore(routeCalDO.getScore());
                     routeCalReponse.setCity(cityCalList);
