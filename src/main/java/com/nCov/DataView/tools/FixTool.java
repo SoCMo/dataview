@@ -9,7 +9,6 @@ import com.nCov.DataView.dao.PassInfoDOMapper;
 import com.nCov.DataView.dao.PathInfoDOMapper;
 import com.nCov.DataView.model.entity.CovData;
 import com.nCov.DataView.model.entity.CovDataExample;
-import com.nCov.DataView.service.Impl.EpidemicServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -53,9 +52,6 @@ public class FixTool {
     @Resource
     private AssessDOMapper assessDOMapper;
 
-    @Resource
-    private EpidemicServiceImpl epidemicServiceImpl;
-
     /**
      * @Description: 疫情数据拟合
      * @Param: [Date, name]
@@ -64,7 +60,10 @@ public class FixTool {
      * @Date: 2020/3/16
      */
     public CovData fixCovDate(String date, String name) throws ParseException {
-        //TODO 需要修改，存在日期前
+        if (TimeTool.stringToDay(date).before(TimeTool.stringToDay("2020-01-24"))) {
+            return null;
+        }
+
         CovDataExample covDataExample = new CovDataExample();
         covDataExample.createCriteria()
                 .andAreanameLike(name + "%")

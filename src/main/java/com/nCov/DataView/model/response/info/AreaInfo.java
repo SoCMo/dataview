@@ -12,5 +12,17 @@ import lombok.Data;
 public class AreaInfo {
     private String name;
 
-    private Integer confirm;
+    private int confirm;
+
+    private int heal;
+
+    private int dead;
+
+    private int remainConfirm;
+
+    private double RemainInMillion;
+
+    private double weekGrowth;
+
+    private int growth;
 }
