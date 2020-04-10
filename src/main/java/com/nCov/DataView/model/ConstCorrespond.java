@@ -50,9 +50,9 @@ public class ConstCorrespond {
     //人数(1/200人次),时间,清洁,当地的权重
     public final static double[] ROUTE_WEIGHT = {
             0.1,
-            0.35,
             0.2,
-            0.35
+            0.15,
+            0.55
     };
 
     //人数(1/200人次)

@@ -1,0 +1,350 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.nCov.DataView.dao.AssessDOMapper">
+    <resultMap id="BaseResultMap" type="com.nCov.DataView.model.entity.AssessDO">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="path_id" property="pathId" jdbcType="INTEGER"/>
+        <result column="area_name" property="areaName" jdbcType="VARCHAR"/>
+        <result column="pass_order" property="passOrder" jdbcType="INTEGER"/>
+        <result column="cleanliness_score" property="cleanlinessScore" jdbcType="INTEGER"/>
+        <result column="time" property="time" jdbcType="DOUBLE"/>
+        <result column="time_score" property="timeScore" jdbcType="DOUBLE"/>
+        <result column="crowd_score" property="crowdScore" jdbcType="INTEGER"/>
+        <result column="local_score" property="localScore" jdbcType="INTEGER"/>
+        <result column="final_score" property="finalScore" jdbcType="DOUBLE"/>
+        <result column="sum_score" property="sumScore" jdbcType="DOUBLE"/>
+        <result column="update_time" property="updateTime" jdbcType="DATE"/>
+    </resultMap>
+    <sql id="Example_Where_Clause">
+        <where>
+            <foreach collection="oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" suffix=")" prefixOverrides="and">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach collection="criterion.value" item="listItem" open="(" close=")"
+                                             separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+    <sql id="Update_By_Example_Where_Clause">
+        <where>
+            <foreach collection="example.oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" suffix=")" prefixOverrides="and">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach collection="criterion.value" item="listItem" open="(" close=")"
+                                             separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+    <sql id="Base_Column_List">
+        id, path_id, area_name, pass_order, cleanliness_score, time, time_score, crowd_score,
+        local_score, final_score, sum_score, update_time
+    </sql>
+    <select id="selectByExample" resultMap="BaseResultMap"
+            parameterType="com.nCov.DataView.model.entity.AssessDOExample">
+        select
+        <if test="distinct">
+            distinct
+        </if>
+        'true' as QUERYID,
+        <include refid="Base_Column_List"/>
+        from assess
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+        <if test="orderByClause != null">
+            order by ${orderByClause}
+        </if>
+    </select>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+        select
+        <include refid="Base_Column_List"/>
+        from assess
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        delete from assess
+        where id = #{id,jdbcType=INTEGER}
+    </delete>
+    <delete id="deleteByExample" parameterType="com.nCov.DataView.model.entity.AssessDOExample">
+        delete from assess
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+    </delete>
+    <insert id="insertList" parameterType="java.util.List">
+        insert into assess (path_id, area_name,
+        pass_order, cleanliness_score, time,
+        time_score, crowd_score, local_score,
+        final_score, sum_score, update_time
+        ) values
+        <foreach collection="list" item="assessDo" index="index" separator=",">
+            (
+            #{assessDo.pathId},
+            #{assessDo.areaName},
+            #{assessDo.passOrder},
+            #{assessDo.cleanlinessScore},
+            #{assessDo.time},
+            #{assessDo.timeScore},
+            #{assessDo.crowdScore},
+            #{assessDo.localScore},
+            #{assessDo.finalScore},
+            #{assessDo.sumScore},
+            #{assessDo.updateTime}
+            )
+        </foreach>
+    </insert>
+    <insert id="insert" parameterType="com.nCov.DataView.model.entity.AssessDO">
+        insert into assess (id, path_id, area_name,
+        pass_order, cleanliness_score, time,
+        time_score, crowd_score, local_score,
+        final_score, sum_score, update_time
+        )
+        values (#{id,jdbcType=INTEGER}, #{pathId,jdbcType=INTEGER}, #{areaName,jdbcType=VARCHAR},
+        #{passOrder,jdbcType=INTEGER}, #{cleanlinessScore,jdbcType=INTEGER}, #{time,jdbcType=DOUBLE},
+        #{timeScore,jdbcType=DOUBLE}, #{crowdScore,jdbcType=INTEGER}, #{localScore,jdbcType=INTEGER},
+        #{finalScore,jdbcType=DOUBLE}, #{sumScore,jdbcType=DOUBLE}, #{updateTime,jdbcType=DATE}
+        )
+    </insert>
+    <insert id="insertSelective" parameterType="com.nCov.DataView.model.entity.AssessDO">
+        insert into assess
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="pathId != null">
+                path_id,
+            </if>
+            <if test="areaName != null">
+                area_name,
+            </if>
+            <if test="passOrder != null">
+                pass_order,
+            </if>
+            <if test="cleanlinessScore != null">
+                cleanliness_score,
+            </if>
+            <if test="time != null">
+                time,
+            </if>
+            <if test="timeScore != null">
+                time_score,
+            </if>
+            <if test="crowdScore != null">
+                crowd_score,
+            </if>
+            <if test="localScore != null">
+                local_score,
+            </if>
+            <if test="finalScore != null">
+                final_score,
+            </if>
+            <if test="sumScore != null">
+                sum_score,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="pathId != null">
+                #{pathId,jdbcType=INTEGER},
+            </if>
+            <if test="areaName != null">
+                #{areaName,jdbcType=VARCHAR},
+            </if>
+            <if test="passOrder != null">
+                #{passOrder,jdbcType=INTEGER},
+            </if>
+            <if test="cleanlinessScore != null">
+                #{cleanlinessScore,jdbcType=INTEGER},
+            </if>
+            <if test="time != null">
+                #{time,jdbcType=DOUBLE},
+            </if>
+            <if test="timeScore != null">
+                #{timeScore,jdbcType=DOUBLE},
+            </if>
+            <if test="crowdScore != null">
+                #{crowdScore,jdbcType=INTEGER},
+            </if>
+            <if test="localScore != null">
+                #{localScore,jdbcType=INTEGER},
+            </if>
+            <if test="finalScore != null">
+                #{finalScore,jdbcType=DOUBLE},
+            </if>
+            <if test="sumScore != null">
+                #{sumScore,jdbcType=DOUBLE},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=DATE},
+            </if>
+        </trim>
+    </insert>
+    <select id="countByExample" parameterType="com.nCov.DataView.model.entity.AssessDOExample"
+            resultType="java.lang.Integer">
+        select count(*) from assess
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+    </select>
+    <update id="updateByExampleSelective" parameterType="map">
+        update assess
+        <set>
+            <if test="record.id != null">
+                id = #{record.id,jdbcType=INTEGER},
+            </if>
+            <if test="record.pathId != null">
+                path_id = #{record.pathId,jdbcType=INTEGER},
+            </if>
+            <if test="record.areaName != null">
+                area_name = #{record.areaName,jdbcType=VARCHAR},
+            </if>
+            <if test="record.passOrder != null">
+                pass_order = #{record.passOrder,jdbcType=INTEGER},
+            </if>
+            <if test="record.cleanlinessScore != null">
+                cleanliness_score = #{record.cleanlinessScore,jdbcType=INTEGER},
+            </if>
+            <if test="record.time != null">
+                time = #{record.time,jdbcType=DOUBLE},
+            </if>
+            <if test="record.timeScore != null">
+                time_score = #{record.timeScore,jdbcType=DOUBLE},
+            </if>
+            <if test="record.crowdScore != null">
+                crowd_score = #{record.crowdScore,jdbcType=INTEGER},
+            </if>
+            <if test="record.localScore != null">
+                local_score = #{record.localScore,jdbcType=INTEGER},
+            </if>
+            <if test="record.finalScore != null">
+                final_score = #{record.finalScore,jdbcType=DOUBLE},
+            </if>
+            <if test="record.sumScore != null">
+                sum_score = #{record.sumScore,jdbcType=DOUBLE},
+            </if>
+            <if test="record.updateTime != null">
+                update_time = #{record.updateTime,jdbcType=DATE},
+            </if>
+        </set>
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause"/>
+        </if>
+    </update>
+    <update id="updateByExample" parameterType="map">
+        update assess
+        set id = #{record.id,jdbcType=INTEGER},
+        path_id = #{record.pathId,jdbcType=INTEGER},
+        area_name = #{record.areaName,jdbcType=VARCHAR},
+        pass_order = #{record.passOrder,jdbcType=INTEGER},
+        cleanliness_score = #{record.cleanlinessScore,jdbcType=INTEGER},
+        time = #{record.time,jdbcType=DOUBLE},
+        time_score = #{record.timeScore,jdbcType=DOUBLE},
+        crowd_score = #{record.crowdScore,jdbcType=INTEGER},
+        local_score = #{record.localScore,jdbcType=INTEGER},
+        final_score = #{record.finalScore,jdbcType=DOUBLE},
+        sum_score = #{record.sumScore,jdbcType=DOUBLE},
+        update_time = #{record.updateTime,jdbcType=DATE}
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause"/>
+        </if>
+    </update>
+    <update id="updateByPrimaryKeySelective" parameterType="com.nCov.DataView.model.entity.AssessDO">
+        update assess
+        <set>
+            <if test="pathId != null">
+                path_id = #{pathId,jdbcType=INTEGER},
+            </if>
+            <if test="areaName != null">
+                area_name = #{areaName,jdbcType=VARCHAR},
+            </if>
+            <if test="passOrder != null">
+                pass_order = #{passOrder,jdbcType=INTEGER},
+            </if>
+            <if test="cleanlinessScore != null">
+                cleanliness_score = #{cleanlinessScore,jdbcType=INTEGER},
+            </if>
+            <if test="time != null">
+                time = #{time,jdbcType=DOUBLE},
+            </if>
+            <if test="timeScore != null">
+                time_score = #{timeScore,jdbcType=DOUBLE},
+            </if>
+            <if test="crowdScore != null">
+                crowd_score = #{crowdScore,jdbcType=INTEGER},
+            </if>
+            <if test="localScore != null">
+                local_score = #{localScore,jdbcType=INTEGER},
+            </if>
+            <if test="finalScore != null">
+                final_score = #{finalScore,jdbcType=DOUBLE},
+            </if>
+            <if test="sumScore != null">
+                sum_score = #{sumScore,jdbcType=DOUBLE},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=DATE},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.nCov.DataView.model.entity.AssessDO">
+        update assess
+        set path_id = #{pathId,jdbcType=INTEGER},
+        area_name = #{areaName,jdbcType=VARCHAR},
+        pass_order = #{passOrder,jdbcType=INTEGER},
+        cleanliness_score = #{cleanlinessScore,jdbcType=INTEGER},
+        time = #{time,jdbcType=DOUBLE},
+        time_score = #{timeScore,jdbcType=DOUBLE},
+        crowd_score = #{crowdScore,jdbcType=INTEGER},
+        local_score = #{localScore,jdbcType=INTEGER},
+        final_score = #{finalScore,jdbcType=DOUBLE},
+        sum_score = #{sumScore,jdbcType=DOUBLE},
+        update_time = #{updateTime,jdbcType=DATE}
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+</mapper>

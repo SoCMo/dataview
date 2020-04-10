@@ -3,9 +3,13 @@ package com.nCov.DataView.tools;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.nCov.DataView.dao.AssessDOMapper;
 import com.nCov.DataView.dao.CovDataMapper;
+import com.nCov.DataView.dao.PassInfoDOMapper;
+import com.nCov.DataView.dao.PathInfoDOMapper;
 import com.nCov.DataView.model.entity.CovData;
 import com.nCov.DataView.model.entity.CovDataExample;
+import com.nCov.DataView.service.Impl.EpidemicServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -39,6 +43,18 @@ import java.util.regex.Pattern;
 public class FixTool {
     @Resource
     private CovDataMapper covDataMapper;
+
+    @Resource
+    private PathInfoDOMapper pathInfoDOMapper;
+
+    @Resource
+    private PassInfoDOMapper passInfoDOMapper;
+
+    @Resource
+    private AssessDOMapper assessDOMapper;
+
+    @Resource
+    private EpidemicServiceImpl epidemicServiceImpl;
 
     /**
      * @Description: 疫情数据拟合
@@ -235,4 +251,87 @@ public class FixTool {
             }
         }
     }
+
+    /**
+     * @Description: 每天对各路段进行评估
+     * @Param: []
+     * @return: void
+     * @Author: SoCMo
+     * @Date: 2020/4/10
+     */
+//    @Scheduled(cron = "0 0 0 * * *")
+//    public void assess(){
+//        try {
+//            //获取path表信息
+//            PathInfoDOExample pathInfoDOExample = new PathInfoDOExample();
+//            List<PathInfoDO> pathInfoDOList = pathInfoDOMapper.selectByExample(pathInfoDOExample);
+//            if(pathInfoDOList.isEmpty()){
+//                throw new AllException(EmAllException.DATABASE_ERROR, "pathInfo表为空");
+//            }
+//
+//            //获取pass表信息
+//            PassInfoDOExample passInfoDOExample = new PassInfoDOExample();
+//            passInfoDOExample.setOrderByClause("order_id ASC id ASC");
+//            List<PassInfoDO> passInfoDOList = passInfoDOMapper.selectByExample(passInfoDOExample);
+//            if(passInfoDOList.isEmpty()){
+//                throw new AllException(EmAllException.DATABASE_ERROR, "passInfo表为空");
+//            }
+//
+//            //获取impArea的信息
+//            ImpAreaDOExample impAreaDOExample = new ImpAreaDOExample();
+//            Calendar calendar = TimeTool.todayCreate();
+//            calendar.add(Calendar.DATE, -1);
+//            List<CovRankResponse> covDataList = epidemicServiceImpl.allAreaCal(TimeTool.timeToDaySy(calendar.getTime()));
+//            Map<String, CovRankResponse> covRankResponseMap = covDataList.stream().collect(Collectors.toMap(CovRankResponse::getName, covRankResponse -> covRankResponse));
+//
+//            //计算
+//            for(PathInfoDO pathInfoDO: pathInfoDOList){
+//                List<PassInfoDO> passInfoDOS = passInfoDOList.stream().filter(passInfoDO -> passInfoDO.getPathId().equals(pathInfoDO.getId())).collect(Collectors.toList());
+//                int order = 0;
+//                List<AssessDO> sumList = new ArrayList<>();
+//                List<AssessDO> finalList = new ArrayList<>();
+//                for(PassInfoDO passInfoDO: passInfoDOS){
+//                    if(order < passInfoDO.getOrderId()){
+//                        double localScore = finalList.stream().mapToDouble(AssessDO::getLocalScore).max().getAsDouble();
+//                        for(AssessDO assessDO: finalList){
+//                            assessDO.setFinalScore((int)localScore);
+//                            sumList.add(assessDO);
+//                        }
+//                        order++;
+//
+//                    }
+//                    AssessDO assessDO = new AssessDO();
+//                    assessDO.setAreaName(passInfoDO.getArea());
+//                    assessDO.setPathId(pathInfoDO.getId());
+//                    assessDO.setPassOrder(passInfoDO.getOrderId());
+//
+//                    assessDO.setCleanlinessScore((int)ConstCorrespond.CLEAN_SCORE[passInfoDO.getTypeNum()]);
+//                    assessDO.setCrowdScore((int)ConstCorrespond.CROWD[passInfoDO.getTypeNum()]);
+//
+//                    CovRankResponse covRankResponse = covRankResponseMap.get(this.areaUni(passInfoDO.getArea()));
+//                    if(covRankResponse == null){
+//                        covRankResponse = covRankResponseMap.get(passInfoDO.getArea());
+//                        if(covRankResponse == null){
+//                            for(CovRankResponse covRankResponseTemp: covRankResponseMap.values()){
+//                                if(covRankResponseTemp.getName().contains(this.areaUni(passInfoDO.getArea()))){
+//                                    covRankResponse = covRankResponseTemp;
+//                                    break;
+//                                }
+//                            }
+//                            if(covRankResponse == null){
+//                                throw new AllException(EmAllException.DATABASE_ERROR, passInfoDO.getArea() + "无风险数据");
+//                            }
+//                        }
+//                    }
+//                    assessDO.setLocalScore((int)covRankResponse.getSumScore());
+//
+//                }
+//            }
+//        } catch (
+//        AllException e) {
+//            log.error(e.getMsg());
+//        } catch (Exception e) {
+//            log.error(e.getMessage());
+//        }
+//    }
 }
