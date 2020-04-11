@@ -2,6 +2,7 @@ package com.nCov.DataView.controller;
 
 import com.nCov.DataView.model.response.Result;
 import com.nCov.DataView.service.MapService;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,28 +26,15 @@ public class MapController {
     private MapService mapService;
 
     /**
-     * @Description: 各个省每日疫情数据
-     * @Param: []
-     * @return: com.nCov.DataView.model.response.Result
-     * @Author: SoCMo
-     * @Date: 2020/2/28
-     */
-    @Cacheable(key = "provinceInfo")
-    @GetMapping("/provinceInfo")
-    public Result provinceInfo() {
-        return mapService.provinceInfo();
-    }
-
-    /**
      * @Description: 每日各个省数据
      * @Param: []
      * @return: com.nCov.DataView.model.response.Result
      * @Author: SoCMo
      * @Date: 2020/2/28
      */
-    @Cacheable(key = "dateInfo")
+    @Cacheable(key = "dateInfo", value = "date")
     @GetMapping("/dateInfo")
-    public Result dateInfo() {
-        return mapService.dateInfo();
+    public Result dateInfo(@Param("date") String date) {
+        return mapService.dateInfo(date);
     }
 }

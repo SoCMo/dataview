@@ -154,4 +154,13 @@ public interface EpidemicService {
      * @Date: 2020/4/8
      */
     public Result cityQuery(CityRiskRequest cityRiskRequest);
+
+    /**
+     * @Description: 路径信息评估
+     * @Param: [index, max, province]
+     * @return: com.nCov.DataView.model.response.Result
+     * @Author: SoCMo
+     * @Date: 2020/4/10
+     */
+    public Result pathQuery(PathQueryRequest pathQueryRequest);
 }

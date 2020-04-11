@@ -5,6 +5,8 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * program: TimeTool
@@ -53,6 +55,22 @@ public class TimeTool {
         //设置时区为Asia/Shanghai
         simpleDateFormat.setTimeZone(TimeZone.getTimeZone("Asia/Shanghai"));
         return simpleDateFormat.format(date);
+    }
+
+    /**
+     * @Description: 字符串时分转化为小时单位的小时
+     * @Param: [time]
+     * @Return: java.util.Date
+     * @Author: SoCMo
+     * @Date: 2019/12/11
+     */
+    public static double stringToHour(String time) throws ParseException {
+        Pattern pattern = Pattern.compile("^(\\d+)时(\\d+)分");
+        Matcher matcher = pattern.matcher(time);
+        if (!matcher.find()) {
+            throw new ParseException("时间解析错误", 500);
+        }
+        return Double.parseDouble(matcher.group(1)) + Double.parseDouble(matcher.group(2)) / 60.0;
     }
 
     /**

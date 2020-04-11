@@ -195,7 +195,7 @@ public class EpidemicController {
      */
     @PostMapping("/cityQuery")
     public Result cityQuery(@Validated @RequestBody CityRiskRequest cityRiskRequest) {
-        if (cityRiskRequest.getDate().isBlank()) {
+        if (cityRiskRequest.getDate().isEmpty()) {
             cityRiskRequest.setDate(TimeTool.timeToDaySy(new Date()));
         }
         return epidemicService.cityQuery(cityRiskRequest);

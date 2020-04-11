@@ -10,20 +10,11 @@ import com.nCov.DataView.model.response.Result;
  */
 public interface MapService {
     /**
-     * @Description: 各个省每日疫情数据
-     * @Param: []
-     * @return: com.nCov.DataView.model.response.Result
-     * @Author: SoCMo
-     * @Date: 2020/2/28
-     */
-    public Result provinceInfo();
-
-    /**
      * @Description: 每日各个省疫情数据
      * @Param: []
      * @return: com.nCov.DataView.model.response.Result
      * @Author: SoCMo
      * @Date: 2020/2/28
      */
-    public Result dateInfo();
+    public Result dateInfo(String date);
 }

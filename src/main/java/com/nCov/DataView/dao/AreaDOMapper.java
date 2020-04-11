@@ -62,7 +62,7 @@ public interface AreaDOMapper {
     @MapKey("name")
     @Select({"<script>",
             "SELECT * FROM area",
-            "WHERE parentId = 0",
+            "WHERE id &lt; 35",
             "GROUP BY id",
             "</script>"})
     Map<String, AreaDO> getProvinceMapString();
