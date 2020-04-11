@@ -16,20 +16,20 @@ public class AssessDOExample {
         oredCriteria = new ArrayList<Criteria>();
     }
 
-    public String getOrderByClause() {
-        return orderByClause;
-    }
-
     public void setOrderByClause(String orderByClause) {
         this.orderByClause = orderByClause;
     }
 
-    public boolean isDistinct() {
-        return distinct;
+    public String getOrderByClause() {
+        return orderByClause;
     }
 
     public void setDistinct(boolean distinct) {
         this.distinct = distinct;
+    }
+
+    public boolean isDistinct() {
+        return distinct;
     }
 
     public List<Criteria> getOredCriteria() {
@@ -742,6 +742,76 @@ public class AssessDOExample {
             return (Criteria) this;
         }
 
+        public Criteria andSumTimeIsNull() {
+            addCriterion("sum_time is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSumTimeIsNotNull() {
+            addCriterion("sum_time is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSumTimeEqualTo(String value) {
+            addCriterion("sum_time =", value, "sumTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andSumTimeNotEqualTo(String value) {
+            addCriterion("sum_time <>", value, "sumTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andSumTimeGreaterThan(String value) {
+            addCriterion("sum_time >", value, "sumTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andSumTimeGreaterThanOrEqualTo(String value) {
+            addCriterion("sum_time >=", value, "sumTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andSumTimeLessThan(String value) {
+            addCriterion("sum_time <", value, "sumTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andSumTimeLessThanOrEqualTo(String value) {
+            addCriterion("sum_time <=", value, "sumTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andSumTimeLike(String value) {
+            addCriterion("sum_time like", value, "sumTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andSumTimeNotLike(String value) {
+            addCriterion("sum_time not like", value, "sumTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andSumTimeIn(List<String> values) {
+            addCriterion("sum_time in", values, "sumTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andSumTimeNotIn(List<String> values) {
+            addCriterion("sum_time not in", values, "sumTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andSumTimeBetween(String value1, String value2) {
+            addCriterion("sum_time between", value1, value2, "sumTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andSumTimeNotBetween(String value1, String value2) {
+            addCriterion("sum_time not between", value1, value2, "sumTime");
+            return (Criteria) this;
+        }
+
         public Criteria andSumScoreIsNull() {
             addCriterion("sum_score is null");
             return (Criteria) this;
@@ -887,6 +957,38 @@ public class AssessDOExample {
 
         private String typeHandler;
 
+        public String getCondition() {
+            return condition;
+        }
+
+        public Object getValue() {
+            return value;
+        }
+
+        public Object getSecondValue() {
+            return secondValue;
+        }
+
+        public boolean isNoValue() {
+            return noValue;
+        }
+
+        public boolean isSingleValue() {
+            return singleValue;
+        }
+
+        public boolean isBetweenValue() {
+            return betweenValue;
+        }
+
+        public boolean isListValue() {
+            return listValue;
+        }
+
+        public String getTypeHandler() {
+            return typeHandler;
+        }
+
         protected Criterion(String condition) {
             super();
             this.condition = condition;
@@ -921,38 +1023,6 @@ public class AssessDOExample {
 
         protected Criterion(String condition, Object value, Object secondValue) {
             this(condition, value, secondValue, null);
-        }
-
-        public String getCondition() {
-            return condition;
-        }
-
-        public Object getValue() {
-            return value;
-        }
-
-        public Object getSecondValue() {
-            return secondValue;
-        }
-
-        public boolean isNoValue() {
-            return noValue;
-        }
-
-        public boolean isSingleValue() {
-            return singleValue;
-        }
-
-        public boolean isBetweenValue() {
-            return betweenValue;
-        }
-
-        public boolean isListValue() {
-            return listValue;
-        }
-
-        public String getTypeHandler() {
-            return typeHandler;
         }
     }
 }

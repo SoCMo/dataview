@@ -1,7 +1,5 @@
 package com.nCov.DataView.model.entity;
 
-import com.nCov.DataView.model.ConstCorrespond;
-
 import java.util.Date;
 
 public class AssessDO {
@@ -25,20 +23,11 @@ public class AssessDO {
 
     private Double finalScore;
 
+    private String sumTime;
+
     private Double sumScore;
 
     private Date updateTime;
-
-    public double finalScoreCal() {
-        if (timeScore == null || cleanlinessScore == null || localScore == null || crowdScore == null) {
-            throw new NullPointerException("Assess计算时有分数为空");
-        }
-
-        return this.finalScore = ConstCorrespond.ROUTE_WEIGHT[0] * this.crowdScore
-                + ConstCorrespond.ROUTE_WEIGHT[1] * (this.time >= 8 ? 100 : (time / 8 * 100))
-                + ConstCorrespond.ROUTE_WEIGHT[2] * this.cleanlinessScore
-                + ConstCorrespond.ROUTE_WEIGHT[3] * this.localScore;
-    }
 
     public Integer getId() {
         return id;
@@ -118,6 +107,14 @@ public class AssessDO {
 
     public void setFinalScore(Double finalScore) {
         this.finalScore = finalScore;
+    }
+
+    public String getSumTime() {
+        return sumTime;
+    }
+
+    public void setSumTime(String sumTime) {
+        this.sumTime = sumTime == null ? null : sumTime.trim();
     }
 
     public Double getSumScore() {
