@@ -849,6 +849,8 @@ public class EpidemicServiceImpl implements EpidemicService {
             readFromDBResponse.setTotal(total);
             readFromDBResponse.setAssessmentAllResponseList(list);
 
+
+
             return ResultTool.success(readFromDBResponse);
         }
         catch (Exception e) {
@@ -892,7 +894,8 @@ public class EpidemicServiceImpl implements EpidemicService {
                          + row.getCell(13).getStringCellValue();
             tempAddress.replaceAll("\\s*", "");
             //使用正则去除空格和非法字符
-            String regex = "[a-zA-Z0-9\\u4e00-\\u9fa5-]";
+            //String regex = "[a-zA-Z0-9\\u4e00-\\u9fa5-]";
+            String regex = "[0-9\\u4e00-\\u9fa5-]";
             Pattern pattern = Pattern.compile(regex);
             Matcher matcher = pattern.matcher(tempAddress);
             while (matcher.find()) {
