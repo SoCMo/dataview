@@ -25,4 +25,6 @@ public class AreaInfo {
     private double weekGrowth;
 
     private int growth;
+
+    private int abroadInput;
 }

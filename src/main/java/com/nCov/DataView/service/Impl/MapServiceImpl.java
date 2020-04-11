@@ -141,10 +141,16 @@ public class MapServiceImpl implements MapService {
                     }
                     if (covDataSeven == null) {
                         covDataSeven = fixTool.fixCovDate(TimeTool.timeToDaySy(calendar.getTime()), areaDO.getName());
+                        if (covDataSeven == null) {
+                            areaInfo.setWeekGrowth(1.0);
+                        }
                     }
-                    double weekGrowth = NumberTool.intDivision(covData.getTotalconfirm(), covDataSeven.getTotalconfirm());
-                    weekGrowth = (int) (weekGrowth * 100 + 0.5) / 100.0;
-                    areaInfo.setWeekGrowth(weekGrowth);
+
+                    if (covDataSeven != null) {
+                        double weekGrowth = covDataSeven.getTotalconfirm() == 0 ? 1.0 : NumberTool.intDivision(covData.getTotalconfirm(), covDataSeven.getTotalconfirm());
+                        weekGrowth = (int) (weekGrowth * 100 + 0.5) / 100.0;
+                        areaInfo.setWeekGrowth(weekGrowth);
+                    }
                 }
 
                 if (CovDataListFour.isEmpty()) {
@@ -160,6 +166,20 @@ public class MapServiceImpl implements MapService {
                         covDataFour = fixTool.fixCovDate(TimeTool.timeToDaySy(calendar.getTime()), areaDO.getName());
                     }
                     areaInfo.setGrowth(Math.max(covData.getTotalconfirm() - covDataFour.getTotalconfirm(), 0));
+                }
+
+                if (abroadInputDOList.isEmpty()) {
+                    areaInfo.setAbroadInput(0);
+                } else {
+                    AbroadInputDO abroadInputDO = null;
+                    for (AbroadInputDO abroadInputTemp : abroadInputDOList) {
+                        if (abroadInputTemp.getProvincename().contains(fixTool.provinceUni(areaDO.getName()))) {
+                            abroadInputDO = abroadInputTemp;
+                        }
+                    }
+
+                    if (abroadInputDO == null) areaInfo.setAbroadInput(0);
+                    else areaInfo.setAbroadInput(abroadInputDO.getThenumber());
                 }
 
                 dayInfoResponse.getProvinceInfoList().add(areaInfo);
