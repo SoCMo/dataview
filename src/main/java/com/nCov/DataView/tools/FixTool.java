@@ -5,10 +5,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.nCov.DataView.dao.*;
 import com.nCov.DataView.exception.AllException;
-import com.nCov.DataView.model.entity.AreaDO;
-import com.nCov.DataView.model.entity.AreaDOExample;
-import com.nCov.DataView.model.entity.CovData;
-import com.nCov.DataView.model.entity.CovDataExample;
+import com.nCov.DataView.model.entity.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -49,9 +46,6 @@ public class FixTool {
 
     @Resource
     private PassInfoDOMapper passInfoDOMapper;
-
-    @Resource
-    private AssessDOMapper assessDOMapper;
 
     @Resource
     private BaiduTool baiduTool;

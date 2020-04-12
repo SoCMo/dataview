@@ -7,6 +7,7 @@ import com.nCov.DataView.service.EpidemicService;
 import com.nCov.DataView.tools.ResultTool;
 import com.nCov.DataView.tools.TimeTool;
 import org.apache.ibatis.annotations.Param;
+import org.apache.xmlbeans.impl.xb.xsdschema.All;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.validation.annotation.Validated;
@@ -222,5 +223,12 @@ public class EpidemicController {
     @GetMapping("/pathMap")
     public Result pathMap() {
         return epidemicService.pathMap();
+    }
+
+    @GetMapping("/test1")
+    public Result testInterface() throws AllException,  IOException, ParseException {
+        epidemicService.writeInPathAndPass();
+
+        return ResultTool.success("启动成功");
     }
 }
