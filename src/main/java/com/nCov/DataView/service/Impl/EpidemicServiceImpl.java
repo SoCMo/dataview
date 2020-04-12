@@ -1169,17 +1169,7 @@ public class EpidemicServiceImpl implements EpidemicService {
                     }
                     pathResponse.getResultList().add(routeCalReponse);
                 }
-                if (pathResponse.getType().equals(ConstCorrespond.TRAN_TYPE[0])
-                        || pathResponse.getType().equals(ConstCorrespond.TRAN_TYPE[1])) {
-                    pathChildResponse.getTransit().add(pathResponse);
-                    pathChildResponse.setFlag(pathChildResponse.getFlag() | 1);
-                } else if (pathResponse.getType().equals(ConstCorrespond.TRAN_TYPE[3])) {
-                    pathChildResponse.getTrain().add(pathResponse);
-                    pathChildResponse.setFlag(pathChildResponse.getFlag() | 2);
-                } else if (pathResponse.getType().equals(ConstCorrespond.TRAN_TYPE[4])) {
-                    pathChildResponse.getFlight().add(pathResponse);
-                    pathChildResponse.setFlag(pathChildResponse.getFlag() | 4);
-                }
+                pathChildResponse.getTransit().add(pathResponse);
             }
             return ResultTool.success(pathChildResponse);
         } catch (AllException e) {
@@ -1189,6 +1179,48 @@ public class EpidemicServiceImpl implements EpidemicService {
             log.error(e.getMessage());
             return ResultTool.error(500, e.getMessage());
         }
+    }
+
+    /**
+     * @Description: 热力图绘制
+     * @Param: []
+     * @return: com.nCov.DataView.model.response.Result
+     * @Author: SoCMo
+     * @Date: 2020/4/12
+     */
+    @Override
+    public Result pathMap() {
+        //查询ImpArea表
+        ImpAreaDOExample impAreaDOExample = new ImpAreaDOExample();
+        impAreaDOExample.createCriteria()
+                .andDateEqualTo(TimeTool.todayCreate().getTime());
+        List<ImpAreaDO> impAreaDOList = impAreaDOMapper.selectByExample(impAreaDOExample);
+
+        //查询area表;
+        Map<String, AreaDO> cityMap = areaDOMapper.getCityMap();
+
+        List<PathMapResponse> pathMapResponseList = new ArrayList<>();
+        for (ImpAreaDO impAreaDO : impAreaDOList) {
+            PathMapResponse pathMapResponse = new PathMapResponse();
+            pathMapResponse.setCount(impAreaDO.getSumScore());
+            AreaDO areaDO = cityMap.get(fixTool.areaUni(impAreaDO.getName()));
+            if (areaDO == null) {
+                areaDO = cityMap.get(impAreaDO.getName());
+                if (areaDO == null) {
+                    for (AreaDO areaDOTemp : cityMap.values()) {
+                        if (areaDOTemp.getName().contains(fixTool.areaUni(impAreaDO.getName()))) {
+                            areaDO = areaDOTemp;
+                        }
+                    }
+                    if (areaDO == null) continue;
+                }
+            }
+
+            pathMapResponse.setLat(areaDO.getLat());
+            pathMapResponse.setLng(areaDO.getLng());
+            pathMapResponseList.add(pathMapResponse);
+        }
+        return ResultTool.success(pathMapResponseList);
     }
 
     /**

@@ -13,17 +13,9 @@ import java.util.List;
  */
 @Data
 public class PathChildResponse {
-    private List<PathResponse> train;
-
-    private List<PathResponse> flight;
-
     private List<PathResponse> transit;
 
-    private int flag;
-
     public PathChildResponse() {
-        this.setTrain(new ArrayList<>());
-        this.setFlight(new ArrayList<>());
         this.setTransit(new ArrayList<>());
     }
 }
