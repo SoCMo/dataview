@@ -1169,17 +1169,7 @@ public class EpidemicServiceImpl implements EpidemicService {
                     }
                     pathResponse.getResultList().add(routeCalReponse);
                 }
-                if (pathResponse.getType().equals(ConstCorrespond.TRAN_TYPE[0])
-                        || pathResponse.getType().equals(ConstCorrespond.TRAN_TYPE[1])) {
-                    pathChildResponse.getTransit().add(pathResponse);
-                    pathChildResponse.setFlag(pathChildResponse.getFlag() | 1);
-                } else if (pathResponse.getType().equals(ConstCorrespond.TRAN_TYPE[3])) {
-                    pathChildResponse.getTrain().add(pathResponse);
-                    pathChildResponse.setFlag(pathChildResponse.getFlag() | 2);
-                } else if (pathResponse.getType().equals(ConstCorrespond.TRAN_TYPE[4])) {
-                    pathChildResponse.getFlight().add(pathResponse);
-                    pathChildResponse.setFlag(pathChildResponse.getFlag() | 4);
-                }
+                pathChildResponse.getTransit().add(pathResponse);
             }
             return ResultTool.success(pathChildResponse);
         } catch (AllException e) {
