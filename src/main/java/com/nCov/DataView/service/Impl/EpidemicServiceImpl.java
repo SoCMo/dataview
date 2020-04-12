@@ -1787,11 +1787,14 @@ public class EpidemicServiceImpl implements EpidemicService {
                         finalList.clear();
                     }
                     AssessDO assessDO = new AssessDO();
-                    assessDO.setAreaName(passInfoDO.getArea());
                     assessDO.setPathId(pathInfoDO.getId());
                     assessDO.setPassOrder(passInfoDO.getOrderId());
                     assessDO.setStartAddress(pathInfoDO.getStart());
+
                     assessDO.setAreaName(province);
+                    if (assessDO.getAreaName().equals("上海")) {
+                        assessDO.setAreaName(assessDO.getAreaName() + "市" + passInfoDO.getArea());
+                    }
                     assessDO.setSumTime(pathInfoDO.getSumTime());
                     assessDO.setUpdateTime(TimeTool.todayCreate().getTime());
 
