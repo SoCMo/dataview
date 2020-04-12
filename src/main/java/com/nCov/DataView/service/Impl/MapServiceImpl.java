@@ -1,7 +1,6 @@
 package com.nCov.DataView.service.Impl;
 
 import com.nCov.DataView.dao.AbroadInputDOMapper;
-import com.nCov.DataView.dao.AreaDOMapper;
 import com.nCov.DataView.dao.CovDataMapper;
 import com.nCov.DataView.exception.AllException;
 import com.nCov.DataView.exception.EmAllException;
