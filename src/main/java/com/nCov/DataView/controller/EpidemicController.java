@@ -135,18 +135,16 @@ public class EpidemicController {
         if (cur <= 0 || nums <= 0 || province.equals("1")) {
             return ResultTool.error(500, "传参有误 ");
         }
-        
+
         StringBuilder provinceName = new StringBuilder();
         if (province.length() <= 4) {
             provinceName.append("中国");
             String temp = "";
             if (province.contains("省")) {
                 temp = province.replace("省", "");
-            }
-            else if (province.contains("市")) {
+            } else if (province.contains("市")) {
                 temp = province.replace("市", "");
-            }
-            else {
+            } else {
                 temp = province;
             }
             provinceName.append(temp);
@@ -187,5 +185,17 @@ public class EpidemicController {
             cityRiskRequest.setDate(TimeTool.timeToDaySy(new Date()));
         }
         return epidemicService.cityQuery(cityRiskRequest);
+    }
+
+    /**
+     * @Description: 获取返校风险
+     * @Param: [pathQueryRequest]
+     * @return: com.nCov.DataView.model.response.Result
+     * @Author: SoCMo
+     * @Date: 2020/4/12
+     */
+    @PostMapping("/pathQuery")
+    public Result pathQuery(@Validated @RequestBody PathQueryRequest pathQueryRequest) {
+        return epidemicService.pathQuery(pathQueryRequest);
     }
 }

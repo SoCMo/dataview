@@ -94,6 +94,18 @@
       order by ${orderByClause}
     </if>
   </select>
+  <select id="selectPathId" resultMap="BaseResultMap">
+    SELECT * FROM
+    (
+    SELECT *
+    FROM assess
+    WHERE DATE(update_time) = "${date}"
+    AND area_name LIKE "中国${province}%"
+    ORDER BY sum_score DESC
+    ) a
+    GROUP BY a.start_address, a.id
+    LIMIT #{index}, #{num}
+  </select>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer">
     select
     <include refid="Base_Column_List"/>

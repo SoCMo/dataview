@@ -319,9 +319,6 @@ public class EpidemicServiceImpl implements EpidemicService {
                         .andEndEqualTo(routeCalRequest.getEnd());
 
                 List<RouteCalDO> routeCalDataList = routeCalDOMapper.selectByExample(routeCalDataExample);
-                if (routeCalDataList.size() > 1) {
-                    throw new AllException(EmAllException.DATABASE_ERROR, routeCalRequest.getStart() + "至" + routeCalRequest.getEnd() + ",交通方式为:" + ConstCorrespond.TRAN_TYPE[routeCalRequest.getType()] + ",时间为" + calendarToday.getTime());
-                }
 
                 //得到城市分数列表
                 List<String> cityRequestList = new ArrayList<>(new HashSet<String>(routeCalRequest.getCitys()));
@@ -340,25 +337,8 @@ public class EpidemicServiceImpl implements EpidemicService {
                             return cityCal;
                         }).collect(Collectors.toList());
 
-                //有城市未找到信息，进行错误处理
-                if (cityCalList.size() < cityRequestList.size()) {
-                    StringBuilder stringBuilder = new StringBuilder("以下城市信息未找到");
-                    for (String str : cityRequestList) {
-                        int flag = 0;
-                        for (CityCal cityCal : cityCalList) {
-                            if (cityCal.getCityname().contains(fixTool.areaUni(str))) {
-                                flag = 1;
-                                break;
-                            }
-                        }
-                        if (flag == 0) stringBuilder.append(str).append(",");
-                    }
-                    throw new AllException(EmAllException.DATABASE_ERROR,
-                            stringBuilder.substring(0, stringBuilder.length() - 1));
-                }
-
                 //找到当前城市信息
-                if (routeCalDataList.size() == 1) {
+                if (routeCalDataList.size() > 1) {
                     RouteCalReponse routeCalReponse = new RouteCalReponse();
                     BeanUtils.copyProperties(routeCalRequest, routeCalReponse);
                     routeCalReponse.setTime(routeCalDataList.get(0).getTime());
@@ -380,7 +360,7 @@ public class EpidemicServiceImpl implements EpidemicService {
                     RouteCalDO routeCalDO = new RouteCalDO();
                     BeanUtils.copyProperties(routeCalRequest, routeCalReponse);
                     BeanUtils.copyProperties(routeCalRequest, routeCalDO);
-                    DoubleSummaryStatistics sum = cityCalList.stream().mapToDouble(CityCal::getCityscore).summaryStatistics();
+                    double max = cityCalList.stream().mapToDouble(CityCal::getCityscore).max().getAsDouble();
 
                     //准备插入数据库的数据
                     double time = routeCalRequest.getDistance() / 1000.0 / ConstCorrespond.SPEED[routeCalRequest.getType()];
@@ -388,9 +368,9 @@ public class EpidemicServiceImpl implements EpidemicService {
                     routeCalDO.setDate(new Date());
                     routeCalDO.setScore(
                             (ConstCorrespond.ROUTE_WEIGHT[0] * ConstCorrespond.CROWD[routeCalRequest.getType()]
-                                    + ConstCorrespond.ROUTE_WEIGHT[1] * (time >= 24 ? 100 : (time / 24.0 * 100))
+                                    + ConstCorrespond.ROUTE_WEIGHT[1] * (time >= 8 ? 100 : (time / 8 * 100))
                                     + ConstCorrespond.ROUTE_WEIGHT[2] * ConstCorrespond.CLEAN_SCORE[routeCalRequest.getType()]
-                                    + ConstCorrespond.ROUTE_WEIGHT[3] * sum.getAverage()) / 20.0
+                                    + ConstCorrespond.ROUTE_WEIGHT[3] * max) / 20.0
                     );
                     routeCalDO.setId(null);
 
@@ -1049,111 +1029,27 @@ public class EpidemicServiceImpl implements EpidemicService {
     @Override
     public Result pathQuery(PathQueryRequest pathQueryRequest) {
         try {
-            List<Integer> pathIdList = assessDOMapper.selectPathId(TimeTool.todayCreate().getTime(), pathQueryRequest.getIndex(), pathQueryRequest.getNum(), fixTool.provinceUni(pathQueryRequest.getProvince()))
-                    .stream().map(AssessDO::getPathId).collect(Collectors.toList());
+            List<AssessDO> pathIdList = assessDOMapper.selectPathId(TimeTool.todayCreate().getTime(), pathQueryRequest.getIndex(), pathQueryRequest.getNum(), fixTool.provinceUni(pathQueryRequest.getProvince()));
             if (pathIdList.isEmpty()) {
                 throw new AllException(EmAllException.DATABASE_ERROR, "风险数据为空");
             }
-            //初始化返回对象
-            PathResponse pathResponse = new PathResponse();
-            pathResponse.setSumCalResponseList(new ArrayList<>());
 
-            //查询pathInfo表
+            //查询PathInfo表
             PathInfoDOExample pathInfoDOExample = new PathInfoDOExample();
             pathInfoDOExample.createCriteria()
-                    .andIdIn(pathIdList);
+                    .andIdIn(pathIdList.stream().map(AssessDO::getPathId).collect(Collectors.toList()));
             List<PathInfoDO> pathInfoDOList = pathInfoDOMapper.selectByExample(pathInfoDOExample);
+            Map<Integer, PathInfoDO> pathInfoDOMap = pathInfoDOList.stream().collect(Collectors.toMap(PathInfoDO::getId, pathInfoDO -> pathInfoDO));
 
-            //查询passInfo表
-            PassInfoDOExample passInfoDOExample = new PassInfoDOExample();
-            passInfoDOExample.createCriteria()
-                    .andPathIdIn(pathIdList);
-            passInfoDOExample.setOrderByClause("order ASC id ASC");
-            List<PassInfoDO> passInfoDOList = passInfoDOMapper.selectByExample(passInfoDOExample);
+            return ResultTool.success(pathIdList.stream().map(assessDO -> {
+                PathQueryResponse pathQueryResponse = new PathQueryResponse();
+                PathInfoDO pathInfoDO = pathInfoDOMap.get(assessDO.getPathId());
 
-            //查询Assess表
-            AssessDOExample assessDOExample = new AssessDOExample();
-            assessDOExample.createCriteria()
-                    .andPathIdIn(pathIdList)
-                    .andUpdateTimeEqualTo(TimeTool.todayCreate().getTime());
-            assessDOExample.setOrderByClause("pass_order ASC");
-            List<AssessDO> assessDOList = assessDOMapper.selectByExample(assessDOExample);
-
-            //查询impArea表
-            ImpAreaDOExample impAreaDOExample = new ImpAreaDOExample();
-            impAreaDOExample.createCriteria()
-                    .andProvinceNameLike(fixTool.provinceUni(pathQueryRequest.getProvince()) + "%");
-            List<ImpAreaDO> impAreaDOList = impAreaDOMapper.selectByExample(impAreaDOExample);
-            Map<String, ImpAreaDO> impAreaDOMap = impAreaDOList.stream().collect(Collectors.toMap(ImpAreaDO::getName, impAreaDO -> impAreaDO));
-
-            //查询passInfo表相应信息
-            for (PathInfoDO pathInfoDO : pathInfoDOList) {
-                SumCalResponse sumCalResponse = new SumCalResponse();
-
-                //获取passInfo表信息
-                List<PassInfoDO> passInfoDOS = passInfoDOList.stream().filter(passInfoDO -> passInfoDO.getPathId().equals(pathInfoDO.getId()))
-                        .collect(Collectors.toList());
-                if (passInfoDOS.isEmpty()) {
-                    throw new AllException(EmAllException.DATABASE_ERROR, "无路段信息");
-                }
-
-                //获取分数信息
-                List<AssessDO> assessDOS = assessDOList.stream().filter(assessDO -> assessDO.getPathId().equals(pathInfoDO.getId()))
-                        .collect(Collectors.toList());
-                if (assessDOS.isEmpty()) {
-                    throw new AllException(EmAllException.DATABASE_ERROR, "无风险信息");
-                }
-
-                //初始化类
-                sumCalResponse.setType(ConstCorrespond.TRAN_TYPE[pathInfoDO.getMainType()]);
-                sumCalResponse.setSumScore(NumberTool.doubleToStringWotH(assessDOS.get(0).getSumScore()));
-                sumCalResponse.setResultList(new ArrayList<>());
-
-                int i = 0;
-                for (AssessDO assessDO : assessDOS) {
-                    RouteCalReponse routeCalReponse = new RouteCalReponse();
-                    routeCalReponse.setTimeScore(NumberTool.doubleToStringWotH(assessDO.getTimeScore()));
-                    routeCalReponse.setFinalscore(assessDO.getFinalScore());
-                    routeCalReponse.setTransportScore(String.valueOf(assessDO.getCleanlinessScore() + assessDO.getCrowdScore()));
-                    routeCalReponse.setTime(TimeTool.timeSlotToString(assessDO.getTime()));
-                    routeCalReponse.setCity(new ArrayList<>());
-
-                    boolean flag = false;
-                    while (assessDO.getPassOrder().equals(passInfoDOS.get(i).getOrderId())
-                            && i < passInfoDOS.size()) {
-                        PassInfoDO tempPassInfo = passInfoDOS.get(i++);
-                        if (!flag) {
-                            routeCalReponse.setTitle(tempPassInfo.getTitle());
-                            routeCalReponse.setStart(tempPassInfo.getStartAddress());
-                            routeCalReponse.setEnd(tempPassInfo.getEndAddress());
-                            flag = true;
-                        }
-
-                        CityCal cityCal = new CityCal();
-                        cityCal.setCityname(tempPassInfo.getArea());
-                        ImpAreaDO impAreaDO = impAreaDOMap.get(fixTool.areaUni(tempPassInfo.getArea()));
-                        if (impAreaDO == null) {
-                            impAreaDO = impAreaDOMap.get(tempPassInfo.getArea());
-                            if (impAreaDO == null) {
-                                for (ImpAreaDO tempImpAreaDo : impAreaDOMap.values()) {
-                                    if (tempImpAreaDo.getName().contains(fixTool.areaUni(tempPassInfo.getArea()))) {
-                                        impAreaDO = tempImpAreaDo;
-                                        break;
-                                    }
-                                }
-                                if (impAreaDO == null) {
-                                    throw new AllException(EmAllException.DATABASE_ERROR, tempPassInfo.getArea() + "无风险数据");
-                                }
-                            }
-                        }
-                        cityCal.setCityscore(impAreaDO.getSumScore().intValue());
-                        routeCalReponse.getCity().add(cityCal);
-                    }
-                    sumCalResponse.getResultList().add(routeCalReponse);
-                }
-                pathResponse.getSumCalResponseList().add(sumCalResponse);
-            }
-            return ResultTool.success(pathResponse);
+                pathQueryResponse.setStart(pathInfoDO.getStart());
+                pathQueryResponse.setEnd(pathInfoDO.getEnd());
+                pathQueryResponse.setRisk((int) (assessDO.getSumScore() * 10 + 0.5) / 10.0);
+                return pathQueryRequest;
+            }).collect(Collectors.toList()));
         } catch (AllException e) {
             log.error(e.getMsg());
             return ResultTool.error(500, e.getMsg());
