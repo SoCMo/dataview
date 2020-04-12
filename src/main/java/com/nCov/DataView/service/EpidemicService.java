@@ -172,4 +172,13 @@ public interface EpidemicService {
      * @Date: 2020/4/12
      */
     public Result pathMap();
+
+    /**
+     * @Description: 将百度地图api的查询结果存入pathInfo,和passInfo中
+     * @Param: [startaddress]
+     * @return: com.nCov.DataView.model.response.Result
+     * @Author: pongshy
+     * @Date: 2020/4/12
+     */
+    public void writeInPathAndPss(String startAddress) throws AllException, IOException, ParseException;
 }

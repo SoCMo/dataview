@@ -1224,6 +1224,87 @@ public class EpidemicServiceImpl implements EpidemicService {
     }
 
     /**
+     * @Description: 将百度地图api的查询结果存入pathInfo,和passInfo中
+     * @Param: [startaddress]
+     * @return: com.nCov.DataView.model.response.Result
+     * @Author: pongshy
+     * @Date: 2020/4/12
+     */
+    @Override
+    public void writeInPathAndPss(String startAddress) throws AllException, IOException, ParseException {
+        final String endAddress = "上海大学宝山校区";
+        List<RouteInfo> routeInfoList = baiduTool.pathInfo(startAddress, endAddress);
+        //n条路线
+        for (RouteInfo routeInfo : routeInfoList) {
+            List<RouteCalListRequest> routeListRequests = routeInfo.getRouteCalRequestList();
+            if (routeListRequests.isEmpty()) {
+                return;
+            }
+
+            AssessmentAllResponse assessmentAllResponse = new AssessmentAllResponse();
+            assessmentAllResponse.setStart(startAddress);
+            assessmentAllResponse.setEnd(endAddress);
+
+            List<SumCalResponse> sumCalResponseList = new ArrayList<>();
+            PathInfoDOExample pathInfoDOExample = new PathInfoDOExample();
+
+            //每一条路径信息，存入数据库
+            int routeNum = 0;
+            for (RouteListRequest routeListRequest : routeListRequests) {
+                //每一条路线
+                int pathId = 0;
+                PathInfoDO record = new PathInfoDO();
+
+                record.setStart(startAddress);
+                record.setEnd(endAddress);
+                record.setMainType(routeNum);
+                pathInfoDOMapper.insertSelective(record);
+
+                pathInfoDOExample.createCriteria().andStartEqualTo(startAddress).andMainTypeEqualTo(routeNum);
+                PathInfoDO pathInfoDO = pathInfoDOMapper.selectByExample(pathInfoDOExample).get(0);
+                pathId = pathInfoDO.getId();
+                pathInfoDOExample.clear();
+
+                SumCalResponse sumCalResponse = calculate(routeListRequest.getRouteCalRequestList());
+
+                int order_num = 0;
+                int main_type = 0;
+                for (RouteCalRequest routeCalRequest : routeListRequest.getRouteCalRequestList()) {
+                    List<PassInfoDO> passInfoDOList = new ArrayList<>();
+
+                    for (String city : routeCalRequest.getCitys()) {
+                        PassInfoDO passInfoDO_record = new PassInfoDO();
+                        passInfoDO_record.setArea(city);
+                        passInfoDO_record.setDistance((int) routeCalRequest.getDistance());
+                        passInfoDO_record.setOrderId(order_num);
+                        passInfoDO_record.setStartAddress(routeCalRequest.getStart());
+                        passInfoDO_record.setEndAddress(routeCalRequest.getEnd());
+                        passInfoDO_record.setTitle(routeCalRequest.getTitle());
+                        passInfoDO_record.setPathId(pathId);
+                        passInfoDO_record.setTypeNum(routeCalRequest.getType());
+
+                        passInfoDOList.add(passInfoDO_record);
+                    }
+                    if (routeCalRequest.getType() > main_type) {
+                        main_type = routeCalRequest.getType();
+                    }
+                    passInfoDOMapper.insertList(passInfoDOList);
+                    ++order_num;
+                }
+                ++routeNum;
+                pathInfoDO.setMainType(main_type);
+                pathInfoDOMapper.updateByPrimaryKeySelective(pathInfoDO);
+
+                sumCalResponse.setType(ConstCorrespond.TRAN_TYPE[main_type]);
+                sumCalResponseList.add(sumCalResponse);
+            }
+            assessmentAllResponse.setSumCalResponseList(sumCalResponseList);
+        }
+
+
+    }
+
+    /**
      * @Description: 使用excel表格导入学生信息
      * @Param: [file]
      * @return: com.nCov.DataView.model.response.Result
