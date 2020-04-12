@@ -74,15 +74,6 @@ public interface EpidemicService {
     public Result routeCal(List<RouteCalRequest> routeCalRequestList);
 
     /**
-     * @Description: 路径存储兼查询
-     * @Param: [routeCalRequestList]
-     * @return: com.nCov.DataView.model.response.Result
-     * @Author: SoCMo
-     * @Date: 2020/3/29
-     */
-    public Result routeStore(PathRequest pathRequest);
-
-    /**
      * @Description: 同一终点和起点的不同路径进行计算
      * @Param: []
      * @return: com.nCov.DataView.model.response.Result

@@ -6,6 +6,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.nCov.DataView.exception.AllException;
 import com.nCov.DataView.exception.EmAllException;
 import com.nCov.DataView.model.ConstCorrespond;
+import com.nCov.DataView.model.entity.RouteInfo;
 import com.nCov.DataView.model.request.PathRequest;
 import com.nCov.DataView.model.request.RouteCalRequest;
 import com.nCov.DataView.model.request.RouteListRequest;
@@ -131,22 +132,6 @@ public class BaiduTool {
         pathRequest.setPathList(new ArrayList<>());
         boolean exist = false;
 
-        RouteListRequest aircraft = routeListInfo(start, end, 1);
-        if (aircraft.getRouteCalRequestList().get(0).getType() != -1) {
-            exist = true;
-        }
-
-        RouteListRequest train = routeListInfo(start, end, 0);
-        if (train.getRouteCalRequestList().get(0).getType() != -1) {
-            exist = true;
-        }
-
-        if (exist) {
-            pathRequest.getPathList().add(aircraft);
-            pathRequest.getPathList().add(train);
-        } else {
-            pathRequest.getPathList().add(routeListInfo(start, end, 3));
-        }
         return pathRequest;
     }
 
@@ -157,7 +142,7 @@ public class BaiduTool {
      * @Author: SoCMo
      * @Date: 2020/3/30
      */
-    public RouteListRequest routeListInfo(String start, String end, Integer type) throws AllException, IOException {
+    public List<RouteInfo> routeListInfo(String start, String end, Integer type) throws AllException, IOException {
         int akNumber = 0;
         Map<String, Double> startMap = this.geoCoding(start);
         Map<String, Double> endMap = this.geoCoding(end);
@@ -181,135 +166,126 @@ public class BaiduTool {
             } else if (jsonObject.getString("status").matches("1001")) {
                 throw new AllException(EmAllException.BAIDU_REQUEST_FAILE, "没有公交方案");
             } else if (jsonObject.getInteger("status") == 0) {
-                JSONArray jsonArray = jsonObject.getJSONObject("result").getJSONArray("routes");
-                JSONArray steps = jsonArray.getJSONObject(0).getJSONArray("steps");
+                int methodNum = 0;
+                PathRequest pathRequest = new PathRequest();
+                pathRequest.setPathList(new ArrayList<>());
 
-                //验证类型
-                if (type < 2) {
-                    boolean exist = false;
+                while (methodNum++ < 3) {
+                    JSONArray jsonArray = jsonObject.getJSONObject("result").getJSONArray("routes");
+                    JSONArray steps = jsonArray.getJSONObject(0).getJSONArray("steps");
+
+                    //验证类型
+                    if (type < 2) {
+                        boolean exist = false;
+                        for (int j = 0; j < steps.size(); j++) {
+                            JSONArray childSteps = steps.getJSONArray(j);
+                            for (int z = 0; z < childSteps.size(); z++) {
+                                JSONObject finalSteps = childSteps.getJSONObject(z);
+                                JSONObject vehicle = finalSteps.getJSONObject("vehicle_info");
+                                if (vehicle.getInteger("type") == type + 1) {
+                                    exist = true;
+                                    break;
+                                }
+                            }
+                            if (exist) break;
+                        }
+
+                        if (!exist) break;
+                    }
+
+                    RouteListRequest routeListRequest = new RouteListRequest();
+                    routeListRequest.setRouteCalRequestList(new ArrayList<>());
                     for (int j = 0; j < steps.size(); j++) {
                         JSONArray childSteps = steps.getJSONArray(j);
                         for (int z = 0; z < childSteps.size(); z++) {
                             JSONObject finalSteps = childSteps.getJSONObject(z);
+                            RouteCalRequest routeCalRequest = new RouteCalRequest();
                             JSONObject vehicle = finalSteps.getJSONObject("vehicle_info");
-                            if (vehicle.getInteger("type") == type + 1) {
-                                exist = true;
-                                break;
-                            }
-                        }
-                        if (exist) break;
-                    }
-
-                    if (!exist) {
-                        RouteListRequest routeListRequest = new RouteListRequest();
-                        routeListRequest.setRouteCalRequestList(new ArrayList<>());
-
-                        RouteCalRequest routeCalRequest = new RouteCalRequest();
-                        routeCalRequest.setTitle("无");
-                        routeCalRequest.setEnd("无");
-                        routeCalRequest.setStart("无");
-                        routeCalRequest.setType(-1);
-                        routeCalRequest.setCitys(new ArrayList<>());
-                        routeCalRequest.setStartAdressZone("无");
-                        routeCalRequest.setDistance(0);
-                        routeListRequest.getRouteCalRequestList().add(routeCalRequest);
-                        return routeListRequest;
-                    }
-                }
-
-                RouteListRequest routeListRequest = new RouteListRequest();
-                routeListRequest.setRouteCalRequestList(new ArrayList<>());
-                for (int j = 0; j < steps.size(); j++) {
-                    JSONArray childSteps = steps.getJSONArray(j);
-                    for (int z = 0; z < childSteps.size(); z++) {
-                        JSONObject finalSteps = childSteps.getJSONObject(z);
-                        RouteCalRequest routeCalRequest = new RouteCalRequest();
-                        JSONObject vehicle = finalSteps.getJSONObject("vehicle_info");
-                        switch (vehicle.getInteger("type")) {
-                            //火车路线
-                            case 1: {
-                                routeCalRequest.setType(ConstCorrespond.PATH_INFO_TYPE[0]);
-                                List<String> cities = new ArrayList<>();
-                                String path = finalSteps.getString("path");
-                                String[] points = path.split(";");
-                                double sumDistance = 0;
-                                String[] lngLat = null;
-                                for (int pointIndex = 0; pointIndex < points.length; pointIndex++) {
-                                    if (pointIndex == 0) {
-                                        lngLat = points[pointIndex].split(",");
-                                    }
-                                    if (pointIndex < points.length - 1) {
-                                        String[] temp = points[pointIndex + 1].split(",");
-                                        //计算距离
-                                        if (pointIndex < points.length - 1) {
-                                            sumDistance += NumberTool.getDistance(Double.parseDouble(lngLat[1]), Double.parseDouble(lngLat[0]),
-                                                    Double.parseDouble(temp[1]), Double.parseDouble(temp[0]));
+                            switch (vehicle.getInteger("type")) {
+                                //火车路线
+                                case 1: {
+                                    routeCalRequest.setType(ConstCorrespond.PATH_INFO_TYPE[0]);
+                                    List<String> cities = new ArrayList<>();
+                                    String path = finalSteps.getString("path");
+                                    String[] points = path.split(";");
+                                    double sumDistance = 0;
+                                    String[] lngLat = null;
+                                    for (int pointIndex = 0; pointIndex < points.length; pointIndex++) {
+                                        if (pointIndex == 0) {
+                                            lngLat = points[pointIndex].split(",");
                                         }
-                                        lngLat = temp;
+                                        if (pointIndex < points.length - 1) {
+                                            String[] temp = points[pointIndex + 1].split(",");
+                                            //计算距离
+                                            if (pointIndex < points.length - 1) {
+                                                sumDistance += NumberTool.getDistance(Double.parseDouble(lngLat[1]), Double.parseDouble(lngLat[0]),
+                                                        Double.parseDouble(temp[1]), Double.parseDouble(temp[0]));
+                                            }
+                                            lngLat = temp;
+                                        }
+                                        String city = this.reverseGeoCoding(Double.parseDouble(lngLat[1]), Double.parseDouble(lngLat[0]));
+                                        if (!cities.contains(city)) cities.add(city);
                                     }
-                                    String city = this.reverseGeoCoding(Double.parseDouble(lngLat[1]), Double.parseDouble(lngLat[0]));
-                                    if (!cities.contains(city)) cities.add(city);
+                                    routeCalRequest.setCitys(cities);
+                                    JSONObject detail = vehicle.getJSONObject("detail");
+                                    routeCalRequest.setStart(detail.getString("departure_station"));
+                                    routeCalRequest.setEnd(detail.getString("arrive_station"));
+                                    routeCalRequest.setTitle(detail.getString("name"));
+                                    routeCalRequest.setDistance(sumDistance);
+                                    break;
                                 }
-                                routeCalRequest.setCitys(cities);
-                                JSONObject detail = vehicle.getJSONObject("detail");
-                                routeCalRequest.setStart(detail.getString("departure_station"));
-                                routeCalRequest.setEnd(detail.getString("arrive_station"));
-                                routeCalRequest.setTitle(detail.getString("name"));
-                                routeCalRequest.setDistance(sumDistance);
-                                break;
-                            }
-                            case 2: {
-                                //飞机路线
-                                routeCalRequest.setDistance(finalSteps.getInteger("distance"));
-                                routeCalRequest.setType(ConstCorrespond.PATH_INFO_TYPE[1]);
-                                List<String> cities = new ArrayList<>();
-                                JSONObject startJson = finalSteps.getJSONObject("start_location");
-                                JSONObject endJson = finalSteps.getJSONObject("end_location");
-                                cities.add(this.reverseGeoCoding(startJson.getDouble("lat"), startJson.getDouble("lng")));
-                                cities.add(this.reverseGeoCoding(endJson.getDouble("lat"), endJson.getDouble("lng")));
-                                routeCalRequest.setCitys(cities);
+                                case 2: {
+                                    //飞机路线
+                                    routeCalRequest.setDistance(finalSteps.getInteger("distance"));
+                                    routeCalRequest.setType(ConstCorrespond.PATH_INFO_TYPE[1]);
+                                    List<String> cities = new ArrayList<>();
+                                    JSONObject startJson = finalSteps.getJSONObject("start_location");
+                                    JSONObject endJson = finalSteps.getJSONObject("end_location");
+                                    cities.add(this.reverseGeoCoding(startJson.getDouble("lat"), startJson.getDouble("lng")));
+                                    cities.add(this.reverseGeoCoding(endJson.getDouble("lat"), endJson.getDouble("lng")));
+                                    routeCalRequest.setCitys(cities);
 
-                                JSONObject detail = vehicle.getJSONObject("detail");
-                                routeCalRequest.setStart(detail.getString("departure_station"));
-                                routeCalRequest.setEnd(detail.getString("arrive_station"));
-                                routeCalRequest.setTitle(detail.getString("name"));
-                                break;
-                            }
-                            case 3: {
-                                if (finalSteps.getString("instructions").contains("地铁")) {
-                                    //按地铁处理
-                                    routeCalRequest.setType(ConstCorrespond.PATH_INFO_TYPE[6]);
-                                } else {
-                                    //按公交车处理
-                                    routeCalRequest.setType(ConstCorrespond.PATH_INFO_TYPE[2]);
+                                    JSONObject detail = vehicle.getJSONObject("detail");
+                                    routeCalRequest.setStart(detail.getString("departure_station"));
+                                    routeCalRequest.setEnd(detail.getString("arrive_station"));
+                                    routeCalRequest.setTitle(detail.getString("name"));
+                                    break;
                                 }
-                                routeCalRequest.setDistance(finalSteps.getInteger("distance"));
-                                JSONObject detail = vehicle.getJSONObject("detail");
-                                routeCalRequest.setStart(detail.getString("on_station"));
-                                routeCalRequest.setEnd(detail.getString("off_station"));
-                                List<String> cities = new ArrayList<>();
-                                String path = finalSteps.getString("path");
-                                String[] points = path.split(";");
-                                double sumDistance = 0;
-                                for (int i = 0; i < points.length; i = i + 10) {
-                                    String[] lngLat = points[i].split(",");
-                                    String city = this.reverseGeoCoding(Double.parseDouble(lngLat[1]), Double.parseDouble(lngLat[0]));
-                                    if (!cities.contains(city)) cities.add(city);
+                                case 3: {
+                                    if (finalSteps.getString("instructions").contains("地铁")) {
+                                        //按地铁处理
+                                        routeCalRequest.setType(ConstCorrespond.PATH_INFO_TYPE[6]);
+                                    } else {
+                                        //按公交车处理
+                                        routeCalRequest.setType(ConstCorrespond.PATH_INFO_TYPE[2]);
+                                    }
+                                    routeCalRequest.setDistance(finalSteps.getInteger("distance"));
+                                    JSONObject detail = vehicle.getJSONObject("detail");
+                                    routeCalRequest.setStart(detail.getString("on_station"));
+                                    routeCalRequest.setEnd(detail.getString("off_station"));
+                                    List<String> cities = new ArrayList<>();
+                                    String path = finalSteps.getString("path");
+                                    String[] points = path.split(";");
+                                    double sumDistance = 0;
+                                    for (int i = 0; i < points.length; i = i + 10) {
+                                        String[] lngLat = points[i].split(",");
+                                        String city = this.reverseGeoCoding(Double.parseDouble(lngLat[1]), Double.parseDouble(lngLat[0]));
+                                        if (!cities.contains(city)) cities.add(city);
+                                    }
+                                    routeCalRequest.setCitys(cities);
+                                    routeCalRequest.setTitle(detail.getString("name"));
+                                    break;
                                 }
-                                routeCalRequest.setCitys(cities);
-                                routeCalRequest.setTitle(detail.getString("name"));
-                                break;
+                                default:
+                                    continue;
                             }
-                            default:
-                                continue;
+
+                            routeCalRequest.setStartAdressZone(start);
+                            routeListRequest.getRouteCalRequestList().add(routeCalRequest);
                         }
-
-                        routeCalRequest.setStartAdressZone(start);
-                        routeListRequest.getRouteCalRequestList().add(routeCalRequest);
                     }
                 }
-
-                return routeListRequest;
+                return null;
             } else {
                 throw new AllException(EmAllException.BAIDU_REQUEST_FAILE, "百度api报错为" + jsonObject.getInteger("status"));
             }

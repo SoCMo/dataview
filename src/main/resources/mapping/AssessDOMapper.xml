@@ -13,6 +13,7 @@
     <result column="local_score" property="localScore" jdbcType="INTEGER"/>
     <result column="final_score" property="finalScore" jdbcType="DOUBLE"/>
     <result column="sum_time" property="sumTime" jdbcType="VARCHAR"/>
+    <result column="sum_price" property="sumPrice" jdbcType="DOUBLE"/>
     <result column="sum_score" property="sumScore" jdbcType="DOUBLE"/>
     <result column="update_time" property="updateTime" jdbcType="DATE"/>
   </resultMap>
@@ -76,7 +77,7 @@
   </sql>
   <sql id="Base_Column_List">
     id, path_id, area_name, pass_order, cleanliness_score, time, time_score, crowd_score,
-    local_score, final_score, sum_time, sum_score, update_time
+    local_score, final_score, sum_time, sum_price, sum_score, update_time
   </sql>
   <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.nCov.DataView.model.entity.AssessDOExample">
     select
@@ -113,20 +114,21 @@
     insert into assess (id, path_id, area_name,
     pass_order, cleanliness_score, time,
     time_score, crowd_score, local_score,
-    final_score, sum_time, sum_score,
-    update_time)
+    final_score, sum_time, sum_price,
+    sum_score, update_time)
     values (#{id,jdbcType=INTEGER}, #{pathId,jdbcType=INTEGER}, #{areaName,jdbcType=VARCHAR},
     #{passOrder,jdbcType=INTEGER}, #{cleanlinessScore,jdbcType=INTEGER}, #{time,jdbcType=DOUBLE},
     #{timeScore,jdbcType=DOUBLE}, #{crowdScore,jdbcType=INTEGER}, #{localScore,jdbcType=INTEGER},
-    #{finalScore,jdbcType=DOUBLE}, #{sumTime,jdbcType=VARCHAR}, #{sumScore,jdbcType=DOUBLE},
-    #{updateTime,jdbcType=DATE})
+    #{finalScore,jdbcType=DOUBLE}, #{sumTime,jdbcType=VARCHAR}, #{sumPrice,jdbcType=DOUBLE},
+    #{sumScore,jdbcType=DOUBLE}, #{updateTime,jdbcType=DATE})
   </insert>
   <insert id="insertList" parameterType="java.util.List">
-    insert into assess (path_id, area_name,
+    insert into assess (id, path_id, area_name,
     pass_order, cleanliness_score, time,
     time_score, crowd_score, local_score,
-    final_score, sum_score, sum_time, update_time
-    ) values
+    final_score, sum_time, sum_price,
+    sum_score, update_time)
+    values
     <foreach collection="list" item="assessDo" index="index" separator=",">
       (
       #{assessDo.pathId},
@@ -138,8 +140,9 @@
       #{assessDo.crowdScore},
       #{assessDo.localScore},
       #{assessDo.finalScore},
-      #{assessDo.sumScore},
       #{assessDo.sumTime},
+      #{assessDo.sumPrice},
+      #{assessDo.sumScore},
       #{assessDo.updateTime}
       )
     </foreach>
@@ -179,6 +182,9 @@
       </if>
       <if test="sumTime != null">
         sum_time,
+      </if>
+      <if test="sumPrice != null">
+        sum_price,
       </if>
       <if test="sumScore != null">
         sum_score,
@@ -220,6 +226,9 @@
       </if>
       <if test="sumTime != null">
         #{sumTime,jdbcType=VARCHAR},
+      </if>
+      <if test="sumPrice != null">
+        #{sumPrice,jdbcType=DOUBLE},
       </if>
       <if test="sumScore != null">
         #{sumScore,jdbcType=DOUBLE},
@@ -272,6 +281,9 @@
       <if test="record.sumTime != null">
         sum_time = #{record.sumTime,jdbcType=VARCHAR},
       </if>
+      <if test="record.sumPrice != null">
+        sum_price = #{record.sumPrice,jdbcType=DOUBLE},
+      </if>
       <if test="record.sumScore != null">
         sum_score = #{record.sumScore,jdbcType=DOUBLE},
       </if>
@@ -296,6 +308,7 @@
     local_score = #{record.localScore,jdbcType=INTEGER},
     final_score = #{record.finalScore,jdbcType=DOUBLE},
     sum_time = #{record.sumTime,jdbcType=VARCHAR},
+    sum_price = #{record.sumPrice,jdbcType=DOUBLE},
     sum_score = #{record.sumScore,jdbcType=DOUBLE},
     update_time = #{record.updateTime,jdbcType=DATE}
     <if test="_parameter != null">
@@ -335,6 +348,9 @@
       <if test="sumTime != null">
         sum_time = #{sumTime,jdbcType=VARCHAR},
       </if>
+      <if test="sumPrice != null">
+        sum_price = #{sumPrice,jdbcType=DOUBLE},
+      </if>
       <if test="sumScore != null">
         sum_score = #{sumScore,jdbcType=DOUBLE},
       </if>
@@ -356,6 +372,7 @@
     local_score = #{localScore,jdbcType=INTEGER},
     final_score = #{finalScore,jdbcType=DOUBLE},
     sum_time = #{sumTime,jdbcType=VARCHAR},
+    sum_price = #{sumPrice,jdbcType=DOUBLE},
     sum_score = #{sumScore,jdbcType=DOUBLE},
     update_time = #{updateTime,jdbcType=DATE}
     where id = #{id,jdbcType=INTEGER}

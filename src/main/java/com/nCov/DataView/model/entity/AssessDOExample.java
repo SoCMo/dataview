@@ -812,6 +812,66 @@ public class AssessDOExample {
             return (Criteria) this;
         }
 
+        public Criteria andSumPriceIsNull() {
+            addCriterion("sum_price is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSumPriceIsNotNull() {
+            addCriterion("sum_price is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSumPriceEqualTo(Double value) {
+            addCriterion("sum_price =", value, "sumPrice");
+            return (Criteria) this;
+        }
+
+        public Criteria andSumPriceNotEqualTo(Double value) {
+            addCriterion("sum_price <>", value, "sumPrice");
+            return (Criteria) this;
+        }
+
+        public Criteria andSumPriceGreaterThan(Double value) {
+            addCriterion("sum_price >", value, "sumPrice");
+            return (Criteria) this;
+        }
+
+        public Criteria andSumPriceGreaterThanOrEqualTo(Double value) {
+            addCriterion("sum_price >=", value, "sumPrice");
+            return (Criteria) this;
+        }
+
+        public Criteria andSumPriceLessThan(Double value) {
+            addCriterion("sum_price <", value, "sumPrice");
+            return (Criteria) this;
+        }
+
+        public Criteria andSumPriceLessThanOrEqualTo(Double value) {
+            addCriterion("sum_price <=", value, "sumPrice");
+            return (Criteria) this;
+        }
+
+        public Criteria andSumPriceIn(List<Double> values) {
+            addCriterion("sum_price in", values, "sumPrice");
+            return (Criteria) this;
+        }
+
+        public Criteria andSumPriceNotIn(List<Double> values) {
+            addCriterion("sum_price not in", values, "sumPrice");
+            return (Criteria) this;
+        }
+
+        public Criteria andSumPriceBetween(Double value1, Double value2) {
+            addCriterion("sum_price between", value1, value2, "sumPrice");
+            return (Criteria) this;
+        }
+
+        public Criteria andSumPriceNotBetween(Double value1, Double value2) {
+            addCriterion("sum_price not between", value1, value2, "sumPrice");
+            return (Criteria) this;
+        }
+
         public Criteria andSumScoreIsNull() {
             addCriterion("sum_score is null");
             return (Criteria) this;

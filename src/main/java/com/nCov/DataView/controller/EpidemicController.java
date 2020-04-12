@@ -110,18 +110,6 @@ public class EpidemicController {
     }
 
     /**
-     * @Description: 路径存储与评估
-     * @Param: [routeStoreInfo]
-     * @return: com.nCov.DataView.model.response.Result
-     * @Author: SoCMo
-     * @Date: 2020/3/29
-     */
-    @PostMapping("/routeStore")
-    public Result routeStore(@Validated @RequestBody PathRequest pathRequest) {
-        return epidemicService.routeStore(pathRequest);
-    }
-
-    /**
      * @Description: 前端发送地址信息，后端进行风险评估并返回分数
      * @Param: [AddressRequest]
      * @return: com.nCov.DataView.model.response.Result

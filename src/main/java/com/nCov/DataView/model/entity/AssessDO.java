@@ -25,6 +25,8 @@ public class AssessDO {
 
     private String sumTime;
 
+    private Double sumPrice;
+
     private Double sumScore;
 
     private Date updateTime;
@@ -115,6 +117,14 @@ public class AssessDO {
 
     public void setSumTime(String sumTime) {
         this.sumTime = sumTime == null ? null : sumTime.trim();
+    }
+
+    public Double getSumPrice() {
+        return sumPrice;
+    }
+
+    public void setSumPrice(Double sumPrice) {
+        this.sumPrice = sumPrice;
     }
 
     public Double getSumScore() {
