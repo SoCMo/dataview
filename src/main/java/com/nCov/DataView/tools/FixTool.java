@@ -3,10 +3,10 @@ package com.nCov.DataView.tools;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.nCov.DataView.dao.AssessDOMapper;
-import com.nCov.DataView.dao.CovDataMapper;
-import com.nCov.DataView.dao.PassInfoDOMapper;
-import com.nCov.DataView.dao.PathInfoDOMapper;
+import com.nCov.DataView.dao.*;
+import com.nCov.DataView.exception.AllException;
+import com.nCov.DataView.model.entity.AreaDO;
+import com.nCov.DataView.model.entity.AreaDOExample;
 import com.nCov.DataView.model.entity.CovData;
 import com.nCov.DataView.model.entity.CovDataExample;
 import lombok.extern.slf4j.Slf4j;
@@ -24,9 +24,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 import java.io.IOException;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -41,6 +39,9 @@ import java.util.regex.Pattern;
 @Slf4j
 public class FixTool {
     @Resource
+    private AreaDOMapper areaDOMapper;
+
+    @Resource
     private CovDataMapper covDataMapper;
 
     @Resource
@@ -51,6 +52,9 @@ public class FixTool {
 
     @Resource
     private AssessDOMapper assessDOMapper;
+
+    @Resource
+    private BaiduTool baiduTool;
 
     /**
      * @Description: 疫情数据拟合
@@ -248,6 +252,39 @@ public class FixTool {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        }
+    }
+
+
+    /**
+     * @Description: area表经纬度补充
+     * @Param: []
+     * @return: void
+     * @Author: SoCMo
+     * @Date: 2020/4/12
+     */
+    public void LngAndLatFix() throws IOException, AllException {
+        AreaDOExample areaDOExample = new AreaDOExample();
+        areaDOExample.createCriteria()
+                .andIdGreaterThan(35)
+                .andLngEqualTo(0.0)
+                .andParentidNotEqualTo(32);
+        List<AreaDO> areaDOList = areaDOMapper.selectByExample(areaDOExample);
+
+        Map<Integer, AreaDO> integerProvinceMap = areaDOMapper.getProvinceMapInt();
+        for (AreaDO areaDO : areaDOList) {
+            Map<String, Double> lngAndLatMap = null;
+            List<String> someName = Arrays.asList("垫江", "忠县");
+            if (someName.contains(areaDO.getName())) lngAndLatMap = baiduTool.geoCoding(areaDO.getName());
+            else if (areaDO.getName().equals("苗栗")) continue;
+            else
+                lngAndLatMap = baiduTool.geoCoding(integerProvinceMap.get(areaDO.getParentid()).getName() + areaDO.getName());
+            AreaDO areaDOTemp = new AreaDO();
+            areaDOTemp.setLng(lngAndLatMap.get("lng"));
+            areaDOTemp.setLat(lngAndLatMap.get("lat"));
+            areaDOExample.clear();
+            areaDOExample.createCriteria().andIdEqualTo(areaDO.getId());
+            areaDOMapper.updateByExampleSelective(areaDOTemp, areaDOExample);
         }
     }
 

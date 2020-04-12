@@ -1192,6 +1192,48 @@ public class EpidemicServiceImpl implements EpidemicService {
     }
 
     /**
+     * @Description: 热力图绘制
+     * @Param: []
+     * @return: com.nCov.DataView.model.response.Result
+     * @Author: SoCMo
+     * @Date: 2020/4/12
+     */
+    @Override
+    public Result pathMap() {
+        //查询ImpArea表
+        ImpAreaDOExample impAreaDOExample = new ImpAreaDOExample();
+        impAreaDOExample.createCriteria()
+                .andDateEqualTo(TimeTool.todayCreate().getTime());
+        List<ImpAreaDO> impAreaDOList = impAreaDOMapper.selectByExample(impAreaDOExample);
+
+        //查询area表;
+        Map<String, AreaDO> cityMap = areaDOMapper.getCityMap();
+
+        List<PathMapResponse> pathMapResponseList = new ArrayList<>();
+        for (ImpAreaDO impAreaDO : impAreaDOList) {
+            PathMapResponse pathMapResponse = new PathMapResponse();
+            pathMapResponse.setCount(impAreaDO.getSumScore());
+            AreaDO areaDO = cityMap.get(fixTool.areaUni(impAreaDO.getName()));
+            if (areaDO == null) {
+                areaDO = cityMap.get(impAreaDO.getName());
+                if (areaDO == null) {
+                    for (AreaDO areaDOTemp : cityMap.values()) {
+                        if (areaDOTemp.getName().contains(fixTool.areaUni(impAreaDO.getName()))) {
+                            areaDO = areaDOTemp;
+                        }
+                    }
+                    if (areaDO == null) continue;
+                }
+            }
+
+            pathMapResponse.setLat(areaDO.getLat());
+            pathMapResponse.setLng(areaDO.getLng());
+            pathMapResponseList.add(pathMapResponse);
+        }
+        return ResultTool.success(pathMapResponseList);
+    }
+
+    /**
      * @Description: 使用excel表格导入学生信息
      * @Param: [file]
      * @return: com.nCov.DataView.model.response.Result

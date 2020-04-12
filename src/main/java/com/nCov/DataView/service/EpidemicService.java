@@ -163,4 +163,13 @@ public interface EpidemicService {
      * @Date: 2020/4/12
      */
     public Result pathChildQuery(String startAddress);
+
+    /**
+     * @Description: 热力图绘制
+     * @Param: []
+     * @return: com.nCov.DataView.model.response.Result
+     * @Author: SoCMo
+     * @Date: 2020/4/12
+     */
+    public Result pathMap();
 }

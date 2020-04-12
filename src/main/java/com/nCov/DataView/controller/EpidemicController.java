@@ -210,4 +210,17 @@ public class EpidemicController {
     public Result pathChildQuery(@Param("startAddress") String startAddress) {
         return epidemicService.pathChildQuery(startAddress);
     }
+
+    /**
+     * @Description: 热力图绘制
+     * @Param: []
+     * @return: com.nCov.DataView.model.response.Result
+     * @Author: SoCMo
+     * @Date: 2020/4/12
+     */
+    @Cacheable("pathMap")
+    @GetMapping("/pathMap")
+    public Result pathMap() {
+        return epidemicService.pathMap();
+    }
 }
