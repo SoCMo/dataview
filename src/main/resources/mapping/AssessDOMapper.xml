@@ -100,7 +100,7 @@
     SELECT *
     FROM assess
     WHERE DATE(update_time) = "${date}"
-    AND area_name LIKE "中国${province}%"
+    AND area_name LIKE "${province}%"
     ORDER BY sum_score DESC
     ) a
     GROUP BY a.start_address, a.id

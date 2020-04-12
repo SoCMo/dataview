@@ -1,24 +1,21 @@
 package com.nCov.DataView;
 
-import com.nCov.DataView.tools.FixTool;
+import com.nCov.DataView.exception.AllException;
+import com.nCov.DataView.service.EpidemicService;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import javax.annotation.Resource;
+import java.text.ParseException;
 
 @SpringBootTest
 class NCovApplicationTests {
-
     @Resource
-    private FixTool fixTool;
+    private EpidemicService epidemicService;
 
     @Test
-    void contextLoads() {
-        try {
-            fixTool.LngAndLatFix();
-        } catch (Exception e) {
-            System.out.println(e.getLocalizedMessage());
-        }
+    void contextLoads() throws AllException, ParseException {
+        epidemicService.assess();
     }
 
 }

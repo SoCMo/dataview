@@ -172,4 +172,13 @@ public interface EpidemicService {
      * @Date: 2020/4/12
      */
     public Result pathMap();
+
+    /**
+     * @Description: 路径计算
+     * @Param: []
+     * @return: void
+     * @Author: SoCMo
+     * @Date: 2020/4/12
+     */
+    public void assess();
 }

@@ -18,6 +18,8 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.springframework.beans.BeanUtils;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -37,6 +39,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Service
+@EnableScheduling
 public class EpidemicServiceImpl implements EpidemicService {
     @Resource
     private AreaDOMapper areaDOMapper;
@@ -1609,4 +1612,136 @@ public class EpidemicServiceImpl implements EpidemicService {
     }
 
 
+    /**
+     * @Description: 每天对各路段进行评估
+     * @Param: []
+     * @return: void
+     * @Author: SoCMo
+     * @Date: 2020/4/10
+     */
+    @Scheduled(cron = "0 2 0 * * *")
+    public void assess() {
+        try {
+            //获取path表信息
+            PathInfoDOExample pathInfoDOExample = new PathInfoDOExample();
+            List<PathInfoDO> pathInfoDOList = pathInfoDOMapper.selectByExample(pathInfoDOExample);
+            if (pathInfoDOList.isEmpty()) {
+                throw new AllException(EmAllException.DATABASE_ERROR, "pathInfo表为空");
+            }
+
+            //获取impArea的信息
+            ImpAreaDOExample impAreaDOExample = new ImpAreaDOExample();
+            Calendar calendar = TimeTool.todayCreate();
+            List<CovRankResponse> covDataList = this.allAreaCal(TimeTool.timeToDaySy(calendar.getTime()));
+            Map<String, CovRankResponse> covRankResponseMap = covDataList.stream().collect(Collectors.toMap(CovRankResponse::getName, covRankResponse -> covRankResponse));
+
+            //查询Area表的信息
+            Map<Integer, AreaDO> provinceMapInt = areaDOMapper.getProvinceMapInt();
+            Map<String, AreaDO> cityMap = areaDOMapper.getCityMap();
+
+            //计算
+            for (PathInfoDO pathInfoDO : pathInfoDOList) {
+                PassInfoDOExample passInfoDOExample = new PassInfoDOExample();
+                passInfoDOExample.createCriteria().andPathIdEqualTo(pathInfoDO.getId());
+                List<PassInfoDO> passInfoDOS = passInfoDOMapper.selectByExample(passInfoDOExample);
+                if (passInfoDOS.isEmpty()) {
+                    log.error("id为:" + pathInfoDO.getId() + "的路径无路段信息");
+                    continue;
+                }
+
+                int order = 0;
+                List<AssessDO> sumList = new ArrayList<>();
+                List<AssessDO> finalList = new ArrayList<>();
+                AreaDO city = cityMap.get(fixTool.areaUni(passInfoDOS.get(0).getArea()));
+                if (city == null) {
+                    city = cityMap.get(passInfoDOS.get(0).getArea());
+                    if (city == null) {
+                        for (AreaDO areaDOTemp : cityMap.values()) {
+                            if (areaDOTemp.getName().contains(fixTool.areaUni(passInfoDOS.get(0).getArea()))) {
+                                city = areaDOTemp;
+                            }
+                        }
+                        if (city == null) {
+                            log.error(passInfoDOS.get(0).getArea() + "在area表中不存在!");
+                            continue;
+                        }
+                    }
+                }
+                String province = provinceMapInt.get(city.getParentid()).getName();
+
+                for (PassInfoDO passInfoDO : passInfoDOS) {
+                    if (order < passInfoDO.getOrderId()) {
+                        double localScore = finalList.stream().mapToDouble(AssessDO::getLocalScore).max().getAsDouble();
+                        double finalScore = ConstCorrespond.ROUTE_WEIGHT[0] * finalList.get(0).getCrowdScore()
+                                + ConstCorrespond.ROUTE_WEIGHT[1] * finalList.get(0).getTimeScore()
+                                + ConstCorrespond.ROUTE_WEIGHT[2] * finalList.get(0).getCleanlinessScore()
+                                + ConstCorrespond.ROUTE_WEIGHT[3] * localScore;
+                        for (AssessDO assessDO : finalList) {
+                            assessDO.setFinalScore(finalScore);
+                            sumList.add(assessDO);
+                        }
+                        order++;
+                        finalList.clear();
+                    }
+                    AssessDO assessDO = new AssessDO();
+                    assessDO.setAreaName(passInfoDO.getArea());
+                    assessDO.setPathId(pathInfoDO.getId());
+                    assessDO.setPassOrder(passInfoDO.getOrderId());
+                    assessDO.setStartAddress(pathInfoDO.getStart());
+                    assessDO.setAreaName(province);
+                    assessDO.setSumTime(pathInfoDO.getSumTime());
+                    assessDO.setUpdateTime(TimeTool.todayCreate().getTime());
+
+                    assessDO.setCleanlinessScore((int) ConstCorrespond.CLEAN_SCORE[passInfoDO.getTypeNum()]);
+                    assessDO.setCrowdScore((int) ConstCorrespond.CROWD[passInfoDO.getTypeNum()]);
+                    assessDO.setTime(passInfoDO.getDistance() / ConstCorrespond.SPEED[passInfoDO.getTypeNum()]);
+                    assessDO.setTimeScore(assessDO.getTime() >= 6 ? 100 : (assessDO.getTime() / 6) * 100);
+
+                    CovRankResponse covRankResponse = covRankResponseMap.get(fixTool.areaUni(passInfoDO.getArea()));
+                    if (covRankResponse == null) {
+                        covRankResponse = covRankResponseMap.get(passInfoDO.getArea());
+                        if (covRankResponse == null) {
+                            for (CovRankResponse covRankResponseTemp : covRankResponseMap.values()) {
+                                if (covRankResponseTemp.getName().contains(fixTool.areaUni(passInfoDO.getArea()))) {
+                                    covRankResponse = covRankResponseTemp;
+                                    break;
+                                }
+                            }
+                            if (covRankResponse == null) {
+                                throw new AllException(EmAllException.DATABASE_ERROR, passInfoDO.getArea() + "无风险数据");
+                            }
+                        }
+                    }
+                    assessDO.setLocalScore((int) covRankResponse.getSumScore());
+                    finalList.add(assessDO);
+                }
+                if (!finalList.isEmpty()) {
+                    double localScore = finalList.stream().mapToDouble(AssessDO::getLocalScore).max().getAsDouble();
+                    double finalScore = ConstCorrespond.ROUTE_WEIGHT[0] * finalList.get(0).getCrowdScore()
+                            + ConstCorrespond.ROUTE_WEIGHT[1] * finalList.get(0).getTimeScore()
+                            + ConstCorrespond.ROUTE_WEIGHT[2] * finalList.get(0).getCleanlinessScore()
+                            + ConstCorrespond.ROUTE_WEIGHT[3] * localScore;
+                    for (AssessDO assessDO : finalList) {
+                        assessDO.setFinalScore(finalScore);
+                        sumList.add(assessDO);
+                    }
+                    finalList.clear();
+                }
+
+                double maxScore = 0;
+                for (AssessDO assessDO : sumList) {
+                    if (assessDO.getFinalScore() > maxScore) maxScore = assessDO.getFinalScore();
+                }
+                for (AssessDO assessDO : sumList) {
+                    assessDO.setSumScore(maxScore);
+                }
+
+                assessDOMapper.insertList(sumList);
+            }
+        } catch (AllException e) {
+            log.error(e.getMsg());
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        }
+    }
 }
