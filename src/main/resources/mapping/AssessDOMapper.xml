@@ -94,7 +94,7 @@
       order by ${orderByClause}
     </if>
   </select>
-  <select id="selectPathId" resultMap="BaseResultMap">
+  <select id="selectMax" resultMap="BaseResultMap">
     SELECT * FROM
     (
     SELECT *
@@ -103,7 +103,7 @@
     AND area_name LIKE "${province}%"
     ORDER BY sum_score DESC
     ) a
-    GROUP BY a.start_address, a.id
+    GROUP BY a.start_address
     LIMIT #{index}, #{num}
   </select>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer">

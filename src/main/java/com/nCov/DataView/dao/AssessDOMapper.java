@@ -4,7 +4,6 @@ import com.nCov.DataView.model.entity.AssessDO;
 import com.nCov.DataView.model.entity.AssessDOExample;
 import org.apache.ibatis.annotations.Param;
 
-import java.util.Date;
 import java.util.List;
 
 public interface AssessDOMapper {
@@ -30,7 +29,7 @@ public interface AssessDOMapper {
 
     int updateByPrimaryKey(AssessDO record);
 
-    List<AssessDO> selectPathId(@Param("date") Date date, @Param("index") int index, @Param("num") int num, @Param("province") String province);
+    List<AssessDO> selectMax(@Param("date") String date, @Param("index") int index, @Param("num") int num, @Param("province") String province);
 
     void insertList(List<AssessDO> assessDOList);
 }

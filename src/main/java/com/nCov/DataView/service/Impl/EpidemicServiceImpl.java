@@ -1032,7 +1032,7 @@ public class EpidemicServiceImpl implements EpidemicService {
     @Override
     public Result pathQuery(PathQueryRequest pathQueryRequest) {
         try {
-            List<AssessDO> pathIdList = assessDOMapper.selectPathId(TimeTool.todayCreate().getTime(), pathQueryRequest.getIndex(), pathQueryRequest.getNum(), fixTool.provinceUni(pathQueryRequest.getProvince()));
+            List<AssessDO> pathIdList = assessDOMapper.selectMax(TimeTool.timeToDaySy(TimeTool.todayCreate().getTime()), pathQueryRequest.getIndex(), pathQueryRequest.getNum(), fixTool.provinceUni(pathQueryRequest.getProvince()));
             if (pathIdList.isEmpty()) {
                 throw new AllException(EmAllException.DATABASE_ERROR, "风险数据为空");
             }
@@ -1052,7 +1052,7 @@ public class EpidemicServiceImpl implements EpidemicService {
                 pathQueryResponse.setStart(pathInfoDO.getStart());
                 pathQueryResponse.setEnd(pathInfoDO.getEnd());
                 pathQueryResponse.setRisk((int) (assessDO.getSumScore() * 10 + 0.5) / 10.0);
-                return pathQueryRequest;
+                return pathQueryResponse;
             }).collect(Collectors.toList()));
         } catch (AllException e) {
             log.error(e.getMsg());
@@ -1134,14 +1134,14 @@ public class EpidemicServiceImpl implements EpidemicService {
                 for (AssessDO assessDO : assessDOS) {
                     RouteCalReponse routeCalReponse = new RouteCalReponse();
                     routeCalReponse.setTimeScore(NumberTool.doubleToStringWotH(assessDO.getTimeScore()));
-                    routeCalReponse.setFinalscore(assessDO.getFinalScore());
+                    routeCalReponse.setFinalscore((int) (assessDO.getFinalScore() * 10 + 0.5) / 10.0);
                     routeCalReponse.setTransportScore(String.valueOf(assessDO.getCleanlinessScore() + assessDO.getCrowdScore()));
                     routeCalReponse.setTime(TimeTool.timeSlotToString(assessDO.getTime()));
                     routeCalReponse.setCity(new ArrayList<>());
 
                     boolean flag = false;
-                    while (assessDO.getPassOrder().equals(passInfoDOS.get(i).getOrderId())
-                            && i < passInfoDOS.size()) {
+                    while (i < passInfoDOS.size()
+                            && assessDO.getPassOrder().equals(passInfoDOS.get(i).getOrderId())) {
                         PassInfoDO tempPassInfo = passInfoDOS.get(i++);
                         if (!flag) {
                             routeCalReponse.setTitle(tempPassInfo.getTitle());
@@ -1797,7 +1797,7 @@ public class EpidemicServiceImpl implements EpidemicService {
 
                     assessDO.setCleanlinessScore((int) ConstCorrespond.CLEAN_SCORE[passInfoDO.getTypeNum()]);
                     assessDO.setCrowdScore((int) ConstCorrespond.CROWD[passInfoDO.getTypeNum()]);
-                    assessDO.setTime(passInfoDO.getDistance() / ConstCorrespond.SPEED[passInfoDO.getTypeNum()]);
+                    assessDO.setTime(passInfoDO.getDistance() / ConstCorrespond.SPEED[passInfoDO.getTypeNum()] / 1000);
                     assessDO.setTimeScore(assessDO.getTime() >= 6 ? 100 : (assessDO.getTime() / 6) * 100);
 
                     CovRankResponse covRankResponse = covRankResponseMap.get(fixTool.areaUni(passInfoDO.getArea()));
@@ -1811,7 +1811,12 @@ public class EpidemicServiceImpl implements EpidemicService {
                                 }
                             }
                             if (covRankResponse == null) {
-                                throw new AllException(EmAllException.DATABASE_ERROR, passInfoDO.getArea() + "无风险数据");
+                                if (passInfoDO.getArea().equals("浦东新区")) {
+                                    covRankResponse = covRankResponseMap.get(passInfoDO.getArea());
+                                }
+                                if (covRankResponse == null) {
+                                    throw new AllException(EmAllException.DATABASE_ERROR, passInfoDO.getArea() + "无风险数据");
+                                }
                             }
                         }
                     }
