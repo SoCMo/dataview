@@ -3,7 +3,6 @@ package com.nCov.DataView.dao;
 import com.nCov.DataView.model.entity.AssessDO;
 import com.nCov.DataView.model.entity.AssessDOExample;
 import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
 
 import java.util.Date;
 import java.util.List;
@@ -31,15 +30,7 @@ public interface AssessDOMapper {
 
     int updateByPrimaryKey(AssessDO record);
 
-    @Select({"<script>",
-            "SELECT * FROM assess",
-            "WHERE date(update_time) = '${date}'",
-            "AND area_name LIKE '中国${province}%'",
-            "GROUP BY path_id",
-            "ORDER BY sum_score DESC",
-            "limit index ${index}, ${num}",
-            "</script>"})
-    List<AssessDO> selectPathId(Date date, int index, int num, String province);
+    List<AssessDO> selectPathId(@Param("date") Date date, @Param("index") int index, @Param("num") int num, @Param("province") String province);
 
     void insertList(List<AssessDO> assessDOList);
 }

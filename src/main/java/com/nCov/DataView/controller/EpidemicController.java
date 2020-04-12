@@ -110,18 +110,6 @@ public class EpidemicController {
     }
 
     /**
-     * @Description: 路径存储与评估
-     * @Param: [routeStoreInfo]
-     * @return: com.nCov.DataView.model.response.Result
-     * @Author: SoCMo
-     * @Date: 2020/3/29
-     */
-    @PostMapping("/routeStore")
-    public Result routeStore(@Validated @RequestBody PathRequest pathRequest) {
-        return epidemicService.routeStore(pathRequest);
-    }
-
-    /**
      * @Description: 前端发送地址信息，后端进行风险评估并返回分数
      * @Param: [AddressRequest]
      * @return: com.nCov.DataView.model.response.Result
@@ -154,11 +142,9 @@ public class EpidemicController {
             String temp = "";
             if (province.contains("省")) {
                 temp = province.replace("省", "");
-            }
-            else if (province.contains("市")) {
+            } else if (province.contains("市")) {
                 temp = province.replace("市", "");
-            }
-            else {
+            } else {
                 temp = province;
             }
             provinceName.append(temp);
@@ -199,5 +185,29 @@ public class EpidemicController {
             cityRiskRequest.setDate(TimeTool.timeToDaySy(new Date()));
         }
         return epidemicService.cityQuery(cityRiskRequest);
+    }
+
+    /**
+     * @Description: 获取返校风险
+     * @Param: [pathQueryRequest]
+     * @return: com.nCov.DataView.model.response.Result
+     * @Author: SoCMo
+     * @Date: 2020/4/12
+     */
+    @PostMapping("/pathQuery")
+    public Result pathQuery(@Validated @RequestBody PathQueryRequest pathQueryRequest) {
+        return epidemicService.pathQuery(pathQueryRequest);
+    }
+
+    /**
+     * @Description: 单地址返校信息
+     * @Param: [startAddress]
+     * @return: com.nCov.DataView.model.response.Result
+     * @Author: SoCMo
+     * @Date: 2020/4/12
+     */
+    @GetMapping("/pathChildQuery")
+    public Result pathChildQuery(@Param("startAddress") String startAddress) {
+        return epidemicService.pathChildQuery(startAddress);
     }
 }

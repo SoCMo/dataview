@@ -12,7 +12,8 @@
     <result column="crowd_score" property="crowdScore" jdbcType="INTEGER"/>
     <result column="local_score" property="localScore" jdbcType="INTEGER"/>
     <result column="final_score" property="finalScore" jdbcType="DOUBLE"/>
-    <result column="sum_time" property="sumTime" jdbcType="VARCHAR"/>
+    <result column="start_address" property="startAddress" jdbcType="VARCHAR"/>
+    <result column="sum_time" property="sumTime" jdbcType="DOUBLE"/>
     <result column="sum_score" property="sumScore" jdbcType="DOUBLE"/>
     <result column="update_time" property="updateTime" jdbcType="DATE"/>
   </resultMap>
@@ -76,7 +77,7 @@
   </sql>
   <sql id="Base_Column_List">
     id, path_id, area_name, pass_order, cleanliness_score, time, time_score, crowd_score,
-    local_score, final_score, sum_time, sum_score, update_time
+    local_score, final_score, start_address, sum_time, sum_score, update_time
   </sql>
   <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.nCov.DataView.model.entity.AssessDOExample">
     select
@@ -92,6 +93,18 @@
     <if test="orderByClause != null">
       order by ${orderByClause}
     </if>
+  </select>
+  <select id="selectPathId" resultMap="BaseResultMap">
+    SELECT * FROM
+    (
+    SELECT *
+    FROM assess
+    WHERE DATE(update_time) = "${date}"
+    AND area_name LIKE "中国${province}%"
+    ORDER BY sum_score DESC
+    ) a
+    GROUP BY a.start_address, a.id
+    LIMIT #{index}, #{num}
   </select>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer">
     select
@@ -113,20 +126,21 @@
     insert into assess (id, path_id, area_name,
     pass_order, cleanliness_score, time,
     time_score, crowd_score, local_score,
-    final_score, sum_time, sum_score,
-    update_time)
+    final_score, start_address, sum_time,
+    sum_score, update_time)
     values (#{id,jdbcType=INTEGER}, #{pathId,jdbcType=INTEGER}, #{areaName,jdbcType=VARCHAR},
     #{passOrder,jdbcType=INTEGER}, #{cleanlinessScore,jdbcType=INTEGER}, #{time,jdbcType=DOUBLE},
     #{timeScore,jdbcType=DOUBLE}, #{crowdScore,jdbcType=INTEGER}, #{localScore,jdbcType=INTEGER},
-    #{finalScore,jdbcType=DOUBLE}, #{sumTime,jdbcType=VARCHAR}, #{sumScore,jdbcType=DOUBLE},
-    #{updateTime,jdbcType=DATE})
+    #{finalScore,jdbcType=DOUBLE}, #{startAddress,jdbcType=VARCHAR}, #{sumTime,jdbcType=DOUBLE},
+    #{sumScore,jdbcType=DOUBLE}, #{updateTime,jdbcType=DATE})
   </insert>
   <insert id="insertList" parameterType="java.util.List">
     insert into assess (path_id, area_name,
     pass_order, cleanliness_score, time,
     time_score, crowd_score, local_score,
-    final_score, sum_score, sum_time, update_time
-    ) values
+    final_score, start_address, sum_time,
+    sum_score, update_time)
+    values
     <foreach collection="list" item="assessDo" index="index" separator=",">
       (
       #{assessDo.pathId},
@@ -138,8 +152,9 @@
       #{assessDo.crowdScore},
       #{assessDo.localScore},
       #{assessDo.finalScore},
-      #{assessDo.sumScore},
+      #{assessDo.startAddress},
       #{assessDo.sumTime},
+      #{assessDo.sumScore},
       #{assessDo.updateTime}
       )
     </foreach>
@@ -176,6 +191,9 @@
       </if>
       <if test="finalScore != null">
         final_score,
+      </if>
+      <if test="startAddress != null">
+        start_address,
       </if>
       <if test="sumTime != null">
         sum_time,
@@ -218,8 +236,11 @@
       <if test="finalScore != null">
         #{finalScore,jdbcType=DOUBLE},
       </if>
+      <if test="startAddress != null">
+        #{startAddress,jdbcType=VARCHAR},
+      </if>
       <if test="sumTime != null">
-        #{sumTime,jdbcType=VARCHAR},
+        #{sumTime,jdbcType=DOUBLE},
       </if>
       <if test="sumScore != null">
         #{sumScore,jdbcType=DOUBLE},
@@ -269,8 +290,11 @@
       <if test="record.finalScore != null">
         final_score = #{record.finalScore,jdbcType=DOUBLE},
       </if>
+      <if test="record.startAddress != null">
+        start_address = #{record.startAddress,jdbcType=VARCHAR},
+      </if>
       <if test="record.sumTime != null">
-        sum_time = #{record.sumTime,jdbcType=VARCHAR},
+        sum_time = #{record.sumTime,jdbcType=DOUBLE},
       </if>
       <if test="record.sumScore != null">
         sum_score = #{record.sumScore,jdbcType=DOUBLE},
@@ -295,7 +319,8 @@
     crowd_score = #{record.crowdScore,jdbcType=INTEGER},
     local_score = #{record.localScore,jdbcType=INTEGER},
     final_score = #{record.finalScore,jdbcType=DOUBLE},
-    sum_time = #{record.sumTime,jdbcType=VARCHAR},
+    start_address = #{record.startAddress,jdbcType=VARCHAR},
+    sum_time = #{record.sumTime,jdbcType=DOUBLE},
     sum_score = #{record.sumScore,jdbcType=DOUBLE},
     update_time = #{record.updateTime,jdbcType=DATE}
     <if test="_parameter != null">
@@ -332,8 +357,11 @@
       <if test="finalScore != null">
         final_score = #{finalScore,jdbcType=DOUBLE},
       </if>
+      <if test="startAddress != null">
+        start_address = #{startAddress,jdbcType=VARCHAR},
+      </if>
       <if test="sumTime != null">
-        sum_time = #{sumTime,jdbcType=VARCHAR},
+        sum_time = #{sumTime,jdbcType=DOUBLE},
       </if>
       <if test="sumScore != null">
         sum_score = #{sumScore,jdbcType=DOUBLE},
@@ -355,7 +383,8 @@
     crowd_score = #{crowdScore,jdbcType=INTEGER},
     local_score = #{localScore,jdbcType=INTEGER},
     final_score = #{finalScore,jdbcType=DOUBLE},
-    sum_time = #{sumTime,jdbcType=VARCHAR},
+    start_address = #{startAddress,jdbcType=VARCHAR},
+    sum_time = #{sumTime,jdbcType=DOUBLE},
     sum_score = #{sumScore,jdbcType=DOUBLE},
     update_time = #{updateTime,jdbcType=DATE}
     where id = #{id,jdbcType=INTEGER}
