@@ -7,9 +7,7 @@ import com.nCov.DataView.exception.AllException;
 import com.nCov.DataView.exception.EmAllException;
 import com.nCov.DataView.model.ConstCorrespond;
 import com.nCov.DataView.model.entity.RouteInfo;
-import com.nCov.DataView.model.request.PathRequest;
 import com.nCov.DataView.model.request.RouteCalRequest;
-import com.nCov.DataView.model.request.RouteListRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -127,12 +125,26 @@ public class BaiduTool {
      * @Author: SoCMo
      * @Date: 2020/3/30
      */
-    public PathRequest pathInfo(String start, String end) throws IOException, AllException {
-        PathRequest pathRequest = new PathRequest();
-        pathRequest.setPathList(new ArrayList<>());
+    public List<RouteInfo> pathInfo(String start, String end) throws IOException, AllException {
         boolean exist = false;
+        List<RouteInfo> aircraft = routeListInfo(start, end, 1);
+        if (!aircraft.isEmpty()) {
+            exist = true;
+        }
 
-        return pathRequest;
+        List<RouteInfo> train = routeListInfo(start, end, 0);
+        if (!train.isEmpty()) {
+            exist = true;
+        }
+
+        if (exist) {
+            List<RouteInfo> routeInfoList = new ArrayList<>();
+            routeInfoList.addAll(aircraft);
+            routeInfoList.addAll(train);
+            return routeInfoList;
+        } else {
+            return routeListInfo(start, end, 3);
+        }
     }
 
     /**
@@ -167,12 +179,12 @@ public class BaiduTool {
                 throw new AllException(EmAllException.BAIDU_REQUEST_FAILE, "没有公交方案");
             } else if (jsonObject.getInteger("status") == 0) {
                 int methodNum = 0;
-                PathRequest pathRequest = new PathRequest();
-                pathRequest.setPathList(new ArrayList<>());
+                List<RouteInfo> routeInfoList = new ArrayList<>();
 
-                while (methodNum++ < 3) {
+                while (methodNum < 3) {
                     JSONArray jsonArray = jsonObject.getJSONObject("result").getJSONArray("routes");
-                    JSONArray steps = jsonArray.getJSONObject(0).getJSONArray("steps");
+                    JSONObject route = jsonArray.getJSONObject(methodNum++);
+                    JSONArray steps = route.getJSONArray("steps");
 
                     //验证类型
                     if (type < 2) {
@@ -193,8 +205,11 @@ public class BaiduTool {
                         if (!exist) break;
                     }
 
-                    RouteListRequest routeListRequest = new RouteListRequest();
-                    routeListRequest.setRouteCalRequestList(new ArrayList<>());
+                    RouteInfo routeInfo = new RouteInfo();
+                    routeInfo.setPrice(route.getDouble("price"));
+                    routeInfo.setSumTime(route.getDouble("duration") / 60.0 / 60.0);
+                    routeInfo.setRouteCalRequestList(new ArrayList<>());
+
                     for (int j = 0; j < steps.size(); j++) {
                         JSONArray childSteps = steps.getJSONArray(j);
                         for (int z = 0; z < childSteps.size(); z++) {
@@ -281,11 +296,12 @@ public class BaiduTool {
                             }
 
                             routeCalRequest.setStartAdressZone(start);
-                            routeListRequest.getRouteCalRequestList().add(routeCalRequest);
+                            routeInfo.getRouteCalRequestList().add(routeCalRequest);
                         }
                     }
+                    routeInfoList.add(routeInfo);
                 }
-                return null;
+                return routeInfoList;
             } else {
                 throw new AllException(EmAllException.BAIDU_REQUEST_FAILE, "百度api报错为" + jsonObject.getInteger("status"));
             }

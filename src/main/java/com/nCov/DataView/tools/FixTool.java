@@ -3,6 +3,7 @@ package com.nCov.DataView.tools;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.nCov.DataView.dao.AssessDOMapper;
 import com.nCov.DataView.dao.CovDataMapper;
 import com.nCov.DataView.dao.PassInfoDOMapper;
 import com.nCov.DataView.dao.PathInfoDOMapper;
