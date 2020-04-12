@@ -341,13 +341,13 @@ public class EpidemicServiceImpl implements EpidemicService {
                         }).collect(Collectors.toList());
 
                 //找到当前城市信息
-                if (routeCalDataList.size() > 1) {
+                if (routeCalDataList.size() >= 1) {
                     RouteCalReponse routeCalReponse = new RouteCalReponse();
                     BeanUtils.copyProperties(routeCalRequest, routeCalReponse);
                     routeCalReponse.setTime(routeCalDataList.get(0).getTime());
                     routeCalReponse.setFinalscore(routeCalDataList.get(0).getScore());
                     double time = TimeTool.stringToHour(routeCalDataList.get(0).getTime());
-                    routeCalReponse.setTimeScore(NumberTool.doubleToStringWotH(time >= 12 ? 100 : (time / 12.0 * 100)));
+                    routeCalReponse.setTimeScore(NumberTool.doubleToStringWotH(time >= 6 ? 100 : (time / 6.0 * 100)));
                     routeCalReponse.setTransportScore(
                             NumberTool.doubleToStringWotH(
                                     ConstCorrespond.ROUTE_WEIGHT[0] / (ConstCorrespond.ROUTE_WEIGHT[0] + ConstCorrespond.ROUTE_WEIGHT[2])
@@ -370,15 +370,15 @@ public class EpidemicServiceImpl implements EpidemicService {
                     routeCalDO.setTime(TimeTool.timeSlotToString(time));
                     routeCalDO.setDate(new Date());
                     routeCalDO.setScore(
-                            (ConstCorrespond.ROUTE_WEIGHT[0] * ConstCorrespond.CROWD[routeCalRequest.getType()]
-                                    + ConstCorrespond.ROUTE_WEIGHT[1] * (time >= 8 ? 100 : (time / 8 * 100))
+                            ConstCorrespond.ROUTE_WEIGHT[0] * ConstCorrespond.CROWD[routeCalRequest.getType()]
+                                    + ConstCorrespond.ROUTE_WEIGHT[1] * (time >= 6 ? 100 : (time / 6 * 100))
                                     + ConstCorrespond.ROUTE_WEIGHT[2] * ConstCorrespond.CLEAN_SCORE[routeCalRequest.getType()]
-                                    + ConstCorrespond.ROUTE_WEIGHT[3] * max) / 20.0
+                                    + ConstCorrespond.ROUTE_WEIGHT[3] * max
                     );
                     routeCalDO.setId(null);
 
                     routeCalDOList.add(routeCalDO);
-                    routeCalReponse.setTimeScore(NumberTool.doubleToStringWotH(time >= 12 ? 100 : (time / 12.0 * 100)));
+                    routeCalReponse.setTimeScore(NumberTool.doubleToStringWotH(time >= 6 ? 100 : (time / 6.0 * 100)));
                     routeCalReponse.setTransportScore(
                             NumberTool.doubleToStringWotH(
                                     ConstCorrespond.ROUTE_WEIGHT[0] / (ConstCorrespond.ROUTE_WEIGHT[0] + ConstCorrespond.ROUTE_WEIGHT[2])
@@ -405,7 +405,7 @@ public class EpidemicServiceImpl implements EpidemicService {
                 if (findMainType.getType() > type) type = findMainType.getType();
             }
             sumCalResponse.setType(ConstCorrespond.TRAN_TYPE[type]);
-            sumCalResponse.setSumScore(NumberTool.doubleToStringWotH(resultList.stream().mapToDouble(RouteCalReponse::getFinalscore).average().getAsDouble()));
+            sumCalResponse.setSumScore(NumberTool.doubleToStringWotH(resultList.stream().mapToDouble(RouteCalReponse::getFinalscore).max().getAsDouble()));
             return ResultTool.success(sumCalResponse);
         } catch (AllException e) {
             log.error(e.getMsg());
