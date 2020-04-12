@@ -742,6 +742,76 @@ public class AssessDOExample {
             return (Criteria) this;
         }
 
+        public Criteria andStartAddressIsNull() {
+            addCriterion("start_address is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andStartAddressIsNotNull() {
+            addCriterion("start_address is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andStartAddressEqualTo(String value) {
+            addCriterion("start_address =", value, "startAddress");
+            return (Criteria) this;
+        }
+
+        public Criteria andStartAddressNotEqualTo(String value) {
+            addCriterion("start_address <>", value, "startAddress");
+            return (Criteria) this;
+        }
+
+        public Criteria andStartAddressGreaterThan(String value) {
+            addCriterion("start_address >", value, "startAddress");
+            return (Criteria) this;
+        }
+
+        public Criteria andStartAddressGreaterThanOrEqualTo(String value) {
+            addCriterion("start_address >=", value, "startAddress");
+            return (Criteria) this;
+        }
+
+        public Criteria andStartAddressLessThan(String value) {
+            addCriterion("start_address <", value, "startAddress");
+            return (Criteria) this;
+        }
+
+        public Criteria andStartAddressLessThanOrEqualTo(String value) {
+            addCriterion("start_address <=", value, "startAddress");
+            return (Criteria) this;
+        }
+
+        public Criteria andStartAddressLike(String value) {
+            addCriterion("start_address like", value, "startAddress");
+            return (Criteria) this;
+        }
+
+        public Criteria andStartAddressNotLike(String value) {
+            addCriterion("start_address not like", value, "startAddress");
+            return (Criteria) this;
+        }
+
+        public Criteria andStartAddressIn(List<String> values) {
+            addCriterion("start_address in", values, "startAddress");
+            return (Criteria) this;
+        }
+
+        public Criteria andStartAddressNotIn(List<String> values) {
+            addCriterion("start_address not in", values, "startAddress");
+            return (Criteria) this;
+        }
+
+        public Criteria andStartAddressBetween(String value1, String value2) {
+            addCriterion("start_address between", value1, value2, "startAddress");
+            return (Criteria) this;
+        }
+
+        public Criteria andStartAddressNotBetween(String value1, String value2) {
+            addCriterion("start_address not between", value1, value2, "startAddress");
+            return (Criteria) this;
+        }
+
         public Criteria andSumTimeIsNull() {
             addCriterion("sum_time is null");
             return (Criteria) this;
@@ -752,123 +822,53 @@ public class AssessDOExample {
             return (Criteria) this;
         }
 
-        public Criteria andSumTimeEqualTo(String value) {
+        public Criteria andSumTimeEqualTo(Double value) {
             addCriterion("sum_time =", value, "sumTime");
             return (Criteria) this;
         }
 
-        public Criteria andSumTimeNotEqualTo(String value) {
+        public Criteria andSumTimeNotEqualTo(Double value) {
             addCriterion("sum_time <>", value, "sumTime");
             return (Criteria) this;
         }
 
-        public Criteria andSumTimeGreaterThan(String value) {
+        public Criteria andSumTimeGreaterThan(Double value) {
             addCriterion("sum_time >", value, "sumTime");
             return (Criteria) this;
         }
 
-        public Criteria andSumTimeGreaterThanOrEqualTo(String value) {
+        public Criteria andSumTimeGreaterThanOrEqualTo(Double value) {
             addCriterion("sum_time >=", value, "sumTime");
             return (Criteria) this;
         }
 
-        public Criteria andSumTimeLessThan(String value) {
+        public Criteria andSumTimeLessThan(Double value) {
             addCriterion("sum_time <", value, "sumTime");
             return (Criteria) this;
         }
 
-        public Criteria andSumTimeLessThanOrEqualTo(String value) {
+        public Criteria andSumTimeLessThanOrEqualTo(Double value) {
             addCriterion("sum_time <=", value, "sumTime");
             return (Criteria) this;
         }
 
-        public Criteria andSumTimeLike(String value) {
-            addCriterion("sum_time like", value, "sumTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andSumTimeNotLike(String value) {
-            addCriterion("sum_time not like", value, "sumTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andSumTimeIn(List<String> values) {
+        public Criteria andSumTimeIn(List<Double> values) {
             addCriterion("sum_time in", values, "sumTime");
             return (Criteria) this;
         }
 
-        public Criteria andSumTimeNotIn(List<String> values) {
+        public Criteria andSumTimeNotIn(List<Double> values) {
             addCriterion("sum_time not in", values, "sumTime");
             return (Criteria) this;
         }
 
-        public Criteria andSumTimeBetween(String value1, String value2) {
+        public Criteria andSumTimeBetween(Double value1, Double value2) {
             addCriterion("sum_time between", value1, value2, "sumTime");
             return (Criteria) this;
         }
 
-        public Criteria andSumTimeNotBetween(String value1, String value2) {
+        public Criteria andSumTimeNotBetween(Double value1, Double value2) {
             addCriterion("sum_time not between", value1, value2, "sumTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andSumPriceIsNull() {
-            addCriterion("sum_price is null");
-            return (Criteria) this;
-        }
-
-        public Criteria andSumPriceIsNotNull() {
-            addCriterion("sum_price is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andSumPriceEqualTo(Double value) {
-            addCriterion("sum_price =", value, "sumPrice");
-            return (Criteria) this;
-        }
-
-        public Criteria andSumPriceNotEqualTo(Double value) {
-            addCriterion("sum_price <>", value, "sumPrice");
-            return (Criteria) this;
-        }
-
-        public Criteria andSumPriceGreaterThan(Double value) {
-            addCriterion("sum_price >", value, "sumPrice");
-            return (Criteria) this;
-        }
-
-        public Criteria andSumPriceGreaterThanOrEqualTo(Double value) {
-            addCriterion("sum_price >=", value, "sumPrice");
-            return (Criteria) this;
-        }
-
-        public Criteria andSumPriceLessThan(Double value) {
-            addCriterion("sum_price <", value, "sumPrice");
-            return (Criteria) this;
-        }
-
-        public Criteria andSumPriceLessThanOrEqualTo(Double value) {
-            addCriterion("sum_price <=", value, "sumPrice");
-            return (Criteria) this;
-        }
-
-        public Criteria andSumPriceIn(List<Double> values) {
-            addCriterion("sum_price in", values, "sumPrice");
-            return (Criteria) this;
-        }
-
-        public Criteria andSumPriceNotIn(List<Double> values) {
-            addCriterion("sum_price not in", values, "sumPrice");
-            return (Criteria) this;
-        }
-
-        public Criteria andSumPriceBetween(Double value1, Double value2) {
-            addCriterion("sum_price between", value1, value2, "sumPrice");
-            return (Criteria) this;
-        }
-
-        public Criteria andSumPriceNotBetween(Double value1, Double value2) {
-            addCriterion("sum_price not between", value1, value2, "sumPrice");
             return (Criteria) this;
         }
 

@@ -23,9 +23,9 @@ public class AssessDO {
 
     private Double finalScore;
 
-    private String sumTime;
+    private String startAddress;
 
-    private Double sumPrice;
+    private Double sumTime;
 
     private Double sumScore;
 
@@ -111,20 +111,20 @@ public class AssessDO {
         this.finalScore = finalScore;
     }
 
-    public String getSumTime() {
+    public String getStartAddress() {
+        return startAddress;
+    }
+
+    public void setStartAddress(String startAddress) {
+        this.startAddress = startAddress == null ? null : startAddress.trim();
+    }
+
+    public Double getSumTime() {
         return sumTime;
     }
 
-    public void setSumTime(String sumTime) {
-        this.sumTime = sumTime == null ? null : sumTime.trim();
-    }
-
-    public Double getSumPrice() {
-        return sumPrice;
-    }
-
-    public void setSumPrice(Double sumPrice) {
-        this.sumPrice = sumPrice;
+    public void setSumTime(Double sumTime) {
+        this.sumTime = sumTime;
     }
 
     public Double getSumScore() {

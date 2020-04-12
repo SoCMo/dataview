@@ -206,7 +206,6 @@ public class BaiduTool {
                     }
 
                     RouteInfo routeInfo = new RouteInfo();
-                    routeInfo.setPrice(route.getDouble("price"));
                     routeInfo.setSumTime(route.getDouble("duration") / 60.0 / 60.0);
                     routeInfo.setRouteCalRequestList(new ArrayList<>());
 

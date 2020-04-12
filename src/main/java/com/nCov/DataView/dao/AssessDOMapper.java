@@ -31,6 +31,7 @@ public interface AssessDOMapper {
 
     int updateByPrimaryKey(AssessDO record);
 
+
     @Select({"<script>",
             "SELECT * FROM assess",
             "WHERE date(update_time) = '${date}'",
