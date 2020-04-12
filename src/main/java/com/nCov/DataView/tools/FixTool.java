@@ -52,11 +52,11 @@ public class FixTool {
     @Resource
     private PassInfoDOMapper passInfoDOMapper;
 
-    @Resource
-    private AssessDOMapper assessDOMapper;
-
-    @Resource
-    private EpidemicServiceImpl epidemicServiceImpl;
+//    @Resource
+//    private AssessDOMapper assessDOMapper;
+//
+//    @Resource
+//    private EpidemicServiceImpl epidemicServiceImpl;
 
     @Resource
     private BaiduTool baiduTool;
@@ -300,6 +300,7 @@ public class FixTool {
      * @Author: SoCMo
      * @Date: 2020/4/10
      */
+    /*
     @Scheduled(cron = "0 2 0 * * *")
     public void assess() {
         try {
@@ -372,4 +373,8 @@ public class FixTool {
             log.error(e.getMessage());
         }
     }
+
+     */
 }
+
+

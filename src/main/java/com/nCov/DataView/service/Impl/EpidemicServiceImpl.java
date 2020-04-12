@@ -1230,78 +1230,100 @@ public class EpidemicServiceImpl implements EpidemicService {
      * @Author: pongshy
      * @Date: 2020/4/12
      */
+    @Async
     @Override
-    public void writeInPathAndPss(String startAddress) throws AllException, IOException, ParseException {
+    public Result writeInPathAndPass() throws AllException, IOException, ParseException {
         final String endAddress = "上海大学宝山校区";
-        List<RouteInfo> routeInfoList = baiduTool.pathInfo(startAddress, endAddress);
-        //n条路线
-        for (RouteInfo routeInfo : routeInfoList) {
-            List<RouteCalListRequest> routeListRequests = routeInfo.getRouteCalRequestList();
-            if (routeListRequests.isEmpty()) {
-                return;
-            }
 
-            AssessmentAllResponse assessmentAllResponse = new AssessmentAllResponse();
-            assessmentAllResponse.setStart(startAddress);
-            assessmentAllResponse.setEnd(endAddress);
+        List<StudentInformationDO> studentInformationDOList = studentInformationDOMapper.selectByExample(null);
 
-            List<SumCalResponse> sumCalResponseList = new ArrayList<>();
-            PathInfoDOExample pathInfoDOExample = new PathInfoDOExample();
-
-            //每一条路径信息，存入数据库
-            int routeNum = 0;
-            for (RouteListRequest routeListRequest : routeListRequests) {
-                //每一条路线
-                int pathId = 0;
-                PathInfoDO record = new PathInfoDO();
-
-                record.setStart(startAddress);
-                record.setEnd(endAddress);
-                record.setMainType(routeNum);
-                pathInfoDOMapper.insertSelective(record);
-
-                pathInfoDOExample.createCriteria().andStartEqualTo(startAddress).andMainTypeEqualTo(routeNum);
-                PathInfoDO pathInfoDO = pathInfoDOMapper.selectByExample(pathInfoDOExample).get(0);
-                pathId = pathInfoDO.getId();
-                pathInfoDOExample.clear();
-
-                SumCalResponse sumCalResponse = calculate(routeListRequest.getRouteCalRequestList());
-
-                int order_num = 0;
-                int main_type = 0;
-                for (RouteCalRequest routeCalRequest : routeListRequest.getRouteCalRequestList()) {
-                    List<PassInfoDO> passInfoDOList = new ArrayList<>();
-
-                    for (String city : routeCalRequest.getCitys()) {
-                        PassInfoDO passInfoDO_record = new PassInfoDO();
-                        passInfoDO_record.setArea(city);
-                        passInfoDO_record.setDistance((int) routeCalRequest.getDistance());
-                        passInfoDO_record.setOrderId(order_num);
-                        passInfoDO_record.setStartAddress(routeCalRequest.getStart());
-                        passInfoDO_record.setEndAddress(routeCalRequest.getEnd());
-                        passInfoDO_record.setTitle(routeCalRequest.getTitle());
-                        passInfoDO_record.setPathId(pathId);
-                        passInfoDO_record.setTypeNum(routeCalRequest.getType());
-
-                        passInfoDOList.add(passInfoDO_record);
-                    }
-                    if (routeCalRequest.getType() > main_type) {
-                        main_type = routeCalRequest.getType();
-                    }
-                    passInfoDOMapper.insertList(passInfoDOList);
-                    ++order_num;
-                }
-                ++routeNum;
-                pathInfoDO.setMainType(main_type);
-                pathInfoDOMapper.updateByPrimaryKeySelective(pathInfoDO);
-
-                sumCalResponse.setType(ConstCorrespond.TRAN_TYPE[main_type]);
-                sumCalResponseList.add(sumCalResponse);
-            }
-            assessmentAllResponse.setSumCalResponseList(sumCalResponseList);
+        if (studentInformationDOList.size() == 0) {
+            return ResultTool.success("数据库中暂无学生地址信息");
         }
+        for (StudentInformationDO studentInformationDO : studentInformationDOList) {
+            String startAddress = "";
+            if (studentInformationDO.getCountry().equals("中国")) {
+                startAddress = studentInformationDO.getCountry() +
+                        studentInformationDO.getProvince() +
+                        studentInformationDO.getCity() +
+                        studentInformationDO.getArea() +
+                        studentInformationDO.getAddress();
+                //调用百度地图api查询路径信息
+                try {
+                    List<RouteInfo> routeInfoList = baiduTool.pathInfo(startAddress, endAddress);
+                    //n条路线
+                    for (RouteInfo routeInfo : routeInfoList) {
+                        //每一条线路的详细信息
+                        List<RouteCalRequest> routeCalRequestList = routeInfo.getRouteCalRequestList();
+                        if (routeCalRequestList.isEmpty()) {
+                            throw new AllException(EmAllException.BAIDU_REQUEST_FAILE, "百度api获取的路径信息为空");
+                        }
+                        PathInfoDOExample pathInfoDOExample = new PathInfoDOExample();
+                        //每一条路径信息，存入数据库
+                        int routeNum = 0;
+                            //每一条路线
+                        int pathId = 0;
+                        PathInfoDO record = new PathInfoDO();
 
+                        record.setStart(startAddress);
+                        record.setEnd(endAddress);
+                        record.setMainType(routeNum);
+                        record.setSumTime(routeInfo.getSumTime());
+                        if (pathInfoDOMapper.insertSelective(record) != 1) {
+                            throw new AllException(EmAllException.DATABASE_ERROR, "无法插入pathInfo中");
+                        }
 
+                        pathInfoDOExample.createCriteria().andStartEqualTo(startAddress).andMainTypeEqualTo(routeNum);
+                        PathInfoDO pathInfoDO = pathInfoDOMapper.selectByExample(pathInfoDOExample).get(0);
+                        pathId = pathInfoDO.getId();
+                        pathInfoDOExample.clear();
+
+                        int order_num = 0;
+                        int main_type = 0;
+                        //插入PassInfo这张表中
+                        for (RouteCalRequest routeCalRequest : routeCalRequestList) {
+                            List<PassInfoDO> passInfoDOList = new ArrayList<>();
+
+                            for (String city : routeCalRequest.getCitys()) {
+                                PassInfoDO passInfoDO_record = new PassInfoDO();
+                                passInfoDO_record.setArea(city);
+                                passInfoDO_record.setDistance((int) routeCalRequest.getDistance());
+                                passInfoDO_record.setOrderId(order_num);
+                                passInfoDO_record.setStartAddress(routeCalRequest.getStart());
+                                passInfoDO_record.setEndAddress(routeCalRequest.getEnd());
+                                passInfoDO_record.setTitle(routeCalRequest.getTitle());
+                                passInfoDO_record.setPathId(pathId);
+                                passInfoDO_record.setTypeNum(routeCalRequest.getType());
+
+                                passInfoDOList.add(passInfoDO_record);
+                            }
+                            if (routeCalRequest.getType() > main_type) {
+                                main_type = routeCalRequest.getType();
+                            }
+                            passInfoDOMapper.insertList(passInfoDOList);
+                            ++order_num;
+                        }
+                        ++routeNum;
+                        //更新PathInfo中刚插入的那条数据的main_type
+                        pathInfoDO.setMainType(main_type);
+                        pathInfoDOMapper.updateByPrimaryKeySelective(pathInfoDO);
+                    }
+                }
+                catch (AllException e) {
+                    log.info(e.getMsg());
+                    log.info(startAddress + " 无法存入数据库");
+                }
+                catch (IOException e) {
+                    log.info(e.getMessage());
+                    log.info(startAddress + " 无法存入数据库");
+                }
+                catch (Exception e) {
+                    log.info(e.getMessage());
+                    log.info(startAddress + " 无法存入数据库");
+                }
+            }
+        }
+        return ResultTool.success("写入成功");
     }
 
     /**
