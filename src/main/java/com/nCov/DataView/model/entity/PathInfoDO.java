@@ -9,6 +9,8 @@ public class PathInfoDO {
 
     private Integer mainType;
 
+    private Double sumTime;
+
     public Integer getId() {
         return id;
     }
@@ -39,5 +41,13 @@ public class PathInfoDO {
 
     public void setMainType(Integer mainType) {
         this.mainType = mainType;
+    }
+
+    public Double getSumTime() {
+        return sumTime;
+    }
+
+    public void setSumTime(Double sumTime) {
+        this.sumTime = sumTime;
     }
 }

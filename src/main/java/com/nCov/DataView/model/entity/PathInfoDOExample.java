@@ -363,6 +363,66 @@ public class PathInfoDOExample {
             addCriterion("main_Type not between", value1, value2, "mainType");
             return (Criteria) this;
         }
+
+        public Criteria andSumTimeIsNull() {
+            addCriterion("sum_time is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSumTimeIsNotNull() {
+            addCriterion("sum_time is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSumTimeEqualTo(Double value) {
+            addCriterion("sum_time =", value, "sumTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andSumTimeNotEqualTo(Double value) {
+            addCriterion("sum_time <>", value, "sumTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andSumTimeGreaterThan(Double value) {
+            addCriterion("sum_time >", value, "sumTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andSumTimeGreaterThanOrEqualTo(Double value) {
+            addCriterion("sum_time >=", value, "sumTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andSumTimeLessThan(Double value) {
+            addCriterion("sum_time <", value, "sumTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andSumTimeLessThanOrEqualTo(Double value) {
+            addCriterion("sum_time <=", value, "sumTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andSumTimeIn(List<Double> values) {
+            addCriterion("sum_time in", values, "sumTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andSumTimeNotIn(List<Double> values) {
+            addCriterion("sum_time not in", values, "sumTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andSumTimeBetween(Double value1, Double value2) {
+            addCriterion("sum_time between", value1, value2, "sumTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andSumTimeNotBetween(Double value1, Double value2) {
+            addCriterion("sum_time not between", value1, value2, "sumTime");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {
