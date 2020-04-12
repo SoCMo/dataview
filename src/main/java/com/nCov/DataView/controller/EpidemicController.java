@@ -198,4 +198,16 @@ public class EpidemicController {
     public Result pathQuery(@Validated @RequestBody PathQueryRequest pathQueryRequest) {
         return epidemicService.pathQuery(pathQueryRequest);
     }
+
+    /**
+     * @Description: 单地址返校信息
+     * @Param: [startAddress]
+     * @return: com.nCov.DataView.model.response.Result
+     * @Author: SoCMo
+     * @Date: 2020/4/12
+     */
+    @GetMapping("/pathChildQuery")
+    public Result pathChildQuery(@Param("startAddress") String startAddress) {
+        return epidemicService.pathChildQuery(startAddress);
+    }
 }

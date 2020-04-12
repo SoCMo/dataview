@@ -154,4 +154,13 @@ public interface EpidemicService {
      * @Date: 2020/4/10
      */
     public Result pathQuery(PathQueryRequest pathQueryRequest);
+
+    /**
+     * @Description: 查询单条返校信息
+     * @Param: [startAddress]
+     * @return: com.nCov.DataView.model.response.Result
+     * @Author: SoCMo
+     * @Date: 2020/4/12
+     */
+    public Result pathChildQuery(String startAddress);
 }

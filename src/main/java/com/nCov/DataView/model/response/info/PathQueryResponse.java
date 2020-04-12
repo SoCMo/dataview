@@ -14,5 +14,7 @@ public class PathQueryResponse {
 
     private String end;
 
+    private String type;
+
     private double risk;
 }
