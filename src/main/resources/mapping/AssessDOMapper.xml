@@ -103,7 +103,7 @@
     AND area_name LIKE "${province}%"
     ) a
     GROUP BY a.start_address
-    ORDER BY sum_score DESC
+      ORDER BY sum_score DESC, id
     LIMIT #{index}, #{num}
   </select>
   <select id="count" resultType="java.lang.Integer">
