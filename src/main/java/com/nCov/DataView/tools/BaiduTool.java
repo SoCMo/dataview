@@ -213,6 +213,7 @@ public class BaiduTool {
                         JSONArray childSteps = steps.getJSONArray(j);
                         for (int z = 0; z < childSteps.size(); z++) {
                             JSONObject finalSteps = childSteps.getJSONObject(z);
+                            if (finalSteps.getString("instructions").isEmpty()) continue;
                             RouteCalRequest routeCalRequest = new RouteCalRequest();
                             JSONObject vehicle = finalSteps.getJSONObject("vehicle_info");
                             switch (vehicle.getInteger("type")) {
