@@ -3,6 +3,7 @@ package com.nCov.DataView.dao;
 import com.nCov.DataView.model.entity.AssessDO;
 import com.nCov.DataView.model.entity.AssessDOExample;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
 
@@ -32,4 +33,10 @@ public interface AssessDOMapper {
     List<AssessDO> selectMax(@Param("date") String date, @Param("index") int index, @Param("num") int num, @Param("province") String province);
 
     void insertList(List<AssessDO> assessDOList);
+
+    @Select({"<script>",
+            "SELECT COUNT(DISTINCT assess.start_address)",
+            "FROM assess",
+            "</script>"})
+    int count();
 }

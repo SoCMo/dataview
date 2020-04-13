@@ -29,6 +29,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -1037,6 +1039,8 @@ public class EpidemicServiceImpl implements EpidemicService {
                 throw new AllException(EmAllException.DATABASE_ERROR, "风险数据为空");
             }
 
+            PathQueryListResponse pathQueryListResponse = new PathQueryListResponse();
+
             //查询PathInfo表
             PathInfoDOExample pathInfoDOExample = new PathInfoDOExample();
             pathInfoDOExample.createCriteria()
@@ -1044,7 +1048,7 @@ public class EpidemicServiceImpl implements EpidemicService {
             List<PathInfoDO> pathInfoDOList = pathInfoDOMapper.selectByExample(pathInfoDOExample);
             Map<Integer, PathInfoDO> pathInfoDOMap = pathInfoDOList.stream().collect(Collectors.toMap(PathInfoDO::getId, pathInfoDO -> pathInfoDO));
 
-            return ResultTool.success(pathIdList.stream().map(assessDO -> {
+            pathQueryListResponse.setPathQueryResponseList(pathIdList.stream().map(assessDO -> {
                 PathQueryResponse pathQueryResponse = new PathQueryResponse();
                 PathInfoDO pathInfoDO = pathInfoDOMap.get(assessDO.getPathId());
 
@@ -1054,6 +1058,9 @@ public class EpidemicServiceImpl implements EpidemicService {
                 pathQueryResponse.setRisk((int) (assessDO.getSumScore() * 10 + 0.5) / 10.0);
                 return pathQueryResponse;
             }).collect(Collectors.toList()));
+
+            pathQueryListResponse.setNum(assessDOMapper.count());
+            return ResultTool.success(pathQueryListResponse);
         } catch (AllException e) {
             log.error(e.getMsg());
             return ResultTool.error(500, e.getMsg());
@@ -1773,6 +1780,12 @@ public class EpidemicServiceImpl implements EpidemicService {
                     }
                 }
                 String province = provinceMapInt.get(city.getParentid()).getName();
+                if (province.equals("上海")) {
+                    String area = pathInfoDO.getStart();
+                    Pattern pattern = Pattern.compile("上海市..区");
+                    Matcher matcher = pattern.matcher(area);
+                    province = matcher.group(0);
+                }
 
                 for (PassInfoDO passInfoDO : passInfoDOS) {
                     if (order < passInfoDO.getOrderId()) {
@@ -1794,9 +1807,6 @@ public class EpidemicServiceImpl implements EpidemicService {
                     assessDO.setStartAddress(pathInfoDO.getStart());
 
                     assessDO.setAreaName(province);
-                    if (assessDO.getAreaName().equals("上海")) {
-                        assessDO.setAreaName(assessDO.getAreaName() + "市" + passInfoDO.getArea());
-                    }
                     assessDO.setSumTime(pathInfoDO.getSumTime());
                     assessDO.setUpdateTime(TimeTool.todayCreate().getTime());
 
