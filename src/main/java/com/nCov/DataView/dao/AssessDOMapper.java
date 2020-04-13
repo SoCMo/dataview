@@ -3,7 +3,6 @@ package com.nCov.DataView.dao;
 import com.nCov.DataView.model.entity.AssessDO;
 import com.nCov.DataView.model.entity.AssessDOExample;
 import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
 
@@ -34,9 +33,5 @@ public interface AssessDOMapper {
 
     void insertList(List<AssessDO> assessDOList);
 
-    @Select({"<script>",
-            "SELECT COUNT(DISTINCT assess.start_address)",
-            "FROM assess",
-            "</script>"})
-    int count();
+    int count(@Param("date") String date, @Param("province") String province);
 }

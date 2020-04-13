@@ -103,8 +103,19 @@
     AND area_name LIKE "${province}%"
     ) a
     GROUP BY a.start_address
-      ORDER BY sum_score DESC
+    ORDER BY sum_score DESC
     LIMIT #{index}, #{num}
+  </select>
+  <select id="count" resultType="java.lang.Integer">
+    SELECT
+    count(
+    DISTINCT assess.start_address
+    )
+    FROM
+    assess
+    WHERE
+    DATE(update_time) = "${date}"
+    AND area_name LIKE "${province}%"
   </select>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer">
     select

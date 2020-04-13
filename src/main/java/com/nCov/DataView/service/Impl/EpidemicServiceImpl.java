@@ -1059,7 +1059,7 @@ public class EpidemicServiceImpl implements EpidemicService {
                 return pathQueryResponse;
             }).collect(Collectors.toList()));
 
-            pathQueryListResponse.setNum(assessDOMapper.count());
+            pathQueryListResponse.setNum(assessDOMapper.count(TimeTool.timeToDaySy(TimeTool.todayCreate().getTime()), fixTool.provinceUni(pathQueryRequest.getProvince())));
             return ResultTool.success(pathQueryListResponse);
         } catch (AllException e) {
             log.error(e.getMsg());
@@ -1782,8 +1782,11 @@ public class EpidemicServiceImpl implements EpidemicService {
                 String province = provinceMapInt.get(city.getParentid()).getName();
                 if (province.equals("上海")) {
                     String area = pathInfoDO.getStart();
-                    Pattern pattern = Pattern.compile("上海市..区");
+                    Pattern pattern = Pattern.compile("上海市(.+?)区");
                     Matcher matcher = pattern.matcher(area);
+
+                    //加了这行好像正则就能用了
+                    if (!matcher.find()) System.out.println("SB JAVA!");
                     province = matcher.group(0);
                 }
 
