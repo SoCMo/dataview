@@ -1135,7 +1135,9 @@ public class EpidemicServiceImpl implements EpidemicService {
                     RouteCalReponse routeCalReponse = new RouteCalReponse();
                     routeCalReponse.setTimeScore(NumberTool.doubleToStringWotH(assessDO.getTimeScore()));
                     routeCalReponse.setFinalscore((int) (assessDO.getFinalScore() * 10 + 0.5) / 10.0);
-                    routeCalReponse.setTransportScore(String.valueOf(assessDO.getCleanlinessScore() + assessDO.getCrowdScore()));
+
+                    double temp = ConstCorrespond.ROUTE_WEIGHT[0] / (ConstCorrespond.ROUTE_WEIGHT[0] + ConstCorrespond.ROUTE_WEIGHT[2]);
+                    routeCalReponse.setTransportScore(String.valueOf(temp * assessDO.getCleanlinessScore() + (1 - temp) * assessDO.getCrowdScore()));
                     routeCalReponse.setTime(TimeTool.timeSlotToString(assessDO.getTime()));
                     routeCalReponse.setCity(new ArrayList<>());
 
