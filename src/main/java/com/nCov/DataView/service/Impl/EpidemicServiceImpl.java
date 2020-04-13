@@ -1139,6 +1139,7 @@ public class EpidemicServiceImpl implements EpidemicService {
 
                 int i = 0;
                 for (AssessDO assessDO : assessDOS) {
+                    if (i >= passInfoDOS.size() || assessDO.getPassOrder() < passInfoDOS.get(i).getOrderId()) continue;
                     RouteCalReponse routeCalReponse = new RouteCalReponse();
                     routeCalReponse.setTimeScore(NumberTool.doubleToStringWotH(assessDO.getTimeScore()));
                     routeCalReponse.setFinalscore((int) (assessDO.getFinalScore() * 10 + 0.5) / 10.0);
