@@ -14,7 +14,7 @@ import javax.validation.constraints.NotNull;
  */
 @Data
 public class PathQueryRequest {
-    @Min(value = 1, message = "偏移值最小为1")
+    @Min(value = 0, message = "偏移值最小为0")
     int index;
 
     @NotNull(message = "获取数不能为空")

@@ -1173,7 +1173,7 @@ public class EpidemicServiceImpl implements EpidemicService {
                                     }
                                 }
                                 if (impAreaDO == null) {
-                                    throw new AllException(EmAllException.DATABASE_ERROR, tempPassInfo.getArea() + "无风险数据");
+                                    continue;
                                 }
                             }
                         }
@@ -1564,7 +1564,7 @@ public class EpidemicServiceImpl implements EpidemicService {
             if (abroadInputDO == null) {
                 log.info(impAreaDO.getProvinceName() + "名称可能无法标准化");
                 for (AbroadInputDO abroadInputDOTRA : abroadInputMap.values()) {
-                    if (impAreaDO.getProvinceName().contains(abroadInputDOTRA.getProvincename())) {
+                    if (impAreaDO.getProvinceName().contains(fixTool.provinceUni(abroadInputDOTRA.getProvincename()))) {
                         abroadInputDO = abroadInputDOTRA;
                     }
                 }
@@ -1834,7 +1834,7 @@ public class EpidemicServiceImpl implements EpidemicService {
                                     covRankResponse = covRankResponseMap.get(passInfoDO.getArea());
                                 }
                                 if (covRankResponse == null) {
-                                    throw new AllException(EmAllException.DATABASE_ERROR, passInfoDO.getArea() + "无风险数据");
+                                    continue;
                                 }
                             }
                         }
