@@ -27,4 +27,6 @@ public interface StudentInformationDOMapper {
     int updateByPrimaryKeySelective(StudentInformationDO record);
 
     int updateByPrimaryKey(StudentInformationDO record);
+
+    List<StudentInformationDO> selectStartFrom(Integer id);
 }

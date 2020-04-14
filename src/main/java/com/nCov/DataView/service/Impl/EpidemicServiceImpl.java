@@ -1232,13 +1232,13 @@ public class EpidemicServiceImpl implements EpidemicService {
      */
     @Async
     @Override
-    public Result writeInPathAndPass() throws AllException, IOException, ParseException {
+    public void writeInPathAndPass(Integer id) throws AllException, IOException, ParseException {
         final String endAddress = "上海大学宝山校区";
 
-        List<StudentInformationDO> studentInformationDOList = studentInformationDOMapper.selectByExample(null);
+        List<StudentInformationDO> studentInformationDOList = studentInformationDOMapper.selectStartFrom(id);
 
         if (studentInformationDOList.size() == 0) {
-            return ResultTool.success("数据库中暂无学生地址信息");
+            throw new AllException(EmAllException.DATABASE_ERROR, "数据库中暂无学生地址信息");
         }
         for (StudentInformationDO studentInformationDO : studentInformationDOList) {
             String startAddress = "";
@@ -1250,6 +1250,14 @@ public class EpidemicServiceImpl implements EpidemicService {
                         studentInformationDO.getAddress();
                 //调用百度地图api查询路径信息
                 try {
+                    PathInfoDOExample pathInfoDOExample1 = new PathInfoDOExample();
+                    pathInfoDOExample1.createCriteria().andStartEqualTo(startAddress);
+                    if (pathInfoDOMapper.countByExample(pathInfoDOExample1) > 0) {
+                        pathInfoDOExample1.clear();
+                        continue;
+                    }
+                    pathInfoDOExample1.clear();
+
                     List<RouteInfo> routeInfoList = baiduTool.pathInfo(startAddress, endAddress);
                     //n条路线
                     for (RouteInfo routeInfo : routeInfoList) {
@@ -1323,7 +1331,6 @@ public class EpidemicServiceImpl implements EpidemicService {
                 }
             }
         }
-        return ResultTool.success("写入成功");
     }
 
     /**

@@ -180,5 +180,5 @@ public interface EpidemicService {
      * @Author: pongshy
      * @Date: 2020/4/12
      */
-    public Result writeInPathAndPass() throws AllException, IOException, ParseException;
+    public void writeInPathAndPass(Integer id) throws AllException, IOException, ParseException;
 }
