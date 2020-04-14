@@ -174,6 +174,15 @@ public interface EpidemicService {
     public Result pathMap();
 
     /**
+     * @Description: 路径计算
+     * @Param: []
+     * @return: void
+     * @Author: SoCMo
+     * @Date: 2020/4/12
+     */
+    public void assess();
+
+    /**
      * @Description: 将百度地图api的查询结果存入pathInfo,和passInfo中
      * @Param: [startaddress]
      * @return: com.nCov.DataView.model.response.Result

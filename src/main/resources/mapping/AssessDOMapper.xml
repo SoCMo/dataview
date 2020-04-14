@@ -94,17 +94,28 @@
       order by ${orderByClause}
     </if>
   </select>
-  <select id="selectPathId" resultMap="BaseResultMap">
+  <select id="selectMax" resultMap="BaseResultMap">
     SELECT * FROM
     (
     SELECT *
     FROM assess
     WHERE DATE(update_time) = "${date}"
-    AND area_name LIKE "中国${province}%"
-    ORDER BY sum_score DESC
+    AND area_name LIKE "${province}%"
     ) a
-    GROUP BY a.start_address, a.id
+    GROUP BY a.start_address
+      ORDER BY sum_score DESC, id
     LIMIT #{index}, #{num}
+  </select>
+  <select id="count" resultType="java.lang.Integer">
+    SELECT
+    count(
+    DISTINCT assess.start_address
+    )
+    FROM
+    assess
+    WHERE
+    DATE(update_time) = "${date}"
+    AND area_name LIKE "${province}%"
   </select>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer">
     select

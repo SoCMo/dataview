@@ -18,6 +18,8 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.springframework.beans.BeanUtils;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -27,6 +29,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -37,6 +41,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Service
+@EnableScheduling
 public class EpidemicServiceImpl implements EpidemicService {
     @Resource
     private AreaDOMapper areaDOMapper;
@@ -338,13 +343,13 @@ public class EpidemicServiceImpl implements EpidemicService {
                         }).collect(Collectors.toList());
 
                 //找到当前城市信息
-                if (routeCalDataList.size() > 1) {
+                if (routeCalDataList.size() >= 1) {
                     RouteCalReponse routeCalReponse = new RouteCalReponse();
                     BeanUtils.copyProperties(routeCalRequest, routeCalReponse);
                     routeCalReponse.setTime(routeCalDataList.get(0).getTime());
                     routeCalReponse.setFinalscore(routeCalDataList.get(0).getScore());
                     double time = TimeTool.stringToHour(routeCalDataList.get(0).getTime());
-                    routeCalReponse.setTimeScore(NumberTool.doubleToStringWotH(time >= 12 ? 100 : (time / 12.0 * 100)));
+                    routeCalReponse.setTimeScore(NumberTool.doubleToStringWotH(time >= 6 ? 100 : (time / 6.0 * 100)));
                     routeCalReponse.setTransportScore(
                             NumberTool.doubleToStringWotH(
                                     ConstCorrespond.ROUTE_WEIGHT[0] / (ConstCorrespond.ROUTE_WEIGHT[0] + ConstCorrespond.ROUTE_WEIGHT[2])
@@ -367,15 +372,15 @@ public class EpidemicServiceImpl implements EpidemicService {
                     routeCalDO.setTime(TimeTool.timeSlotToString(time));
                     routeCalDO.setDate(new Date());
                     routeCalDO.setScore(
-                            (ConstCorrespond.ROUTE_WEIGHT[0] * ConstCorrespond.CROWD[routeCalRequest.getType()]
-                                    + ConstCorrespond.ROUTE_WEIGHT[1] * (time >= 8 ? 100 : (time / 8 * 100))
+                            ConstCorrespond.ROUTE_WEIGHT[0] * ConstCorrespond.CROWD[routeCalRequest.getType()]
+                                    + ConstCorrespond.ROUTE_WEIGHT[1] * (time >= 6 ? 100 : (time / 6 * 100))
                                     + ConstCorrespond.ROUTE_WEIGHT[2] * ConstCorrespond.CLEAN_SCORE[routeCalRequest.getType()]
-                                    + ConstCorrespond.ROUTE_WEIGHT[3] * max) / 20.0
+                                    + ConstCorrespond.ROUTE_WEIGHT[3] * max
                     );
                     routeCalDO.setId(null);
 
                     routeCalDOList.add(routeCalDO);
-                    routeCalReponse.setTimeScore(NumberTool.doubleToStringWotH(time >= 12 ? 100 : (time / 12.0 * 100)));
+                    routeCalReponse.setTimeScore(NumberTool.doubleToStringWotH(time >= 6 ? 100 : (time / 6.0 * 100)));
                     routeCalReponse.setTransportScore(
                             NumberTool.doubleToStringWotH(
                                     ConstCorrespond.ROUTE_WEIGHT[0] / (ConstCorrespond.ROUTE_WEIGHT[0] + ConstCorrespond.ROUTE_WEIGHT[2])
@@ -402,7 +407,7 @@ public class EpidemicServiceImpl implements EpidemicService {
                 if (findMainType.getType() > type) type = findMainType.getType();
             }
             sumCalResponse.setType(ConstCorrespond.TRAN_TYPE[type]);
-            sumCalResponse.setSumScore(NumberTool.doubleToStringWotH(resultList.stream().mapToDouble(RouteCalReponse::getFinalscore).average().getAsDouble()));
+            sumCalResponse.setSumScore(NumberTool.doubleToStringWotH(resultList.stream().mapToDouble(RouteCalReponse::getFinalscore).max().getAsDouble()));
             return ResultTool.success(sumCalResponse);
         } catch (AllException e) {
             log.error(e.getMsg());
@@ -1029,10 +1034,12 @@ public class EpidemicServiceImpl implements EpidemicService {
     @Override
     public Result pathQuery(PathQueryRequest pathQueryRequest) {
         try {
-            List<AssessDO> pathIdList = assessDOMapper.selectPathId(TimeTool.todayCreate().getTime(), pathQueryRequest.getIndex(), pathQueryRequest.getNum(), fixTool.provinceUni(pathQueryRequest.getProvince()));
+            List<AssessDO> pathIdList = assessDOMapper.selectMax(TimeTool.timeToDaySy(TimeTool.todayCreate().getTime()), pathQueryRequest.getIndex(), pathQueryRequest.getNum(), fixTool.provinceUni(pathQueryRequest.getProvince()));
             if (pathIdList.isEmpty()) {
                 throw new AllException(EmAllException.DATABASE_ERROR, "风险数据为空");
             }
+
+            PathQueryListResponse pathQueryListResponse = new PathQueryListResponse();
 
             //查询PathInfo表
             PathInfoDOExample pathInfoDOExample = new PathInfoDOExample();
@@ -1041,7 +1048,7 @@ public class EpidemicServiceImpl implements EpidemicService {
             List<PathInfoDO> pathInfoDOList = pathInfoDOMapper.selectByExample(pathInfoDOExample);
             Map<Integer, PathInfoDO> pathInfoDOMap = pathInfoDOList.stream().collect(Collectors.toMap(PathInfoDO::getId, pathInfoDO -> pathInfoDO));
 
-            return ResultTool.success(pathIdList.stream().map(assessDO -> {
+            pathQueryListResponse.setPathQueryResponseList(pathIdList.stream().map(assessDO -> {
                 PathQueryResponse pathQueryResponse = new PathQueryResponse();
                 PathInfoDO pathInfoDO = pathInfoDOMap.get(assessDO.getPathId());
 
@@ -1049,8 +1056,11 @@ public class EpidemicServiceImpl implements EpidemicService {
                 pathQueryResponse.setStart(pathInfoDO.getStart());
                 pathQueryResponse.setEnd(pathInfoDO.getEnd());
                 pathQueryResponse.setRisk((int) (assessDO.getSumScore() * 10 + 0.5) / 10.0);
-                return pathQueryRequest;
+                return pathQueryResponse;
             }).collect(Collectors.toList()));
+
+            pathQueryListResponse.setNum(assessDOMapper.count(TimeTool.timeToDaySy(TimeTool.todayCreate().getTime()), fixTool.provinceUni(pathQueryRequest.getProvince())));
+            return ResultTool.success(pathQueryListResponse);
         } catch (AllException e) {
             log.error(e.getMsg());
             return ResultTool.error(500, e.getMsg());
@@ -1129,16 +1139,19 @@ public class EpidemicServiceImpl implements EpidemicService {
 
                 int i = 0;
                 for (AssessDO assessDO : assessDOS) {
+                    if (i >= passInfoDOS.size() || assessDO.getPassOrder() < passInfoDOS.get(i).getOrderId()) continue;
                     RouteCalReponse routeCalReponse = new RouteCalReponse();
                     routeCalReponse.setTimeScore(NumberTool.doubleToStringWotH(assessDO.getTimeScore()));
-                    routeCalReponse.setFinalscore(assessDO.getFinalScore());
-                    routeCalReponse.setTransportScore(String.valueOf(assessDO.getCleanlinessScore() + assessDO.getCrowdScore()));
+                    routeCalReponse.setFinalscore((int) (assessDO.getFinalScore() * 10 + 0.5) / 10.0);
+
+                    double temp = ConstCorrespond.ROUTE_WEIGHT[0] / (ConstCorrespond.ROUTE_WEIGHT[0] + ConstCorrespond.ROUTE_WEIGHT[2]);
+                    routeCalReponse.setTransportScore(String.valueOf(temp * assessDO.getCleanlinessScore() + (1 - temp) * assessDO.getCrowdScore()));
                     routeCalReponse.setTime(TimeTool.timeSlotToString(assessDO.getTime()));
                     routeCalReponse.setCity(new ArrayList<>());
 
                     boolean flag = false;
-                    while (assessDO.getPassOrder().equals(passInfoDOS.get(i).getOrderId())
-                            && i < passInfoDOS.size()) {
+                    while (i < passInfoDOS.size()
+                            && assessDO.getPassOrder().equals(passInfoDOS.get(i).getOrderId())) {
                         PassInfoDO tempPassInfo = passInfoDOS.get(i++);
                         if (!flag) {
                             routeCalReponse.setTitle(tempPassInfo.getTitle());
@@ -1160,7 +1173,7 @@ public class EpidemicServiceImpl implements EpidemicService {
                                     }
                                 }
                                 if (impAreaDO == null) {
-                                    throw new AllException(EmAllException.DATABASE_ERROR, tempPassInfo.getArea() + "无风险数据");
+                                    continue;
                                 }
                             }
                         }
@@ -1558,7 +1571,7 @@ public class EpidemicServiceImpl implements EpidemicService {
             if (abroadInputDO == null) {
                 log.info(impAreaDO.getProvinceName() + "名称可能无法标准化");
                 for (AbroadInputDO abroadInputDOTRA : abroadInputMap.values()) {
-                    if (impAreaDO.getProvinceName().contains(abroadInputDOTRA.getProvincename())) {
+                    if (impAreaDO.getProvinceName().contains(fixTool.provinceUni(abroadInputDOTRA.getProvincename()))) {
                         abroadInputDO = abroadInputDOTRA;
                     }
                 }
@@ -1719,4 +1732,150 @@ public class EpidemicServiceImpl implements EpidemicService {
     }
 
 
+    /**
+     * @Description: 每天对各路段进行评估
+     * @Param: []
+     * @return: void
+     * @Author: SoCMo
+     * @Date: 2020/4/10
+     */
+    @Scheduled(cron = "0 2 0 * * *")
+    public void assess() {
+        try {
+            //获取path表信息
+            PathInfoDOExample pathInfoDOExample = new PathInfoDOExample();
+            List<PathInfoDO> pathInfoDOList = pathInfoDOMapper.selectByExample(pathInfoDOExample);
+            if (pathInfoDOList.isEmpty()) {
+                throw new AllException(EmAllException.DATABASE_ERROR, "pathInfo表为空");
+            }
+
+            //获取impArea的信息
+            ImpAreaDOExample impAreaDOExample = new ImpAreaDOExample();
+            Calendar calendar = TimeTool.todayCreate();
+            List<CovRankResponse> covDataList = this.allAreaCal(TimeTool.timeToDaySy(calendar.getTime()));
+            Map<String, CovRankResponse> covRankResponseMap = covDataList.stream().collect(Collectors.toMap(CovRankResponse::getName, covRankResponse -> covRankResponse));
+
+            //查询Area表的信息
+            Map<Integer, AreaDO> provinceMapInt = areaDOMapper.getProvinceMapInt();
+            Map<String, AreaDO> cityMap = areaDOMapper.getCityMap();
+
+            //计算
+            for (PathInfoDO pathInfoDO : pathInfoDOList) {
+                PassInfoDOExample passInfoDOExample = new PassInfoDOExample();
+                passInfoDOExample.createCriteria().andPathIdEqualTo(pathInfoDO.getId());
+                List<PassInfoDO> passInfoDOS = passInfoDOMapper.selectByExample(passInfoDOExample);
+                if (passInfoDOS.isEmpty()) {
+                    log.error("id为:" + pathInfoDO.getId() + "的路径无路段信息");
+                    continue;
+                }
+
+                int order = 0;
+                List<AssessDO> sumList = new ArrayList<>();
+                List<AssessDO> finalList = new ArrayList<>();
+                AreaDO city = cityMap.get(fixTool.areaUni(passInfoDOS.get(0).getArea()));
+                if (city == null) {
+                    city = cityMap.get(passInfoDOS.get(0).getArea());
+                    if (city == null) {
+                        for (AreaDO areaDOTemp : cityMap.values()) {
+                            if (areaDOTemp.getName().contains(fixTool.areaUni(passInfoDOS.get(0).getArea()))) {
+                                city = areaDOTemp;
+                            }
+                        }
+                        if (city == null) {
+                            log.error(passInfoDOS.get(0).getArea() + "在area表中不存在!");
+                            continue;
+                        }
+                    }
+                }
+                String province = provinceMapInt.get(city.getParentid()).getName();
+                if (province.equals("上海")) {
+                    String area = pathInfoDO.getStart();
+                    Pattern pattern = Pattern.compile("上海市(.+?)区");
+                    Matcher matcher = pattern.matcher(area);
+
+                    //加了这行好像正则就能用了
+                    if (!matcher.find()) System.out.println("SB JAVA!");
+                    province = matcher.group(0);
+                }
+
+                for (PassInfoDO passInfoDO : passInfoDOS) {
+                    if (order < passInfoDO.getOrderId()) {
+                        double localScore = finalList.stream().mapToDouble(AssessDO::getLocalScore).max().getAsDouble();
+                        double finalScore = ConstCorrespond.ROUTE_WEIGHT[0] * finalList.get(0).getCrowdScore()
+                                + ConstCorrespond.ROUTE_WEIGHT[1] * finalList.get(0).getTimeScore()
+                                + ConstCorrespond.ROUTE_WEIGHT[2] * finalList.get(0).getCleanlinessScore()
+                                + ConstCorrespond.ROUTE_WEIGHT[3] * localScore;
+                        for (AssessDO assessDO : finalList) {
+                            assessDO.setFinalScore(finalScore);
+                            sumList.add(assessDO);
+                        }
+                        order++;
+                        finalList.clear();
+                    }
+                    AssessDO assessDO = new AssessDO();
+                    assessDO.setPathId(pathInfoDO.getId());
+                    assessDO.setPassOrder(passInfoDO.getOrderId());
+                    assessDO.setStartAddress(pathInfoDO.getStart());
+
+                    assessDO.setAreaName(province);
+                    assessDO.setSumTime(pathInfoDO.getSumTime());
+                    assessDO.setUpdateTime(TimeTool.todayCreate().getTime());
+
+                    assessDO.setCleanlinessScore((int) ConstCorrespond.CLEAN_SCORE[passInfoDO.getTypeNum()]);
+                    assessDO.setCrowdScore((int) ConstCorrespond.CROWD[passInfoDO.getTypeNum()]);
+                    assessDO.setTime(passInfoDO.getDistance() / ConstCorrespond.SPEED[passInfoDO.getTypeNum()] / 1000);
+                    assessDO.setTimeScore(assessDO.getTime() >= 6 ? 100 : (assessDO.getTime() / 6) * 100);
+
+                    CovRankResponse covRankResponse = covRankResponseMap.get(fixTool.areaUni(passInfoDO.getArea()));
+                    if (covRankResponse == null) {
+                        covRankResponse = covRankResponseMap.get(passInfoDO.getArea());
+                        if (covRankResponse == null) {
+                            for (CovRankResponse covRankResponseTemp : covRankResponseMap.values()) {
+                                if (covRankResponseTemp.getName().contains(fixTool.areaUni(passInfoDO.getArea()))) {
+                                    covRankResponse = covRankResponseTemp;
+                                    break;
+                                }
+                            }
+                            if (covRankResponse == null) {
+                                if (passInfoDO.getArea().equals("浦东新区")) {
+                                    covRankResponse = covRankResponseMap.get(passInfoDO.getArea());
+                                }
+                                if (covRankResponse == null) {
+                                    continue;
+                                }
+                            }
+                        }
+                    }
+                    assessDO.setLocalScore((int) covRankResponse.getSumScore());
+                    finalList.add(assessDO);
+                }
+                if (!finalList.isEmpty()) {
+                    double localScore = finalList.stream().mapToDouble(AssessDO::getLocalScore).max().getAsDouble();
+                    double finalScore = ConstCorrespond.ROUTE_WEIGHT[0] * finalList.get(0).getCrowdScore()
+                            + ConstCorrespond.ROUTE_WEIGHT[1] * finalList.get(0).getTimeScore()
+                            + ConstCorrespond.ROUTE_WEIGHT[2] * finalList.get(0).getCleanlinessScore()
+                            + ConstCorrespond.ROUTE_WEIGHT[3] * localScore;
+                    for (AssessDO assessDO : finalList) {
+                        assessDO.setFinalScore(finalScore);
+                        sumList.add(assessDO);
+                    }
+                    finalList.clear();
+                }
+
+                double maxScore = 0;
+                for (AssessDO assessDO : sumList) {
+                    if (assessDO.getFinalScore() > maxScore) maxScore = assessDO.getFinalScore();
+                }
+                for (AssessDO assessDO : sumList) {
+                    assessDO.setSumScore(maxScore);
+                }
+
+                assessDOMapper.insertList(sumList);
+            }
+        } catch (AllException e) {
+            log.error(e.getMsg());
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        }
+    }
 }
