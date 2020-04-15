@@ -1333,6 +1333,10 @@ public class EpidemicServiceImpl implements EpidemicService {
                 catch (AllException e) {
                     log.info(e.getMsg());
                     log.info(startAddress + " 无法存入数据库");
+                    if (e.getMsg().equals("配额已到上限")) {
+                        log.info("因配额达到上限，读入结束");
+                        return;
+                    }
                 }
                 catch (IOException e) {
                     log.info(e.getMessage());
