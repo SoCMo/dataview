@@ -78,6 +78,8 @@ public class EpidemicServiceImpl implements EpidemicService {
 
     private final static Integer lock = 1;
 
+    private final static Integer AbroadLock = 1;
+
     /**
      * @Description: 获取地区信息
      * @Param: [areaName]
@@ -1562,18 +1564,27 @@ public class EpidemicServiceImpl implements EpidemicService {
 
             AbroadInputDO abroadInputDO = abroadInputMap.get(fixTool.provinceUni(impAreaDO.getProvinceName()));
             if (abroadInputDO == null) {
-                log.info(impAreaDO.getProvinceName() + "名称可能无法标准化");
+                log.info(impAreaDO.getProvinceName() + "名称可能无法标准化.");
                 for (AbroadInputDO abroadInputDOTRA : abroadInputMap.values()) {
                     if (impAreaDO.getProvinceName().contains(fixTool.provinceUni(abroadInputDOTRA.getProvincename()))) {
                         abroadInputDO = abroadInputDOTRA;
                     }
                 }
                 if (abroadInputDO == null) {
-                    abroadInputDO = new AbroadInputDO();
-                    abroadInputDO.setDate(TimeTool.stringToDay(date));
-                    abroadInputDO.setThenumber(0);
-                    abroadInputDO.setProvincename(fixTool.provinceUni(impAreaDO.getProvinceName()));
-                    abroadInputDOMapper.insertSelective(abroadInputDO);
+                    synchronized (AbroadLock) {
+                        AbroadInputDOExample abroadInputDOExample = new AbroadInputDOExample();
+                        abroadInputDOExample.createCriteria().andDateEqualTo(TimeTool.stringToDay(date))
+                                .andProvincenameLike(fixTool.provinceUni(impAreaDO.getProvinceName()) + "%");
+                        List<AbroadInputDO> abroadInputDOList = abroadInputDOMapper.selectByExample(abroadInputDOExample);
+                        if (!abroadInputDOList.isEmpty()) abroadInputDO = abroadInputDOList.get(0);
+                        else {
+                            abroadInputDO = new AbroadInputDO();
+                            abroadInputDO.setDate(TimeTool.stringToDay(date));
+                            abroadInputDO.setThenumber(0);
+                            abroadInputDO.setProvincename(fixTool.provinceUni(impAreaDO.getProvinceName()));
+                            abroadInputDOMapper.insertSelective(abroadInputDO);
+                        }
+                    }
                 }
             }
 
@@ -1787,12 +1798,12 @@ public class EpidemicServiceImpl implements EpidemicService {
                     Matcher matcher = pattern.matcher(area);
 
                     //加了这行好像正则就能用了
-                    if (!matcher.find()) System.out.println("SB JAVA!");
+                    if (!matcher.find()) continue;
                     province = matcher.group(0);
                 }
 
                 for (PassInfoDO passInfoDO : passInfoDOS) {
-                    if (order < passInfoDO.getOrderId()) {
+                    if (order < passInfoDO.getOrderId() && !finalList.isEmpty()) {
                         double localScore = finalList.stream().mapToDouble(AssessDO::getLocalScore).max().getAsDouble();
                         double finalScore = ConstCorrespond.ROUTE_WEIGHT[0] * finalList.get(0).getCrowdScore()
                                 + ConstCorrespond.ROUTE_WEIGHT[1] * finalList.get(0).getTimeScore()
