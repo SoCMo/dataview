@@ -225,8 +225,8 @@ public class EpidemicController {
     }
 
     @GetMapping("/test1")
-    public Result testInterface() throws AllException,  IOException, ParseException {
-        epidemicService.writeInPathAndPass();
+    public Result testInterface(@RequestParam(value = "id") Integer id) throws AllException,  IOException, ParseException {
+        epidemicService.writeInPathAndPass(id);
 
         return ResultTool.success("启动成功");
     }
