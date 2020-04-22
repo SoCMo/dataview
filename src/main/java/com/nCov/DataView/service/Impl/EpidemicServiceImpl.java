@@ -1802,15 +1802,31 @@ public class EpidemicServiceImpl implements EpidemicService {
                         }
                     }
                 }
-                String province = provinceMapInt.get(city.getParentid()).getName();
-                if (province.equals("上海")) {
-                    String area = pathInfoDO.getStart();
-                    Pattern pattern = Pattern.compile("上海市(.+?)区");
-                    Matcher matcher = pattern.matcher(area);
 
-                    //加了这行好像正则就能用了
-                    if (!matcher.find()) continue;
-                    province = matcher.group(0);
+                String province = "";
+                List<String> provinceList = provinceMapInt.values().stream().map(AreaDO::getName).collect(Collectors.toList());
+                Pattern pattern = Pattern.compile("^中国(.{2})");
+                Matcher matcher = pattern.matcher(pathInfoDO.getStart());
+                if (!matcher.find()) continue;
+
+                if (provinceList.contains(matcher.group(1))) {
+                    province = matcher.group(1);
+                    if (province.equals("上海")) {
+                        String area = pathInfoDO.getStart();
+                        Pattern patternTemp = Pattern.compile("上海市(.+?)区");
+                        Matcher matcherTemp = patternTemp.matcher(area);
+
+                        if (!matcherTemp.find()) continue;
+                        province = matcherTemp.group(0);
+                    }
+                } else {
+                    String area = pathInfoDO.getStart();
+                    Pattern patternTemp = Pattern.compile("^中国(.{3})");
+                    Matcher matcherTemp = patternTemp.matcher(area);
+
+                    if (!matcherTemp.find()) continue;
+                    province = matcherTemp.group(1);
+                    if (!provinceList.contains(province)) continue;
                 }
 
                 for (PassInfoDO passInfoDO : passInfoDOS) {

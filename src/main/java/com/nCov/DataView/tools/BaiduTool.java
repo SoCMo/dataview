@@ -180,9 +180,9 @@ public class BaiduTool {
             } else if (jsonObject.getInteger("status") == 0) {
                 int methodNum = 0;
                 List<RouteInfo> routeInfoList = new ArrayList<>();
+                JSONArray jsonArray = jsonObject.getJSONObject("result").getJSONArray("routes");
 
-                while (methodNum < 3) {
-                    JSONArray jsonArray = jsonObject.getJSONObject("result").getJSONArray("routes");
+                while (methodNum < 3 && methodNum < jsonArray.size()) {
                     JSONObject route = jsonArray.getJSONObject(methodNum++);
                     JSONArray steps = route.getJSONArray("steps");
 
@@ -229,6 +229,7 @@ public class BaiduTool {
                                         if (pointIndex == 0) {
                                             lngLat = points[pointIndex].split(",");
                                         }
+                                        String city = "";
                                         if (pointIndex < points.length - 1) {
                                             String[] temp = points[pointIndex + 1].split(",");
                                             //计算距离
@@ -236,10 +237,12 @@ public class BaiduTool {
                                                 sumDistance += NumberTool.getDistance(Double.parseDouble(lngLat[1]), Double.parseDouble(lngLat[0]),
                                                         Double.parseDouble(temp[1]), Double.parseDouble(temp[0]));
                                             }
+                                            city = this.reverseGeoCoding(Double.parseDouble(lngLat[1]), Double.parseDouble(lngLat[0]));
                                             lngLat = temp;
-                                        }
-                                        String city = this.reverseGeoCoding(Double.parseDouble(lngLat[1]), Double.parseDouble(lngLat[0]));
-                                        if (!cities.contains(city)) cities.add(city);
+                                        } else
+                                            city = this.reverseGeoCoding(Double.parseDouble(lngLat[1]), Double.parseDouble(lngLat[0]));
+
+                                        if (!cities.contains(city) && !city.isEmpty()) cities.add(city);
                                     }
                                     routeCalRequest.setCitys(cities);
                                     JSONObject detail = vehicle.getJSONObject("detail");
