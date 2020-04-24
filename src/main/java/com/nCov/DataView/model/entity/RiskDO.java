@@ -1,13 +1,21 @@
 package com.nCov.DataView.model.entity;
 
+import java.util.Date;
+
 public class RiskDO {
     private Integer id;
 
-    private Integer pathId;
+    private String startAddress;
+
+    private String endAddress;
 
     private String areaName;
 
-    private Double finalScore;
+    private Double sumScore;
+
+    private Integer tranType;
+
+    private Date latestUpdate;
 
     public Integer getId() {
         return id;
@@ -17,12 +25,20 @@ public class RiskDO {
         this.id = id;
     }
 
-    public Integer getPathId() {
-        return pathId;
+    public String getStartAddress() {
+        return startAddress;
     }
 
-    public void setPathId(Integer pathId) {
-        this.pathId = pathId;
+    public void setStartAddress(String startAddress) {
+        this.startAddress = startAddress == null ? null : startAddress.trim();
+    }
+
+    public String getEndAddress() {
+        return endAddress;
+    }
+
+    public void setEndAddress(String endAddress) {
+        this.endAddress = endAddress == null ? null : endAddress.trim();
     }
 
     public String getAreaName() {
@@ -33,11 +49,27 @@ public class RiskDO {
         this.areaName = areaName == null ? null : areaName.trim();
     }
 
-    public Double getFinalScore() {
-        return finalScore;
+    public Double getSumScore() {
+        return sumScore;
     }
 
-    public void setFinalScore(Double finalScore) {
-        this.finalScore = finalScore;
+    public void setSumScore(Double sumScore) {
+        this.sumScore = sumScore;
+    }
+
+    public Integer getTranType() {
+        return tranType;
+    }
+
+    public void setTranType(Integer tranType) {
+        this.tranType = tranType;
+    }
+
+    public Date getLatestUpdate() {
+        return latestUpdate;
+    }
+
+    public void setLatestUpdate(Date latestUpdate) {
+        this.latestUpdate = latestUpdate;
     }
 }

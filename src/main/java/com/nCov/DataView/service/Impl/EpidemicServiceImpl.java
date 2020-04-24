@@ -62,6 +62,9 @@ public class EpidemicServiceImpl implements EpidemicService {
     private AbroadInputDOMapper abroadInputDOMapper;
 
     @Resource
+    private RiskDOMapper riskDOMapper;
+
+    @Resource
     private FixTool fixTool;
 
     @Resource
@@ -1082,32 +1085,26 @@ public class EpidemicServiceImpl implements EpidemicService {
     @Override
     public Result pathQuery(PathQueryRequest pathQueryRequest) {
         try {
-            List<AssessDO> pathIdList = assessDOMapper.selectMax(TimeTool.timeToDaySy(TimeTool.todayCreate().getTime()), pathQueryRequest.getIndex(), pathQueryRequest.getNum(), fixTool.provinceUni(pathQueryRequest.getProvince()));
-            if (pathIdList.isEmpty()) {
-                throw new AllException(EmAllException.DATABASE_ERROR, "风险数据为空");
+            RiskDOExample riskDOExample = new RiskDOExample();
+            riskDOExample.createCriteria().andAreaNameEqualTo(pathQueryRequest.getProvince());
+            riskDOExample.setOrderByClause("sum_score DESC, id ASC limit " + pathQueryRequest.getIndex() + ", " + pathQueryRequest.getNum());
+            List<RiskDO> riskDOList = riskDOMapper.selectByExample(riskDOExample);
+            if (riskDOList == null || riskDOList.isEmpty()) {
+                throw new AllException(EmAllException.DATABASE_ERROR, "占无数据");
+            }
+            PathQueryListResponse pathQueryListResponse = new PathQueryListResponse();
+            for (RiskDO riskDO : riskDOList) {
+                PathQueryResponse pathQueryResponse = new PathQueryResponse();
+                pathQueryResponse.setStart(riskDO.getStartAddress());
+                pathQueryResponse.setEnd(riskDO.getEndAddress());
+                pathQueryResponse.setRisk(riskDO.getSumScore());
+                pathQueryResponse.setType(ConstCorrespond.TRAN_TYPE[riskDO.getTranType()]);
+                pathQueryListResponse.getPathQueryResponseList().add(pathQueryResponse);
             }
 
-            PathQueryListResponse pathQueryListResponse = new PathQueryListResponse();
-
-            //查询PathInfo表
-            PathInfoDOExample pathInfoDOExample = new PathInfoDOExample();
-            pathInfoDOExample.createCriteria()
-                    .andIdIn(pathIdList.stream().map(AssessDO::getPathId).collect(Collectors.toList()));
-            List<PathInfoDO> pathInfoDOList = pathInfoDOMapper.selectByExample(pathInfoDOExample);
-            Map<Integer, PathInfoDO> pathInfoDOMap = pathInfoDOList.stream().collect(Collectors.toMap(PathInfoDO::getId, pathInfoDO -> pathInfoDO));
-
-            pathQueryListResponse.setPathQueryResponseList(pathIdList.stream().map(assessDO -> {
-                PathQueryResponse pathQueryResponse = new PathQueryResponse();
-                PathInfoDO pathInfoDO = pathInfoDOMap.get(assessDO.getPathId());
-
-                pathQueryResponse.setType(ConstCorrespond.TRAN_TYPE[pathInfoDO.getMainType()]);
-                pathQueryResponse.setStart(pathInfoDO.getStart());
-                pathQueryResponse.setEnd(pathInfoDO.getEnd());
-                pathQueryResponse.setRisk((int) (assessDO.getSumScore() * 10 + 0.5) / 10.0);
-                return pathQueryResponse;
-            }).collect(Collectors.toList()));
-
-            pathQueryListResponse.setNum(assessDOMapper.count(TimeTool.timeToDaySy(TimeTool.todayCreate().getTime()), fixTool.provinceUni(pathQueryRequest.getProvince())));
+            RiskDOExample countDOExample = new RiskDOExample();
+            countDOExample.createCriteria().andAreaNameEqualTo(pathQueryRequest.getProvince());
+            pathQueryListResponse.setNum(riskDOMapper.countByExample(countDOExample));
             return ResultTool.success(pathQueryListResponse);
         } catch (AllException e) {
             log.error(e.getMsg());
@@ -1948,6 +1945,30 @@ public class EpidemicServiceImpl implements EpidemicService {
                 }
 
                 assessDOMapper.insertList(sumList);
+
+                RiskDOExample riskDOExample = new RiskDOExample();
+                riskDOExample.createCriteria().andStartAddressEqualTo(pathInfoDO.getStart());
+                List<RiskDO> riskDOList = riskDOMapper.selectByExample(riskDOExample);
+                if (!riskDOList.isEmpty()) {
+                    RiskDO riskDO = riskDOList.get(0);
+                    if (riskDO.getLatestUpdate().before(TimeTool.todayCreate().getTime()) || riskDO.getSumScore() < sumList.get(0).getSumScore()) {
+                        RiskDO riskDOTemp = new RiskDO();
+                        riskDOTemp.setId(riskDO.getId());
+                        riskDOTemp.setSumScore(sumList.get(0).getSumScore());
+                        riskDOTemp.setTranType(pathInfoDO.getMainType());
+                        riskDOTemp.setLatestUpdate(TimeTool.todayCreate().getTime());
+                        riskDOMapper.updateByPrimaryKeySelective(riskDOTemp);
+                    }
+                } else {
+                    RiskDO riskDO = new RiskDO();
+                    riskDO.setStartAddress(pathInfoDO.getStart());
+                    riskDO.setEndAddress(pathInfoDO.getEnd());
+                    riskDO.setAreaName(sumList.get(0).getAreaName());
+                    riskDO.setSumScore(sumList.get(0).getSumScore());
+                    riskDO.setTranType(pathInfoDO.getMainType());
+                    riskDO.setLatestUpdate(TimeTool.todayCreate().getTime());
+                    riskDOMapper.insertSelective(riskDO);
+                }
             }
         } catch (AllException e) {
             log.error(e.getMsg());

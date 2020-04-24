@@ -127,6 +127,11 @@ public class AreaInfoResponse implements Comparable {
                 else if (this.todayConfirm.equals(a.todayConfirm)) return 0;
                 else return -1 * isUp;
             }
+            case 7: {
+                if (this.remainConfirm > a.remainConfirm) return isUp;
+                else if (this.remainConfirm.equals(a.remainConfirm)) return 0;
+                else return -1 * isUp;
+            }
         }
         return 0;
     }

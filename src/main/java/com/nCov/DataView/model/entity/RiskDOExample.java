@@ -1,6 +1,8 @@
 package com.nCov.DataView.model.entity;
 
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 public class RiskDOExample {
@@ -14,20 +16,20 @@ public class RiskDOExample {
         oredCriteria = new ArrayList<Criteria>();
     }
 
-    public String getOrderByClause() {
-        return orderByClause;
-    }
-
     public void setOrderByClause(String orderByClause) {
         this.orderByClause = orderByClause;
     }
 
-    public boolean isDistinct() {
-        return distinct;
+    public String getOrderByClause() {
+        return orderByClause;
     }
 
     public void setDistinct(boolean distinct) {
         this.distinct = distinct;
+    }
+
+    public boolean isDistinct() {
+        return distinct;
     }
 
     public List<Criteria> getOredCriteria() {
@@ -104,6 +106,32 @@ public class RiskDOExample {
             criteria.add(new Criterion(condition, value1, value2));
         }
 
+        protected void addCriterionForJDBCDate(String condition, Date value, String property) {
+            if (value == null) {
+                throw new RuntimeException("Value for " + property + " cannot be null");
+            }
+            addCriterion(condition, new java.sql.Date(value.getTime()), property);
+        }
+
+        protected void addCriterionForJDBCDate(String condition, List<Date> values, String property) {
+            if (values == null || values.size() == 0) {
+                throw new RuntimeException("Value list for " + property + " cannot be null or empty");
+            }
+            List<java.sql.Date> dateList = new ArrayList<java.sql.Date>();
+            Iterator<Date> iter = values.iterator();
+            while (iter.hasNext()) {
+                dateList.add(new java.sql.Date(iter.next().getTime()));
+            }
+            addCriterion(condition, dateList, property);
+        }
+
+        protected void addCriterionForJDBCDate(String condition, Date value1, Date value2, String property) {
+            if (value1 == null || value2 == null) {
+                throw new RuntimeException("Between values for " + property + " cannot be null");
+            }
+            addCriterion(condition, new java.sql.Date(value1.getTime()), new java.sql.Date(value2.getTime()), property);
+        }
+
         public Criteria andIdIsNull() {
             addCriterion("id is null");
             return (Criteria) this;
@@ -164,63 +192,143 @@ public class RiskDOExample {
             return (Criteria) this;
         }
 
-        public Criteria andPathIdIsNull() {
-            addCriterion("path_id is null");
+        public Criteria andStartAddressIsNull() {
+            addCriterion("start_address is null");
             return (Criteria) this;
         }
 
-        public Criteria andPathIdIsNotNull() {
-            addCriterion("path_id is not null");
+        public Criteria andStartAddressIsNotNull() {
+            addCriterion("start_address is not null");
             return (Criteria) this;
         }
 
-        public Criteria andPathIdEqualTo(Integer value) {
-            addCriterion("path_id =", value, "pathId");
+        public Criteria andStartAddressEqualTo(String value) {
+            addCriterion("start_address =", value, "startAddress");
             return (Criteria) this;
         }
 
-        public Criteria andPathIdNotEqualTo(Integer value) {
-            addCriterion("path_id <>", value, "pathId");
+        public Criteria andStartAddressNotEqualTo(String value) {
+            addCriterion("start_address <>", value, "startAddress");
             return (Criteria) this;
         }
 
-        public Criteria andPathIdGreaterThan(Integer value) {
-            addCriterion("path_id >", value, "pathId");
+        public Criteria andStartAddressGreaterThan(String value) {
+            addCriterion("start_address >", value, "startAddress");
             return (Criteria) this;
         }
 
-        public Criteria andPathIdGreaterThanOrEqualTo(Integer value) {
-            addCriterion("path_id >=", value, "pathId");
+        public Criteria andStartAddressGreaterThanOrEqualTo(String value) {
+            addCriterion("start_address >=", value, "startAddress");
             return (Criteria) this;
         }
 
-        public Criteria andPathIdLessThan(Integer value) {
-            addCriterion("path_id <", value, "pathId");
+        public Criteria andStartAddressLessThan(String value) {
+            addCriterion("start_address <", value, "startAddress");
             return (Criteria) this;
         }
 
-        public Criteria andPathIdLessThanOrEqualTo(Integer value) {
-            addCriterion("path_id <=", value, "pathId");
+        public Criteria andStartAddressLessThanOrEqualTo(String value) {
+            addCriterion("start_address <=", value, "startAddress");
             return (Criteria) this;
         }
 
-        public Criteria andPathIdIn(List<Integer> values) {
-            addCriterion("path_id in", values, "pathId");
+        public Criteria andStartAddressLike(String value) {
+            addCriterion("start_address like", value, "startAddress");
             return (Criteria) this;
         }
 
-        public Criteria andPathIdNotIn(List<Integer> values) {
-            addCriterion("path_id not in", values, "pathId");
+        public Criteria andStartAddressNotLike(String value) {
+            addCriterion("start_address not like", value, "startAddress");
             return (Criteria) this;
         }
 
-        public Criteria andPathIdBetween(Integer value1, Integer value2) {
-            addCriterion("path_id between", value1, value2, "pathId");
+        public Criteria andStartAddressIn(List<String> values) {
+            addCriterion("start_address in", values, "startAddress");
             return (Criteria) this;
         }
 
-        public Criteria andPathIdNotBetween(Integer value1, Integer value2) {
-            addCriterion("path_id not between", value1, value2, "pathId");
+        public Criteria andStartAddressNotIn(List<String> values) {
+            addCriterion("start_address not in", values, "startAddress");
+            return (Criteria) this;
+        }
+
+        public Criteria andStartAddressBetween(String value1, String value2) {
+            addCriterion("start_address between", value1, value2, "startAddress");
+            return (Criteria) this;
+        }
+
+        public Criteria andStartAddressNotBetween(String value1, String value2) {
+            addCriterion("start_address not between", value1, value2, "startAddress");
+            return (Criteria) this;
+        }
+
+        public Criteria andEndAddressIsNull() {
+            addCriterion("end_address is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andEndAddressIsNotNull() {
+            addCriterion("end_address is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andEndAddressEqualTo(String value) {
+            addCriterion("end_address =", value, "endAddress");
+            return (Criteria) this;
+        }
+
+        public Criteria andEndAddressNotEqualTo(String value) {
+            addCriterion("end_address <>", value, "endAddress");
+            return (Criteria) this;
+        }
+
+        public Criteria andEndAddressGreaterThan(String value) {
+            addCriterion("end_address >", value, "endAddress");
+            return (Criteria) this;
+        }
+
+        public Criteria andEndAddressGreaterThanOrEqualTo(String value) {
+            addCriterion("end_address >=", value, "endAddress");
+            return (Criteria) this;
+        }
+
+        public Criteria andEndAddressLessThan(String value) {
+            addCriterion("end_address <", value, "endAddress");
+            return (Criteria) this;
+        }
+
+        public Criteria andEndAddressLessThanOrEqualTo(String value) {
+            addCriterion("end_address <=", value, "endAddress");
+            return (Criteria) this;
+        }
+
+        public Criteria andEndAddressLike(String value) {
+            addCriterion("end_address like", value, "endAddress");
+            return (Criteria) this;
+        }
+
+        public Criteria andEndAddressNotLike(String value) {
+            addCriterion("end_address not like", value, "endAddress");
+            return (Criteria) this;
+        }
+
+        public Criteria andEndAddressIn(List<String> values) {
+            addCriterion("end_address in", values, "endAddress");
+            return (Criteria) this;
+        }
+
+        public Criteria andEndAddressNotIn(List<String> values) {
+            addCriterion("end_address not in", values, "endAddress");
+            return (Criteria) this;
+        }
+
+        public Criteria andEndAddressBetween(String value1, String value2) {
+            addCriterion("end_address between", value1, value2, "endAddress");
+            return (Criteria) this;
+        }
+
+        public Criteria andEndAddressNotBetween(String value1, String value2) {
+            addCriterion("end_address not between", value1, value2, "endAddress");
             return (Criteria) this;
         }
 
@@ -294,63 +402,183 @@ public class RiskDOExample {
             return (Criteria) this;
         }
 
-        public Criteria andFinalScoreIsNull() {
-            addCriterion("final_score is null");
+        public Criteria andSumScoreIsNull() {
+            addCriterion("sum_score is null");
             return (Criteria) this;
         }
 
-        public Criteria andFinalScoreIsNotNull() {
-            addCriterion("final_score is not null");
+        public Criteria andSumScoreIsNotNull() {
+            addCriterion("sum_score is not null");
             return (Criteria) this;
         }
 
-        public Criteria andFinalScoreEqualTo(Double value) {
-            addCriterion("final_score =", value, "finalScore");
+        public Criteria andSumScoreEqualTo(Double value) {
+            addCriterion("sum_score =", value, "sumScore");
             return (Criteria) this;
         }
 
-        public Criteria andFinalScoreNotEqualTo(Double value) {
-            addCriterion("final_score <>", value, "finalScore");
+        public Criteria andSumScoreNotEqualTo(Double value) {
+            addCriterion("sum_score <>", value, "sumScore");
             return (Criteria) this;
         }
 
-        public Criteria andFinalScoreGreaterThan(Double value) {
-            addCriterion("final_score >", value, "finalScore");
+        public Criteria andSumScoreGreaterThan(Double value) {
+            addCriterion("sum_score >", value, "sumScore");
             return (Criteria) this;
         }
 
-        public Criteria andFinalScoreGreaterThanOrEqualTo(Double value) {
-            addCriterion("final_score >=", value, "finalScore");
+        public Criteria andSumScoreGreaterThanOrEqualTo(Double value) {
+            addCriterion("sum_score >=", value, "sumScore");
             return (Criteria) this;
         }
 
-        public Criteria andFinalScoreLessThan(Double value) {
-            addCriterion("final_score <", value, "finalScore");
+        public Criteria andSumScoreLessThan(Double value) {
+            addCriterion("sum_score <", value, "sumScore");
             return (Criteria) this;
         }
 
-        public Criteria andFinalScoreLessThanOrEqualTo(Double value) {
-            addCriterion("final_score <=", value, "finalScore");
+        public Criteria andSumScoreLessThanOrEqualTo(Double value) {
+            addCriterion("sum_score <=", value, "sumScore");
             return (Criteria) this;
         }
 
-        public Criteria andFinalScoreIn(List<Double> values) {
-            addCriterion("final_score in", values, "finalScore");
+        public Criteria andSumScoreIn(List<Double> values) {
+            addCriterion("sum_score in", values, "sumScore");
             return (Criteria) this;
         }
 
-        public Criteria andFinalScoreNotIn(List<Double> values) {
-            addCriterion("final_score not in", values, "finalScore");
+        public Criteria andSumScoreNotIn(List<Double> values) {
+            addCriterion("sum_score not in", values, "sumScore");
             return (Criteria) this;
         }
 
-        public Criteria andFinalScoreBetween(Double value1, Double value2) {
-            addCriterion("final_score between", value1, value2, "finalScore");
+        public Criteria andSumScoreBetween(Double value1, Double value2) {
+            addCriterion("sum_score between", value1, value2, "sumScore");
             return (Criteria) this;
         }
 
-        public Criteria andFinalScoreNotBetween(Double value1, Double value2) {
-            addCriterion("final_score not between", value1, value2, "finalScore");
+        public Criteria andSumScoreNotBetween(Double value1, Double value2) {
+            addCriterion("sum_score not between", value1, value2, "sumScore");
+            return (Criteria) this;
+        }
+
+        public Criteria andTranTypeIsNull() {
+            addCriterion("tran_type is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andTranTypeIsNotNull() {
+            addCriterion("tran_type is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andTranTypeEqualTo(Integer value) {
+            addCriterion("tran_type =", value, "tranType");
+            return (Criteria) this;
+        }
+
+        public Criteria andTranTypeNotEqualTo(Integer value) {
+            addCriterion("tran_type <>", value, "tranType");
+            return (Criteria) this;
+        }
+
+        public Criteria andTranTypeGreaterThan(Integer value) {
+            addCriterion("tran_type >", value, "tranType");
+            return (Criteria) this;
+        }
+
+        public Criteria andTranTypeGreaterThanOrEqualTo(Integer value) {
+            addCriterion("tran_type >=", value, "tranType");
+            return (Criteria) this;
+        }
+
+        public Criteria andTranTypeLessThan(Integer value) {
+            addCriterion("tran_type <", value, "tranType");
+            return (Criteria) this;
+        }
+
+        public Criteria andTranTypeLessThanOrEqualTo(Integer value) {
+            addCriterion("tran_type <=", value, "tranType");
+            return (Criteria) this;
+        }
+
+        public Criteria andTranTypeIn(List<Integer> values) {
+            addCriterion("tran_type in", values, "tranType");
+            return (Criteria) this;
+        }
+
+        public Criteria andTranTypeNotIn(List<Integer> values) {
+            addCriterion("tran_type not in", values, "tranType");
+            return (Criteria) this;
+        }
+
+        public Criteria andTranTypeBetween(Integer value1, Integer value2) {
+            addCriterion("tran_type between", value1, value2, "tranType");
+            return (Criteria) this;
+        }
+
+        public Criteria andTranTypeNotBetween(Integer value1, Integer value2) {
+            addCriterion("tran_type not between", value1, value2, "tranType");
+            return (Criteria) this;
+        }
+
+        public Criteria andLatestUpdateIsNull() {
+            addCriterion("latest_update is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andLatestUpdateIsNotNull() {
+            addCriterion("latest_update is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andLatestUpdateEqualTo(Date value) {
+            addCriterionForJDBCDate("latest_update =", value, "latestUpdate");
+            return (Criteria) this;
+        }
+
+        public Criteria andLatestUpdateNotEqualTo(Date value) {
+            addCriterionForJDBCDate("latest_update <>", value, "latestUpdate");
+            return (Criteria) this;
+        }
+
+        public Criteria andLatestUpdateGreaterThan(Date value) {
+            addCriterionForJDBCDate("latest_update >", value, "latestUpdate");
+            return (Criteria) this;
+        }
+
+        public Criteria andLatestUpdateGreaterThanOrEqualTo(Date value) {
+            addCriterionForJDBCDate("latest_update >=", value, "latestUpdate");
+            return (Criteria) this;
+        }
+
+        public Criteria andLatestUpdateLessThan(Date value) {
+            addCriterionForJDBCDate("latest_update <", value, "latestUpdate");
+            return (Criteria) this;
+        }
+
+        public Criteria andLatestUpdateLessThanOrEqualTo(Date value) {
+            addCriterionForJDBCDate("latest_update <=", value, "latestUpdate");
+            return (Criteria) this;
+        }
+
+        public Criteria andLatestUpdateIn(List<Date> values) {
+            addCriterionForJDBCDate("latest_update in", values, "latestUpdate");
+            return (Criteria) this;
+        }
+
+        public Criteria andLatestUpdateNotIn(List<Date> values) {
+            addCriterionForJDBCDate("latest_update not in", values, "latestUpdate");
+            return (Criteria) this;
+        }
+
+        public Criteria andLatestUpdateBetween(Date value1, Date value2) {
+            addCriterionForJDBCDate("latest_update between", value1, value2, "latestUpdate");
+            return (Criteria) this;
+        }
+
+        public Criteria andLatestUpdateNotBetween(Date value1, Date value2) {
+            addCriterionForJDBCDate("latest_update not between", value1, value2, "latestUpdate");
             return (Criteria) this;
         }
     }
@@ -378,6 +606,38 @@ public class RiskDOExample {
         private boolean listValue;
 
         private String typeHandler;
+
+        public String getCondition() {
+            return condition;
+        }
+
+        public Object getValue() {
+            return value;
+        }
+
+        public Object getSecondValue() {
+            return secondValue;
+        }
+
+        public boolean isNoValue() {
+            return noValue;
+        }
+
+        public boolean isSingleValue() {
+            return singleValue;
+        }
+
+        public boolean isBetweenValue() {
+            return betweenValue;
+        }
+
+        public boolean isListValue() {
+            return listValue;
+        }
+
+        public String getTypeHandler() {
+            return typeHandler;
+        }
 
         protected Criterion(String condition) {
             super();
@@ -413,38 +673,6 @@ public class RiskDOExample {
 
         protected Criterion(String condition, Object value, Object secondValue) {
             this(condition, value, secondValue, null);
-        }
-
-        public String getCondition() {
-            return condition;
-        }
-
-        public Object getValue() {
-            return value;
-        }
-
-        public Object getSecondValue() {
-            return secondValue;
-        }
-
-        public boolean isNoValue() {
-            return noValue;
-        }
-
-        public boolean isSingleValue() {
-            return singleValue;
-        }
-
-        public boolean isBetweenValue() {
-            return betweenValue;
-        }
-
-        public boolean isListValue() {
-            return listValue;
-        }
-
-        public String getTypeHandler() {
-            return typeHandler;
         }
     }
 }

@@ -3,9 +3,12 @@
 <mapper namespace="com.nCov.DataView.dao.RiskDOMapper">
     <resultMap id="BaseResultMap" type="com.nCov.DataView.model.entity.RiskDO">
         <id column="id" property="id" jdbcType="INTEGER"/>
-        <result column="path_id" property="pathId" jdbcType="INTEGER"/>
+        <result column="start_address" property="startAddress" jdbcType="VARCHAR"/>
+        <result column="end_address" property="endAddress" jdbcType="VARCHAR"/>
         <result column="area_name" property="areaName" jdbcType="VARCHAR"/>
-        <result column="final_score" property="finalScore" jdbcType="DOUBLE"/>
+        <result column="sum_score" property="sumScore" jdbcType="DOUBLE"/>
+        <result column="tran_type" property="tranType" jdbcType="INTEGER"/>
+        <result column="latest_update" property="latestUpdate" jdbcType="DATE"/>
     </resultMap>
     <sql id="Example_Where_Clause">
         <where>
@@ -68,7 +71,7 @@
         </where>
     </sql>
     <sql id="Base_Column_List">
-    id, path_id, area_name, final_score
+    id, start_address, end_address, area_name, sum_score, tran_type, latest_update
   </sql>
     <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.nCov.DataView.model.entity.RiskDOExample">
         select
@@ -102,10 +105,12 @@
         </if>
     </delete>
     <insert id="insert" parameterType="com.nCov.DataView.model.entity.RiskDO">
-    insert into risk (id, path_id, area_name, 
-      final_score)
-    values (#{id,jdbcType=INTEGER}, #{pathId,jdbcType=INTEGER}, #{areaName,jdbcType=VARCHAR}, 
-      #{finalScore,jdbcType=DOUBLE})
+    insert into risk (id, start_address, end_address, 
+      area_name, sum_score, tran_type, 
+      latest_update)
+    values (#{id,jdbcType=INTEGER}, #{startAddress,jdbcType=VARCHAR}, #{endAddress,jdbcType=VARCHAR}, 
+      #{areaName,jdbcType=VARCHAR}, #{sumScore,jdbcType=DOUBLE}, #{tranType,jdbcType=INTEGER}, 
+      #{latestUpdate,jdbcType=DATE})
   </insert>
     <insert id="insertSelective" parameterType="com.nCov.DataView.model.entity.RiskDO">
         insert into risk
@@ -113,28 +118,46 @@
             <if test="id != null">
                 id,
             </if>
-            <if test="pathId != null">
-                path_id,
+            <if test="startAddress != null">
+                start_address,
+            </if>
+            <if test="endAddress != null">
+                end_address,
             </if>
             <if test="areaName != null">
                 area_name,
             </if>
-            <if test="finalScore != null">
-                final_score,
+            <if test="sumScore != null">
+                sum_score,
+            </if>
+            <if test="tranType != null">
+                tran_type,
+            </if>
+            <if test="latestUpdate != null">
+                latest_update,
             </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">
                 #{id,jdbcType=INTEGER},
             </if>
-            <if test="pathId != null">
-                #{pathId,jdbcType=INTEGER},
+            <if test="startAddress != null">
+                #{startAddress,jdbcType=VARCHAR},
+            </if>
+            <if test="endAddress != null">
+                #{endAddress,jdbcType=VARCHAR},
             </if>
             <if test="areaName != null">
                 #{areaName,jdbcType=VARCHAR},
             </if>
-            <if test="finalScore != null">
-                #{finalScore,jdbcType=DOUBLE},
+            <if test="sumScore != null">
+                #{sumScore,jdbcType=DOUBLE},
+            </if>
+            <if test="tranType != null">
+                #{tranType,jdbcType=INTEGER},
+            </if>
+            <if test="latestUpdate != null">
+                #{latestUpdate,jdbcType=DATE},
             </if>
         </trim>
     </insert>
@@ -151,14 +174,23 @@
             <if test="record.id != null">
                 id = #{record.id,jdbcType=INTEGER},
             </if>
-            <if test="record.pathId != null">
-                path_id = #{record.pathId,jdbcType=INTEGER},
+            <if test="record.startAddress != null">
+                start_address = #{record.startAddress,jdbcType=VARCHAR},
+            </if>
+            <if test="record.endAddress != null">
+                end_address = #{record.endAddress,jdbcType=VARCHAR},
             </if>
             <if test="record.areaName != null">
                 area_name = #{record.areaName,jdbcType=VARCHAR},
             </if>
-            <if test="record.finalScore != null">
-                final_score = #{record.finalScore,jdbcType=DOUBLE},
+            <if test="record.sumScore != null">
+                sum_score = #{record.sumScore,jdbcType=DOUBLE},
+            </if>
+            <if test="record.tranType != null">
+                tran_type = #{record.tranType,jdbcType=INTEGER},
+            </if>
+            <if test="record.latestUpdate != null">
+                latest_update = #{record.latestUpdate,jdbcType=DATE},
             </if>
         </set>
         <if test="_parameter != null">
@@ -168,9 +200,12 @@
     <update id="updateByExample" parameterType="map">
         update risk
         set id = #{record.id,jdbcType=INTEGER},
-        path_id = #{record.pathId,jdbcType=INTEGER},
+        start_address = #{record.startAddress,jdbcType=VARCHAR},
+        end_address = #{record.endAddress,jdbcType=VARCHAR},
         area_name = #{record.areaName,jdbcType=VARCHAR},
-        final_score = #{record.finalScore,jdbcType=DOUBLE}
+        sum_score = #{record.sumScore,jdbcType=DOUBLE},
+        tran_type = #{record.tranType,jdbcType=INTEGER},
+        latest_update = #{record.latestUpdate,jdbcType=DATE}
         <if test="_parameter != null">
             <include refid="Update_By_Example_Where_Clause"/>
         </if>
@@ -178,23 +213,35 @@
     <update id="updateByPrimaryKeySelective" parameterType="com.nCov.DataView.model.entity.RiskDO">
         update risk
         <set>
-            <if test="pathId != null">
-                path_id = #{pathId,jdbcType=INTEGER},
+            <if test="startAddress != null">
+                start_address = #{startAddress,jdbcType=VARCHAR},
+            </if>
+            <if test="endAddress != null">
+                end_address = #{endAddress,jdbcType=VARCHAR},
             </if>
             <if test="areaName != null">
                 area_name = #{areaName,jdbcType=VARCHAR},
             </if>
-            <if test="finalScore != null">
-                final_score = #{finalScore,jdbcType=DOUBLE},
+            <if test="sumScore != null">
+                sum_score = #{sumScore,jdbcType=DOUBLE},
+            </if>
+            <if test="tranType != null">
+                tran_type = #{tranType,jdbcType=INTEGER},
+            </if>
+            <if test="latestUpdate != null">
+                latest_update = #{latestUpdate,jdbcType=DATE},
             </if>
         </set>
         where id = #{id,jdbcType=INTEGER}
     </update>
     <update id="updateByPrimaryKey" parameterType="com.nCov.DataView.model.entity.RiskDO">
     update risk
-    set path_id = #{pathId,jdbcType=INTEGER},
+    set start_address = #{startAddress,jdbcType=VARCHAR},
+      end_address = #{endAddress,jdbcType=VARCHAR},
       area_name = #{areaName,jdbcType=VARCHAR},
-      final_score = #{finalScore,jdbcType=DOUBLE}
+      sum_score = #{sumScore,jdbcType=DOUBLE},
+      tran_type = #{tranType,jdbcType=INTEGER},
+      latest_update = #{latestUpdate,jdbcType=DATE}
     where id = #{id,jdbcType=INTEGER}
   </update>
 </mapper>
