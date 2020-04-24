@@ -1090,7 +1090,7 @@ public class EpidemicServiceImpl implements EpidemicService {
             riskDOExample.setOrderByClause("sum_score DESC, id ASC limit " + pathQueryRequest.getIndex() + ", " + pathQueryRequest.getNum());
             List<RiskDO> riskDOList = riskDOMapper.selectByExample(riskDOExample);
             if (riskDOList == null || riskDOList.isEmpty()) {
-                throw new AllException(EmAllException.DATABASE_ERROR, "占无数据");
+                throw new AllException(EmAllException.DATABASE_ERROR, "暂无数据!");
             }
             PathQueryListResponse pathQueryListResponse = new PathQueryListResponse();
             for (RiskDO riskDO : riskDOList) {
