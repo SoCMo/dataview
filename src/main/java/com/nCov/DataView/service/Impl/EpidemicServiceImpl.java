@@ -153,26 +153,72 @@ public class EpidemicServiceImpl implements EpidemicService {
                 throw new AllException(EmAllException.DATABASE_ERROR, "日期数据不存在或传入参数错误");
             }
 
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(TimeTool.stringToDay(allAreaRequest.getDate()));
+            calendar.add(Calendar.DATE, -1);
+            Map<String, CovData> covDataMapYD = covDataMapper.getInfoByDate(TimeTool.timeToDaySy(calendar.getTime()));
+            if (covDataMap.isEmpty()) {
+                throw new AllException(EmAllException.DATABASE_ERROR, "日期数据不存在或传入参数错误");
+            }
+
             List<AreaInfoResponse> areaInfoResponseList = new ArrayList<>();
             cityMap.forEach((key, value) -> {
                 AreaInfoResponse areaInfoResponse = new AreaInfoResponse();
-                if (covDataMap.get(key) == null) {
-                    //模糊搜索
-                    CovData covData = null;
-                    for (CovData travel : covDataMap.values()) {
-                        if (travel.getAreaname().contains(key))
-                            covData = travel;
+                CovData covData = covDataMap.get(fixTool.areaUni(key));
+                for (int i = 0; covData == null; i++) {
+                    switch (i) {
+                        case 0: {
+                            covData = covDataMap.get(key);
+                            break;
+                        }
+                        case 1: {
+                            for (CovData covDataTemp : covDataMap.values()) {
+                                if (covDataTemp.getAreaname().contains(fixTool.areaUni(key))) {
+                                    covData = covDataTemp;
+                                    break;
+                                }
+                            }
+                            break;
+                        }
+                        default:
+                            return;
                     }
-                    if (covData == null) return;
-                    else {
-                        BeanUtils.copyProperties(covData, areaInfoResponse);
-                        areaInfoResponse.setAreaname(value.getName());
+                }
+                BeanUtils.copyProperties(covData, areaInfoResponse);
+                areaInfoResponse.setAreaname(value.getName());
+
+                CovData covDataYD = covDataMapYD.get(fixTool.areaUni(key));
+                for (int i = 0; covDataYD == null; i++) {
+                    switch (i) {
+                        case 0: {
+                            covDataYD = covDataMapYD.get(key);
+                            break;
+                        }
+                        case 1: {
+                            for (CovData covDataTemp : covDataMapYD.values()) {
+                                if (covDataTemp.getAreaname().contains(fixTool.areaUni(key))) {
+                                    covDataYD = covDataTemp;
+                                    break;
+                                }
+                            }
+                            break;
+                        }
+                        case 2: {
+                            try {
+                                covDataYD = fixTool.fixCovDate(TimeTool.timeToDaySy(calendar.getTime()), covData.getAreaname());
+                            } catch (ParseException e) {
+                                log.error(e.getLocalizedMessage());
+                                return;
+                            }
+                            break;
+                        }
+                        default:
+                            return;
                     }
-                } else {
-                    BeanUtils.copyProperties(covDataMap.get(key), areaInfoResponse);
-                    areaInfoResponse.setAreaname(value.getName());
                 }
                 areaInfoResponse.Calculation(value.getPopulation());
+                areaInfoResponse.setTodayConfirm(Math.max(covData.getTotalconfirm() - covDataYD.getTotalconfirm(), 0));
+
                 areaInfoResponseList.add(areaInfoResponse);
             });
             AreaInfoResponse.init(Integer.valueOf(allAreaRequest.getIsUp()), allAreaRequest.getOrder());

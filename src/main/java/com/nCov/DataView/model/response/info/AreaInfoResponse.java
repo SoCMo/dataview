@@ -27,9 +27,14 @@ public class AreaInfoResponse implements Comparable {
 
     private static Integer order;
     private static Integer isUp;
+
     private String cureRate;
+
     private String mortality;
+
     private String confirmInMillion;
+
+    private Integer todayConfirm;
 
     /**
      * @Description: 初始化排序变量
@@ -117,6 +122,11 @@ public class AreaInfoResponse implements Comparable {
                 Double tempA = Double.valueOf(this.confirmInMillion);
                 Double tempB = Double.valueOf(a.confirmInMillion);
                 return isUp * tempA.compareTo(tempB);
+            case 6: {
+                if (this.todayConfirm > a.todayConfirm) return isUp;
+                else if (this.todayConfirm.equals(a.todayConfirm)) return 0;
+                else return -1 * isUp;
+            }
         }
         return 0;
     }
