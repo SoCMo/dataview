@@ -1085,6 +1085,9 @@ public class EpidemicServiceImpl implements EpidemicService {
     @Override
     public Result pathQuery(PathQueryRequest pathQueryRequest) {
         try {
+            if (!pathQueryRequest.getProvince().contains("上海")) {
+                pathQueryRequest.setProvince(fixTool.provinceUni(pathQueryRequest.getProvince()));
+            }
             RiskDOExample riskDOExample = new RiskDOExample();
             riskDOExample.createCriteria().andAreaNameEqualTo(pathQueryRequest.getProvince());
             riskDOExample.setOrderByClause("sum_score DESC, id ASC limit " + pathQueryRequest.getIndex() + ", " + pathQueryRequest.getNum());
@@ -1105,6 +1108,7 @@ public class EpidemicServiceImpl implements EpidemicService {
             RiskDOExample countDOExample = new RiskDOExample();
             countDOExample.createCriteria().andAreaNameEqualTo(pathQueryRequest.getProvince());
             pathQueryListResponse.setNum(riskDOMapper.countByExample(countDOExample));
+            pathQueryListResponse.setAverage(riskDOMapper.sumRisk(pathQueryRequest.getProvince()) / pathQueryListResponse.getNum());
             return ResultTool.success(pathQueryListResponse);
         } catch (AllException e) {
             log.error(e.getMsg());

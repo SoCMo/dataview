@@ -17,6 +17,8 @@ public class PathQueryListResponse {
 
     private int num;
 
+    private double average;
+
     public PathQueryListResponse() {
         this.pathQueryResponseList = new ArrayList<>();
     }

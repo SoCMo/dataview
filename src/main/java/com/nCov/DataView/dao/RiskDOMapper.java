@@ -3,6 +3,7 @@ package com.nCov.DataView.dao;
 import com.nCov.DataView.model.entity.RiskDO;
 import com.nCov.DataView.model.entity.RiskDOExample;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
 
@@ -28,4 +29,10 @@ public interface RiskDOMapper {
     int updateByPrimaryKeySelective(RiskDO record);
 
     int updateByPrimaryKey(RiskDO record);
+
+    @Select({"<script>",
+            "SELECT SUM(sum_score) FROM risk",
+            "WHERE area_name = '${areaName}'",
+            "</script>"})
+    double sumRisk(@Param("areaName") String areaName);
 }
