@@ -36,6 +36,8 @@ public class AreaInfoResponse implements Comparable {
 
     private Integer todayConfirm;
 
+    private Integer abroadInput;
+
     /**
      * @Description: 初始化排序变量
      * @Param: []
@@ -130,6 +132,11 @@ public class AreaInfoResponse implements Comparable {
             case 7: {
                 if (this.remainConfirm > a.remainConfirm) return isUp;
                 else if (this.remainConfirm.equals(a.remainConfirm)) return 0;
+                else return -1 * isUp;
+            }
+            case 8: {
+                if (this.abroadInput > a.abroadInput) return isUp;
+                else if (this.abroadInput.equals(a.abroadInput)) return 0;
                 else return -1 * isUp;
             }
         }

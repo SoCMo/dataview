@@ -18,7 +18,7 @@ public class AllAreaRequest {
     @NotBlank(message = "日期不能为空")
     private String date;
 
-    @Range(min = 0, max = 7, message = "排列方式错误")
+    @Range(min = 0, max = 8, message = "排列方式错误")
     @NotNull(message = "排序类型不能为空")
     private Integer order;
 

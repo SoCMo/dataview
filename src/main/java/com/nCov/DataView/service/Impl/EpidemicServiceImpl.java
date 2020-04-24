@@ -156,6 +156,11 @@ public class EpidemicServiceImpl implements EpidemicService {
                 throw new AllException(EmAllException.DATABASE_ERROR, "日期数据不存在或传入参数错误");
             }
 
+            AbroadInputDOExample abroadInputDOExample = new AbroadInputDOExample();
+            abroadInputDOExample.createCriteria().andDateEqualTo(TimeTool.stringToDay(allAreaRequest.getDate()));
+            List<AbroadInputDO> abroadInputDOList = abroadInputDOMapper.selectByExample(abroadInputDOExample);
+            abroadInputDOExample.clear();
+
             Calendar calendar = Calendar.getInstance();
             calendar.setTime(TimeTool.stringToDay(allAreaRequest.getDate()));
             calendar.add(Calendar.DATE, -1);
@@ -163,6 +168,8 @@ public class EpidemicServiceImpl implements EpidemicService {
             if (covDataMap.isEmpty()) {
                 throw new AllException(EmAllException.DATABASE_ERROR, "日期数据不存在或传入参数错误");
             }
+            abroadInputDOExample.createCriteria().andDateEqualTo(calendar.getTime());
+            List<AbroadInputDO> abroadInputDOListYD = abroadInputDOMapper.selectByExample(abroadInputDOExample);
 
             List<AreaInfoResponse> areaInfoResponseList = new ArrayList<>();
             cityMap.forEach((key, value) -> {
@@ -221,6 +228,26 @@ public class EpidemicServiceImpl implements EpidemicService {
                 }
                 areaInfoResponse.Calculation(value.getPopulation());
                 areaInfoResponse.setTodayConfirm(Math.max(covData.getTotalconfirm() - covDataYD.getTotalconfirm(), 0));
+
+                if (abroadInputDOList.isEmpty() || abroadInputDOListYD.isEmpty()) {
+                    areaInfoResponse.setAbroadInput(0);
+                } else {
+                    AbroadInputDO abroadInputDO = null;
+                    AbroadInputDO abroadInputDOYD = null;
+                    for (AbroadInputDO abroadInputDOTemp : abroadInputDOList) {
+                        if (abroadInputDOTemp.getProvincename().contains(fixTool.provinceUni(covData.getProvincename()))) {
+                            abroadInputDO = abroadInputDOTemp;
+                            break;
+                        }
+                    }
+                    for (AbroadInputDO abroadInputDOTemp : abroadInputDOListYD) {
+                        if (abroadInputDOTemp.getProvincename().contains(fixTool.provinceUni(covData.getProvincename()))) {
+                            abroadInputDOYD = abroadInputDOTemp;
+                            break;
+                        }
+                    }
+                    areaInfoResponse.setAbroadInput(Math.max((abroadInputDO == null ? 0 : abroadInputDO.getThenumber() - (abroadInputDOYD == null ? 0 : abroadInputDOYD.getThenumber())), 0));
+                }
 
                 areaInfoResponseList.add(areaInfoResponse);
             });
