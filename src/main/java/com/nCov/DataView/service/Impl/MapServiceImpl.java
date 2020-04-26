@@ -3,12 +3,14 @@ package com.nCov.DataView.service.Impl;
 import com.nCov.DataView.dao.AbroadInputDOMapper;
 import com.nCov.DataView.dao.AreaDOMapper;
 import com.nCov.DataView.dao.CovDataMapper;
+import com.nCov.DataView.dao.StatisticDOMapper;
 import com.nCov.DataView.exception.AllException;
 import com.nCov.DataView.exception.EmAllException;
 import com.nCov.DataView.model.entity.*;
 import com.nCov.DataView.model.response.Result;
 import com.nCov.DataView.model.response.info.AreaInfo;
 import com.nCov.DataView.model.response.info.DayInfoResponse;
+import com.nCov.DataView.model.response.info.StatisticResponse;
 import com.nCov.DataView.service.MapService;
 import com.nCov.DataView.tools.FixTool;
 import com.nCov.DataView.tools.NumberTool;
@@ -34,6 +36,9 @@ public class MapServiceImpl implements MapService {
 
     @Resource
     private AbroadInputDOMapper abroadInputDOMapper;
+
+    @Resource
+    private StatisticDOMapper statisticDOMapper;
 
     @Resource
     private FixTool fixTool;
@@ -193,5 +198,37 @@ public class MapServiceImpl implements MapService {
             log.error(e.getMessage());
             return ResultTool.error(500, e.getMessage());
         }
+    }
+
+    /**
+     * @Description: 每日获取数据量
+     * @Param: []
+     * @return: com.nCov.DataView.model.response.Result
+     * @Author: SoCMo
+     * @Date: 2020/4/26
+     */
+    @Override
+    public Result statistic() {
+        StatisticResponse statisticResponse = new StatisticResponse();
+        StatisticDOExample statisticDOExample = new StatisticDOExample();
+        statisticDOExample.createCriteria().andUpdateTimeEqualTo(TimeTool.todayCreate().getTime());
+        List<StatisticDO> statisticDOList = statisticDOMapper.selectByExample(statisticDOExample);
+        for (StatisticDO statisticDO : statisticDOList) {
+            if (statisticDO.getName().equals("covData")) {
+                statisticResponse.setCovData(statisticDO.getValue());
+            } else if (statisticDO.getName().equals("abroadInput")) {
+                statisticResponse.setAbroadInput(statisticDO.getValue());
+            }
+        }
+
+        if (statisticResponse.getAbroadInput() == null) {
+            statisticResponse.setAbroadInput(0);
+        }
+        if (statisticResponse.getCovData() == null) {
+            statisticResponse.setCovData(0);
+        }
+
+        statisticResponse.setSumNumber(statisticResponse.getAbroadInput() + statisticResponse.getCovData());
+        return ResultTool.success(statisticResponse);
     }
 }

@@ -37,4 +37,16 @@ public class MapController {
     public Result dateInfo(@Param("date") String date) {
         return mapService.dateInfo(date);
     }
+
+    /**
+     * @Description: 统计数据
+     * @Param: []
+     * @return: com.nCov.DataView.model.response.Result
+     * @Author: SoCMo
+     * @Date: 2020/4/26
+     */
+    @GetMapping("/statistic")
+    public Result statistic() {
+        return mapService.statistic();
+    }
 }

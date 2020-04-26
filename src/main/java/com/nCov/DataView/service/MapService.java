@@ -17,4 +17,13 @@ public interface MapService {
      * @Date: 2020/2/28
      */
     public Result dateInfo(String date);
+
+    /**
+     * @Description: 每日获取数据量
+     * @Param: []
+     * @return: com.nCov.DataView.model.response.Result
+     * @Author: SoCMo
+     * @Date: 2020/4/26
+     */
+    public Result statistic();
 }
