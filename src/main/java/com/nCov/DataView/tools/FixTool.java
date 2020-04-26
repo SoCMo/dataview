@@ -3,15 +3,9 @@ package com.nCov.DataView.tools;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.nCov.DataView.dao.AreaDOMapper;
-import com.nCov.DataView.dao.CovDataMapper;
-import com.nCov.DataView.dao.PassInfoDOMapper;
-import com.nCov.DataView.dao.PathInfoDOMapper;
+import com.nCov.DataView.dao.*;
 import com.nCov.DataView.exception.AllException;
-import com.nCov.DataView.model.entity.AreaDO;
-import com.nCov.DataView.model.entity.AreaDOExample;
-import com.nCov.DataView.model.entity.CovData;
-import com.nCov.DataView.model.entity.CovDataExample;
+import com.nCov.DataView.model.entity.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -55,6 +49,9 @@ public class FixTool {
 
     @Resource
     private BaiduTool baiduTool;
+
+    @Resource
+    private StatisticDOMapper statisticDOMapper;
 
     /**
      * @Description: 疫情数据拟合
@@ -150,6 +147,9 @@ public class FixTool {
      */
     @Scheduled(cron = "0 0 0/3 * * *")
     public void dataFix() {
+        //计数器
+        int count = 0;
+
         //api地址
         String url = "http://lab.isaaclin.cn/nCoV/api/area?latest=1";
         CloseableHttpClient httpClient = HttpClients.createDefault();
@@ -240,10 +240,30 @@ public class FixTool {
                             covDataMapper.updateByExampleSelective(covData, covDataExample);
                         }
                     }
+                    count++;
                 }
             }
-            if (!covDataListInsert.isEmpty())
+            if (!covDataListInsert.isEmpty()) {
                 covDataMapper.insertList(covDataListInsert);
+            }
+
+            StatisticDOExample statisticDOExample = new StatisticDOExample();
+            statisticDOExample.createCriteria()
+                    .andNameEqualTo("covData")
+                    .andUpdateTimeEqualTo(TimeTool.todayCreate().getTime());
+            List<StatisticDO> statisticDOList = statisticDOMapper.selectByExample(statisticDOExample);
+            if (statisticDOList.size() == 0) {
+                StatisticDO statisticDOInsert = new StatisticDO();
+                statisticDOInsert.setName("covDate");
+                statisticDOInsert.setValue(count);
+                statisticDOInsert.setUpdateTime(TimeTool.todayCreate().getTime());
+                statisticDOMapper.insertSelective(statisticDOInsert);
+            } else {
+                StatisticDO statisticDOUpdate = new StatisticDO();
+                statisticDOUpdate.setId(statisticDOList.get(0).getId());
+                statisticDOUpdate.setValue(count + statisticDOList.get(0).getValue());
+                statisticDOMapper.updateByPrimaryKeySelective(statisticDOUpdate);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
