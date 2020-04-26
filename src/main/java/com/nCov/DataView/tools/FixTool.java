@@ -254,7 +254,7 @@ public class FixTool {
             List<StatisticDO> statisticDOList = statisticDOMapper.selectByExample(statisticDOExample);
             if (statisticDOList.size() == 0) {
                 StatisticDO statisticDOInsert = new StatisticDO();
-                statisticDOInsert.setName("covDate");
+                statisticDOInsert.setName("covData");
                 statisticDOInsert.setValue(count);
                 statisticDOInsert.setUpdateTime(TimeTool.todayCreate().getTime());
                 statisticDOMapper.insertSelective(statisticDOInsert);
