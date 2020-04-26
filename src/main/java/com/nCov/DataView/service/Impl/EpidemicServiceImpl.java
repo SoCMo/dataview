@@ -1230,7 +1230,7 @@ public class EpidemicServiceImpl implements EpidemicService {
                             && assessDO.getPassOrder().equals(passInfoDOS.get(i).getOrderId())) {
                         PassInfoDO tempPassInfo = passInfoDOS.get(i++);
                         if (!flag) {
-                            routeCalReponse.setTitle(tempPassInfo.getTitle());
+                            routeCalReponse.setTitle(tempPassInfo.getTitle().equals("undefined") ? "" : tempPassInfo.getTitle());
                             routeCalReponse.setStart(tempPassInfo.getStartAddress());
                             routeCalReponse.setEnd(tempPassInfo.getEndAddress());
                             flag = true;
