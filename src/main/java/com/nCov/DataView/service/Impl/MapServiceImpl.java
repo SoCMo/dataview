@@ -98,12 +98,18 @@ public class MapServiceImpl implements MapService {
                 CovDataListFour = covDataMapper.selectByExample(covDataExample);
             }
 
-            AbroadInputDOExample abroadInputDOExample = new AbroadInputDOExample();
-            abroadInputDOExample.createCriteria()
-                    .andDateEqualTo(TimeTool.stringToDay(date));
-            List<AbroadInputDO> abroadInputDOList = abroadInputDOMapper.selectByExample(abroadInputDOExample);
-
             Map<String, AreaDO> areaDOMap = areaDOMapper.getProvinceMapString();
+
+            AbroadInputDOExample abroadInputDOExample = new AbroadInputDOExample();
+            abroadInputDOExample.createCriteria().andDateEqualTo(TimeTool.stringToDay(date));
+            List<AbroadInputDO> abroadInputDOList = abroadInputDOMapper.selectByExample(abroadInputDOExample);
+            abroadInputDOExample.clear();
+
+            Calendar calendarAb = Calendar.getInstance();
+            calendar.setTime(TimeTool.stringToDay(date));
+            calendar.add(Calendar.DATE, -1);
+            abroadInputDOExample.createCriteria().andDateEqualTo(calendar.getTime());
+            List<AbroadInputDO> abroadInputDOListYD = abroadInputDOMapper.selectByExample(abroadInputDOExample);
 
             //初始化当天返回体
             DayInfoResponse dayInfoResponse = new DayInfoResponse();
@@ -173,18 +179,24 @@ public class MapServiceImpl implements MapService {
                     areaInfo.setGrowth(Math.max(covData.getTotalconfirm() - covDataFour.getTotalconfirm(), 0));
                 }
 
-                if (abroadInputDOList.isEmpty()) {
+                if (abroadInputDOList.isEmpty() || abroadInputDOListYD.isEmpty()) {
                     areaInfo.setAbroadInput(0);
                 } else {
                     AbroadInputDO abroadInputDO = null;
-                    for (AbroadInputDO abroadInputTemp : abroadInputDOList) {
-                        if (abroadInputTemp.getProvincename().contains(fixTool.provinceUni(areaDO.getName()))) {
-                            abroadInputDO = abroadInputTemp;
+                    AbroadInputDO abroadInputDOYD = null;
+                    for (AbroadInputDO abroadInputDOTemp : abroadInputDOList) {
+                        if (abroadInputDOTemp.getProvincename().contains(fixTool.provinceUni(covData.getProvincename()))) {
+                            abroadInputDO = abroadInputDOTemp;
+                            break;
                         }
                     }
-
-                    if (abroadInputDO == null) areaInfo.setAbroadInput(0);
-                    else areaInfo.setAbroadInput(abroadInputDO.getThenumber());
+                    for (AbroadInputDO abroadInputDOTemp : abroadInputDOListYD) {
+                        if (abroadInputDOTemp.getProvincename().contains(fixTool.provinceUni(covData.getProvincename()))) {
+                            abroadInputDOYD = abroadInputDOTemp;
+                            break;
+                        }
+                    }
+                    areaInfo.setAbroadInput(Math.max((abroadInputDO == null ? 0 : abroadInputDO.getThenumber() - (abroadInputDOYD == null ? 0 : abroadInputDOYD.getThenumber())), 0));
                 }
 
                 dayInfoResponse.getProvinceInfoList().add(areaInfo);
