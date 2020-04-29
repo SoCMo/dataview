@@ -30,11 +30,11 @@ public class StudentController {
         return studentService.studentInfo(index, max);
     }
 
-//    @GetMapping("/testTool")
-//    public Result getResult(@RequestParam(value = "start") String start,
-//                            @RequestParam(value = "end") String end,
-//                            @RequestParam(value = "way") String way,
-//                            @RequestParam(value = "type") Integer type) throws AllException, IOException {
-//        return gaoDeTool.getAddressList(start, end, way, type);
-//    }
+    @GetMapping("/testTool")
+    public Result getResult(@RequestParam(value = "start") String start,
+                            @RequestParam(value = "end") String end,
+                            @RequestParam(value = "way") String way,
+                            @RequestParam(value = "type") Integer type) throws AllException, IOException {
+        return ResultTool.success(gaoDeTool.getSitesList(start, end, way, type));
+    }
 }

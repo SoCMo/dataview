@@ -24,13 +24,7 @@ class NCovApplicationTests {
 
     @Test
     void contextLoads() throws IOException, AllException {
-        Map<String, Double> map = gaoDeTool.getCoding("上海大学宝山校区");
-        System.out.println("lng: " + map.get("lng"));
-        System.out.println("lat: " + map.get("lat"));
-
-        Map<String, Double> map2 = baiduTool.geoCoding("上海大学宝山校区");
-        System.out.println("\nlng: " + map2.get("lng"));
-        System.out.println("lat: " + map2.get("lat"));
+        System.out.println(gaoDeTool.getAreaOrCity("上海市上海大学"));
 //        try {
 //            baiduTool.pathInfo("中国上海上海市静安区长寿路999弄33号12A室", "上海大学宝山校区");
 //        } catch (Exception e) {

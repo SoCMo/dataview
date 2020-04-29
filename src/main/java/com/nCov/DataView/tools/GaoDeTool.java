@@ -97,7 +97,6 @@ public class GaoDeTool {
             JSONArray jsonArray = jsonObject.getJSONArray("geocodes");
 
             String city = jsonArray.getJSONObject(0).getString("city");
-            System.out.println(jsonArray.getJSONObject(0).getString("district"));
 
             response.close();
             closeableHttpClient.close();
@@ -116,6 +115,9 @@ public class GaoDeTool {
      * @Date: 2020/4/29
      */
     public String getAreaOrCity(String address) throws AllException, IOException {
+        if (address.equals("上海市上海大学")) {
+            address = "上海大学宝山校区";
+        }
         String url = "https://restapi.amap.com/v3/geocode/geo?address=" + address + "&output=json&key=" + key;
         CloseableHttpClient closeableHttpClient = HttpClients.createDefault();
         //请求
@@ -132,6 +134,8 @@ public class GaoDeTool {
             if (city.equals("[]")) {
                 city = jsonArray.getJSONObject(0).getString("city");
             }
+
+            System.out.println(address + ": " + city);
 
             response.close();
             closeableHttpClient.close();
@@ -150,14 +154,18 @@ public class GaoDeTool {
      * @Date: 2020/4/28
      */
     public SiteInfo getSitesList(String startAddress, String endAddress, String byTheWay, Integer type_num) throws AllException, IOException {
+        if (endAddress.contains("上海大学")) {
+            endAddress = "上海市上海大学宝山校区";
+        }
         Map<String, Double> startCoding =  getCoding(startAddress);
         Map<String, Double> endCoding = getCoding(endAddress);
         String startCity = getCity(startAddress);
         String endCity = getCity(endAddress);
 
+
         String url = "https://restapi.amap.com/v3/direction/transit/integrated?origin=" + startCoding.get("lng").toString() +
                 "," + startCoding.get("lat").toString() + "&destination=" + endCoding.get("lng").toString() + "," + endCoding.get("lat").toString() +
-                "&city=" + startCity + "&cityd=" + endCity + "&extensions=all&strategy=2&output=json&key=" + key;
+                "&city=" + startCity + "&cityd=" + endCity + "&extensions=all&strategy=0&output=json&key=" + key;
         CloseableHttpClient closeableHttpClient = HttpClients.createDefault();
         //请求
         HttpGet httpGet = new HttpGet(url);
@@ -266,7 +274,7 @@ public class GaoDeTool {
 
                 }
             }
-            throw new AllException(EmAllException.GAODE_REQUEST_FAIL, "无法检索到输入地址之间的站名");
+            throw new AllException(EmAllException.GAODE_REQUEST_FAIL, "无法检索到该交通方式下输入地址之间的站名");
         } else {
             System.out.println(jsonObject.getString("info"));
             log.info("调用高德api失败");
