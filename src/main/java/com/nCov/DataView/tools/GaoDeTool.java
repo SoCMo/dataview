@@ -162,7 +162,6 @@ public class GaoDeTool {
         String startCity = getCity(startAddress);
         String endCity = getCity(endAddress);
 
-
         String url = "https://restapi.amap.com/v3/direction/transit/integrated?origin=" + startCoding.get("lng").toString() +
                 "," + startCoding.get("lat").toString() + "&destination=" + endCoding.get("lng").toString() + "," + endCoding.get("lat").toString() +
                 "&city=" + startCity + "&cityd=" + endCity + "&extensions=all&strategy=0&output=json&key=" + key;
