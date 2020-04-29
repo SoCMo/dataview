@@ -1,16 +1,14 @@
 package com.nCov.DataView.model.response.info;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
-public
-class AreaCalInfo {
+@NoArgsConstructor
+@AllArgsConstructor
+public class AreaCalInfo {
     double sum;
 
     String name;
-
-    public AreaCalInfo(String name, String sumScore) {
-        this.name = name;
-        this.sum = Double.parseDouble(sumScore);
-    }
 }
