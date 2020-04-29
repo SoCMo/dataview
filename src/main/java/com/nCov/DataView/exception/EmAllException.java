@@ -18,7 +18,9 @@ public enum EmAllException implements CommonError {
 
     BAD_FILE_TYPE(400, "文件格式错误"),
 
-    BAIDU_REQUEST_FAILE(401, "百度api请求失败");
+    BAIDU_REQUEST_FAILE(401, "百度api请求失败"),
+
+    GAODE_REQUEST_FAIL(401, "高德api请求失败");
 
     // 错误码
     private Integer code;
