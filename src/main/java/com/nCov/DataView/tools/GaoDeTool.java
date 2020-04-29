@@ -144,12 +144,12 @@ public class GaoDeTool {
 
     /**
      * @Description: 站点获取
-     * @Param: [startAddress, endAddress, buTheWay, type_num]
+     * @Param: [startAddress, endAddress, byTheWay, type_num] type_num: 0 -> 公交; 1 -> 地铁; 3 -> 火车, byTheWay: 具体交通工具，比如地铁2号线，G28
      * @return: com.nCov.DtaView.model.response.info.SiteInfo
      * @Author: pongshy
      * @Date: 2020/4/28
      */
-    public SiteInfo getAddressList(String startAddress, String endAddress, String byTheWay, Integer type_num) throws AllException, IOException {
+    public SiteInfo getSitesList(String startAddress, String endAddress, String byTheWay, Integer type_num) throws AllException, IOException {
         Map<String, Double> startCoding =  getCoding(startAddress);
         Map<String, Double> endCoding = getCoding(endAddress);
         String startCity = getCity(startAddress);
