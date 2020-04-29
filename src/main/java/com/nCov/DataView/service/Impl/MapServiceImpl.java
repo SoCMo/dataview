@@ -3,12 +3,14 @@ package com.nCov.DataView.service.Impl;
 import com.nCov.DataView.dao.AbroadInputDOMapper;
 import com.nCov.DataView.dao.AreaDOMapper;
 import com.nCov.DataView.dao.CovDataMapper;
+import com.nCov.DataView.dao.StatisticDOMapper;
 import com.nCov.DataView.exception.AllException;
 import com.nCov.DataView.exception.EmAllException;
 import com.nCov.DataView.model.entity.*;
 import com.nCov.DataView.model.response.Result;
 import com.nCov.DataView.model.response.info.AreaInfo;
 import com.nCov.DataView.model.response.info.DayInfoResponse;
+import com.nCov.DataView.model.response.info.StatisticResponse;
 import com.nCov.DataView.service.MapService;
 import com.nCov.DataView.tools.FixTool;
 import com.nCov.DataView.tools.NumberTool;
@@ -34,6 +36,9 @@ public class MapServiceImpl implements MapService {
 
     @Resource
     private AbroadInputDOMapper abroadInputDOMapper;
+
+    @Resource
+    private StatisticDOMapper statisticDOMapper;
 
     @Resource
     private FixTool fixTool;
@@ -93,12 +98,18 @@ public class MapServiceImpl implements MapService {
                 CovDataListFour = covDataMapper.selectByExample(covDataExample);
             }
 
-            AbroadInputDOExample abroadInputDOExample = new AbroadInputDOExample();
-            abroadInputDOExample.createCriteria()
-                    .andDateEqualTo(TimeTool.stringToDay(date));
-            List<AbroadInputDO> abroadInputDOList = abroadInputDOMapper.selectByExample(abroadInputDOExample);
-
             Map<String, AreaDO> areaDOMap = areaDOMapper.getProvinceMapString();
+
+            AbroadInputDOExample abroadInputDOExample = new AbroadInputDOExample();
+            abroadInputDOExample.createCriteria().andDateEqualTo(TimeTool.stringToDay(date));
+            List<AbroadInputDO> abroadInputDOList = abroadInputDOMapper.selectByExample(abroadInputDOExample);
+            abroadInputDOExample.clear();
+
+            Calendar calendarAb = Calendar.getInstance();
+            calendar.setTime(TimeTool.stringToDay(date));
+            calendar.add(Calendar.DATE, -1);
+            abroadInputDOExample.createCriteria().andDateEqualTo(calendar.getTime());
+            List<AbroadInputDO> abroadInputDOListYD = abroadInputDOMapper.selectByExample(abroadInputDOExample);
 
             //初始化当天返回体
             DayInfoResponse dayInfoResponse = new DayInfoResponse();
@@ -168,18 +179,24 @@ public class MapServiceImpl implements MapService {
                     areaInfo.setGrowth(Math.max(covData.getTotalconfirm() - covDataFour.getTotalconfirm(), 0));
                 }
 
-                if (abroadInputDOList.isEmpty()) {
+                if (abroadInputDOList.isEmpty() || abroadInputDOListYD.isEmpty()) {
                     areaInfo.setAbroadInput(0);
                 } else {
                     AbroadInputDO abroadInputDO = null;
-                    for (AbroadInputDO abroadInputTemp : abroadInputDOList) {
-                        if (abroadInputTemp.getProvincename().contains(fixTool.provinceUni(areaDO.getName()))) {
-                            abroadInputDO = abroadInputTemp;
+                    AbroadInputDO abroadInputDOYD = null;
+                    for (AbroadInputDO abroadInputDOTemp : abroadInputDOList) {
+                        if (abroadInputDOTemp.getProvincename().contains(fixTool.provinceUni(covData.getProvincename()))) {
+                            abroadInputDO = abroadInputDOTemp;
+                            break;
                         }
                     }
-
-                    if (abroadInputDO == null) areaInfo.setAbroadInput(0);
-                    else areaInfo.setAbroadInput(abroadInputDO.getThenumber());
+                    for (AbroadInputDO abroadInputDOTemp : abroadInputDOListYD) {
+                        if (abroadInputDOTemp.getProvincename().contains(fixTool.provinceUni(covData.getProvincename()))) {
+                            abroadInputDOYD = abroadInputDOTemp;
+                            break;
+                        }
+                    }
+                    areaInfo.setAbroadInput(Math.max((abroadInputDO == null ? 0 : abroadInputDO.getThenumber() - (abroadInputDOYD == null ? 0 : abroadInputDOYD.getThenumber())), 0));
                 }
 
                 dayInfoResponse.getProvinceInfoList().add(areaInfo);
@@ -193,5 +210,37 @@ public class MapServiceImpl implements MapService {
             log.error(e.getMessage());
             return ResultTool.error(500, e.getMessage());
         }
+    }
+
+    /**
+     * @Description: 每日获取数据量
+     * @Param: []
+     * @return: com.nCov.DataView.model.response.Result
+     * @Author: SoCMo
+     * @Date: 2020/4/26
+     */
+    @Override
+    public Result statistic() {
+        StatisticResponse statisticResponse = new StatisticResponse();
+        StatisticDOExample statisticDOExample = new StatisticDOExample();
+        statisticDOExample.createCriteria().andUpdateTimeEqualTo(TimeTool.todayCreate().getTime());
+        List<StatisticDO> statisticDOList = statisticDOMapper.selectByExample(statisticDOExample);
+        for (StatisticDO statisticDO : statisticDOList) {
+            if (statisticDO.getName().equals("covData")) {
+                statisticResponse.setCovData(statisticDO.getValue());
+            } else if (statisticDO.getName().equals("abroadInput")) {
+                statisticResponse.setAbroadInput(statisticDO.getValue());
+            }
+        }
+
+        if (statisticResponse.getAbroadInput() == null) {
+            statisticResponse.setAbroadInput(0);
+        }
+        if (statisticResponse.getCovData() == null) {
+            statisticResponse.setCovData(0);
+        }
+
+        statisticResponse.setSumNumber(statisticResponse.getAbroadInput() + statisticResponse.getCovData());
+        return ResultTool.success(statisticResponse);
     }
 }
