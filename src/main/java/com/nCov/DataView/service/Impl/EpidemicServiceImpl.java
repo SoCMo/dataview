@@ -411,17 +411,112 @@ public class EpidemicServiceImpl implements EpidemicService {
                 switch (routeCalRequest.getType()) {
                     case 0: {
                         SiteInfo siteInfo = gaoDeTool.getSitesList(routeCalRequest.getCitys().get(0) + routeCalRequest.getStart(), routeCalRequest.getCitys().get(0) + routeCalRequest.getEnd(), routeCalRequest.getTitle(), 0);
-                        station(covRankResponseMap, routeCalReponse, cityCalList, siteInfo);
+                        if (siteInfo != null) station(covRankResponseMap, routeCalReponse, cityCalList, siteInfo);
+                        else {
+                            for (String area : routeCalRequest.getCitys()) {
+                                CityCal cityCal = new CityCal();
+                                cityCal.setCityname(area);
+                                CovRankResponse covRankResponse = covRankResponseMap.get(fixTool.areaUni(area));
+                                if (covRankResponse == null) {
+                                    covRankResponse = covRankResponseMap.get(area);
+                                    if (covRankResponse == null) {
+                                        for (CovRankResponse covRankResponseTemp : covRankResponseMap.values()) {
+                                            if (covRankResponseTemp.getName().equals(fixTool.areaUni(area))) {
+                                                covRankResponse = covRankResponseTemp;
+                                                break;
+                                            }
+                                        }
+                                        if (covRankResponse == null) continue;
+//                                        if (covRankResponse == null){
+//                                            area = gaoDeTool.getAreaOrCity(routeCalRequest.getStart());
+//                                            covRankResponse = covRankResponseMap.get(fixTool.areaUni(area));
+//                                            if(covRankResponse == null){
+//                                                covRankResponse = covRankResponseMap.get(area);
+//                                                if (covRankResponse == null) {
+//                                                    for (CovRankResponse covRankResponseTemp : covRankResponseMap.values()) {
+//                                                        if (covRankResponseTemp.getName().equals(fixTool.areaUni(area))) {
+//                                                            covRankResponse = covRankResponseTemp;
+//                                                            break;
+//                                                        }
+//                                                    }
+//                                                    if (covRankResponse == null) continue;
+//                                                }
+//                                            }
+//                                        }
+                                    }
+                                }
+                                cityCal.setCityscore((int) covRankResponse.getSumScore());
+                                cityCalList.add(cityCal);
+                            }
+                        }
                         break;
                     }
                     case 1: {
                         SiteInfo siteInfo = gaoDeTool.getSitesList(routeCalRequest.getCitys().get(0) + routeCalRequest.getStart(), routeCalRequest.getCitys().get(0) + routeCalRequest.getEnd(), routeCalRequest.getTitle(), 1);
-                        station(covRankResponseMap, routeCalReponse, cityCalList, siteInfo);
+                        if (siteInfo != null) station(covRankResponseMap, routeCalReponse, cityCalList, siteInfo);
+                        else {
+                            for (String area : routeCalRequest.getCitys()) {
+                                CityCal cityCal = new CityCal();
+                                cityCal.setCityname(area);
+                                CovRankResponse covRankResponse = covRankResponseMap.get(fixTool.areaUni(area));
+                                if (covRankResponse == null) {
+                                    covRankResponse = covRankResponseMap.get(area);
+                                    if (covRankResponse == null) {
+                                        for (CovRankResponse covRankResponseTemp : covRankResponseMap.values()) {
+                                            if (covRankResponseTemp.getName().equals(fixTool.areaUni(area))) {
+                                                covRankResponse = covRankResponseTemp;
+                                                break;
+                                            }
+                                        }
+                                        if (covRankResponse == null) continue;
+//                                        if (covRankResponse == null){
+//                                            area = gaoDeTool.getAreaOrCity(routeCalRequest.getStart());
+//                                            covRankResponse = covRankResponseMap.get(fixTool.areaUni(area));
+//                                            if(covRankResponse == null){
+//                                                covRankResponse = covRankResponseMap.get(area);
+//                                                if (covRankResponse == null) {
+//                                                    for (CovRankResponse covRankResponseTemp : covRankResponseMap.values()) {
+//                                                        if (covRankResponseTemp.getName().equals(fixTool.areaUni(area))) {
+//                                                            covRankResponse = covRankResponseTemp;
+//                                                            break;
+//                                                        }
+//                                                    }
+//                                                    if (covRankResponse == null) continue;
+//                                                }
+//                                            }
+//                                        }
+                                    }
+                                }
+                                cityCal.setCityscore((int) covRankResponse.getSumScore());
+                                cityCalList.add(cityCal);
+                            }
+                        }
                         break;
                     }
                     case 3: {
                         SiteInfo siteInfo = gaoDeTool.getSitesList(routeCalRequest.getStart(), routeCalRequest.getEnd(), routeCalRequest.getTitle(), 3);
-                        station(covRankResponseMap, routeCalReponse, cityCalList, siteInfo);
+                        if (siteInfo != null) station(covRankResponseMap, routeCalReponse, cityCalList, siteInfo);
+                        else {
+                            for (String area : routeCalRequest.getCitys()) {
+                                CityCal cityCal = new CityCal();
+                                cityCal.setCityname(area);
+                                CovRankResponse covRankResponse = covRankResponseMap.get(fixTool.areaUni(area));
+                                if (covRankResponse == null) {
+                                    covRankResponse = covRankResponseMap.get(area);
+                                    if (covRankResponse == null) {
+                                        for (CovRankResponse covRankResponseTemp : covRankResponseMap.values()) {
+                                            if (covRankResponseTemp.getName().equals(fixTool.areaUni(area))) {
+                                                covRankResponse = covRankResponseTemp;
+                                                break;
+                                            }
+                                        }
+                                        if (covRankResponse == null) continue;
+                                    }
+                                }
+                                cityCal.setCityscore((int) covRankResponse.getSumScore());
+                                cityCalList.add(cityCal);
+                            }
+                        }
                         break;
                     }
                     case 4: {
@@ -453,7 +548,7 @@ public class EpidemicServiceImpl implements EpidemicService {
                     RouteCalDO routeCalDO = new RouteCalDO();
                     BeanUtils.copyProperties(routeCalRequest, routeCalReponse);
                     BeanUtils.copyProperties(routeCalRequest, routeCalDO);
-                    double max = cityCalList.stream().mapToDouble(CityCal::getCityscore).max().getAsDouble();
+                    double max = cityCalList.isEmpty() ? 0 : cityCalList.stream().mapToDouble(CityCal::getCityscore).max().getAsDouble();
 
                     //准备插入数据库的数据
                     double time = routeCalRequest.getDistance() / 1000.0 / ConstCorrespond.SPEED[routeCalRequest.getType()];
@@ -507,7 +602,7 @@ public class EpidemicServiceImpl implements EpidemicService {
     }
 
     private void station(Map<String, CovRankResponse> covRankResponseMap, RouteCalReponse routeCalReponse, List<CityCal> cityCalList, SiteInfo siteInfo) {
-        routeCalReponse.setAllSiteNumber(siteInfo.getAllSiteNumber());
+        routeCalReponse.setAllSiteNumber(siteInfo == null ? 0 : siteInfo.getAllSiteNumber());
         List<StationCal> stationCalList = new ArrayList<>();
         for (SiteAndAreaInfo siteAndAreaInfo : siteInfo.getSiteNames()) {
             StationCal stationCal = new StationCal();
