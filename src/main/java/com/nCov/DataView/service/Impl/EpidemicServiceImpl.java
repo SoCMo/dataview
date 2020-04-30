@@ -420,7 +420,7 @@ public class EpidemicServiceImpl implements EpidemicService {
                         break;
                     }
                     case 3: {
-                        SiteInfo siteInfo = gaoDeTool.getSitesList(routeCalRequest.getStart(), routeCalRequest.getEnd(), routeCalRequest.getTitle(), 2);
+                        SiteInfo siteInfo = gaoDeTool.getSitesList(routeCalRequest.getStart(), routeCalRequest.getEnd(), routeCalRequest.getTitle(), 3);
                         station(covRankResponseMap, routeCalReponse, cityCalList, siteInfo);
                         break;
                     }
