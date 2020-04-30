@@ -24,7 +24,8 @@ class NCovApplicationTests {
 
     @Test
     void contextLoads() throws IOException, AllException {
-        System.out.println(gaoDeTool.getAreaOrCity("上海市上海大学"));
+        System.out.println(gaoDeTool.getSitesList("上海市虹桥西交通中心站", "上海市南门公交站(下客站)站", "嘉虹1线", 0));
+        // System.out.println(gaoDeTool.getAreaOrCity("上海市上海大学"));
 //        try {
 //            baiduTool.pathInfo("中国上海上海市静安区长寿路999弄33号12A室", "上海大学宝山校区");
 //        } catch (Exception e) {

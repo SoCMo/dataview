@@ -164,7 +164,7 @@ public class GaoDeTool {
 
         String url = "https://restapi.amap.com/v3/direction/transit/integrated?origin=" + startCoding.get("lng").toString() +
                 "," + startCoding.get("lat").toString() + "&destination=" + endCoding.get("lng").toString() + "," + endCoding.get("lat").toString() +
-                "&city=" + startCity + "&cityd=" + endCity + "&extensions=all&strategy=0&output=json&key=" + key;
+                "&city=" + startCity + "&cityd=" + endCity + "&extensions=all&strategy=2&output=json&key=" + key;
         CloseableHttpClient closeableHttpClient = HttpClients.createDefault();
         //请求
         HttpGet httpGet = new HttpGet(url);
@@ -273,7 +273,8 @@ public class GaoDeTool {
 
                 }
             }
-            throw new AllException(EmAllException.GAODE_REQUEST_FAIL, "无法检索到该交通方式下输入地址之间的站名");
+            return null;
+            //throw new AllException(EmAllException.GAODE_REQUEST_FAIL, "无法检索到该交通方式下输入地址之间的站名");
         } else {
             System.out.println(jsonObject.getString("info"));
             log.info("调用高德api失败");
