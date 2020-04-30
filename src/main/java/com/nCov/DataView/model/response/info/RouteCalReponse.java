@@ -24,6 +24,10 @@ public class RouteCalReponse {
 
     private List<CityCal> city;
 
+    private List<StationCal> stations;
+
+    private Integer allSiteNumber;
+
     private String timeScore;
 
     private String transportScore;

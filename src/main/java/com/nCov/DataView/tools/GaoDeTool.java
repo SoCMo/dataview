@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.nCov.DataView.exception.AllException;
 import com.nCov.DataView.exception.EmAllException;
-import com.nCov.DataView.model.response.Result;
 import com.nCov.DataView.model.response.info.SiteAndAreaInfo;
 import com.nCov.DataView.model.response.info.SiteInfo;
 import lombok.extern.slf4j.Slf4j;
@@ -14,7 +13,6 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
-import org.apache.xmlbeans.impl.xb.xsdschema.All;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -65,7 +63,7 @@ public class GaoDeTool {
             locationMap.put("lng", Double.parseDouble(addressList[0]));
             locationMap.put("lat", Double.parseDouble(addressList[1]));
 
-            System.out.println(jsonArray.getJSONObject(0).getString("city"));
+//            System.out.println(jsonArray.getJSONObject(0).getString("city"));
 
             response.close();
             closeableHttpClient.close();
@@ -135,7 +133,7 @@ public class GaoDeTool {
                 city = jsonArray.getJSONObject(0).getString("city");
             }
 
-            System.out.println(address + ": " + city);
+//            System.out.println(address + ": " + city);
 
             response.close();
             closeableHttpClient.close();

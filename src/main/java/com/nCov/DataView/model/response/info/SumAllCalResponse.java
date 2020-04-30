@@ -2,7 +2,6 @@ package com.nCov.DataView.model.response.info;
 
 import lombok.Data;
 
-import javax.validation.constraints.NotBlank;
 import java.util.List;
 
 /**
@@ -13,11 +12,11 @@ import java.util.List;
  */
 @Data
 public class SumAllCalResponse {
-    List<RouteCalReponse> resultList;
+    private List<RouteCalReponse> resultList;
 
-    String sumScore;
+    private String sumScore;
 
-    String startAddress;
+    private String startAddress;
 
-    String endAddress;
+    private String endAddress;
 }

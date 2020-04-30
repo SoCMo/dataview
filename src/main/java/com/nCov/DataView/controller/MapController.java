@@ -17,7 +17,6 @@ import javax.annotation.Resource;
  * author: SoCMo
  * create: 2020/2/28
  */
-
 @CrossOrigin
 @RestController
 @RequestMapping("/map")

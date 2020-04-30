@@ -1,11 +1,9 @@
 package com.nCov.DataView.service;
 
 import com.nCov.DataView.exception.AllException;
-import com.nCov.DataView.model.entity.PathInfoDO;
 import com.nCov.DataView.model.request.*;
 import com.nCov.DataView.model.response.Result;
 import com.nCov.DataView.model.response.info.AssessmentAllResponse;
-import com.nCov.DataView.model.response.info.SumCalResponse;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -80,7 +78,7 @@ public interface EpidemicService {
      * @Author: pongshy
      * @Date: 2020/3/29
      */
-    public List<SumCalResponse> getAllRouteCal(List<PathInfoDO> pathInfoDOList) throws AllException, ParseException;
+//    public List<SumCalResponse> getAllRouteCal(List<PathInfoDO> pathInfoDOList) throws AllException, ParseException;
 
     /**
      * @Description: 数据库中存在一条线路进行分数计算
@@ -90,7 +88,7 @@ public interface EpidemicService {
      * @Date: 2020/3/29
      */
 
-    public SumCalResponse getRouteCal(List<RouteCalRequest> routeCalRequestList);
+//    public SumCalResponse getRouteCal(List<RouteCalRequest> routeCalRequestList);
 
     /**
      * @Description: 前端发送地址信息，后端进行风险评估并返回分数
@@ -99,7 +97,7 @@ public interface EpidemicService {
      * @Author: pongshy
      * @Date: 2020/3/31
      */
-    public Result getAssessment(AddressRequest data) throws AllException, IOException, ParseException;
+//    public Result getAssessment(AddressRequest data) throws AllException, IOException, ParseException;
 
     /**
      * @Description: 使用百度api查询该地址回校路径，并插入数据库中
@@ -117,7 +115,7 @@ public interface EpidemicService {
      * @Author: pongshy
      * @Date: 2020/3/31
      */
-    public SumCalResponse calculate(List<RouteCalRequest> routeCalRequestList) throws AllException, ParseException;
+//    public SumCalResponse calculate(List<RouteCalRequest> routeCalRequestList) throws AllException, ParseException;
 
     /**
      * @Description: 读取数据库中存储的信息
@@ -126,7 +124,7 @@ public interface EpidemicService {
      * @Author: pongshy
      * @Date: 2020/4/4
      */
-    public Result getSpecifiedNumber(Integer cur, Integer nums, String provinceName) throws AllException, ParseException;
+//    public Result getSpecifiedNumber(Integer cur, Integer nums, String provinceName) throws AllException, ParseException;
 
     /**
      * @Description: 读取excel表格中的信息，并存储到数据库中
