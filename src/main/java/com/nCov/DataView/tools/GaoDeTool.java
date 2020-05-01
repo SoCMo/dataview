@@ -251,6 +251,8 @@ public class GaoDeTool {
                             routeCalRequest.setEnd(arrival_stop.getString("name"));
                             //交通工具名称
                             routeCalRequest.setTitle(busline.getString("name"));
+                            //花费的时间
+                            routeCalRequest.setCostTime(busline.getInteger("duration"));
                             //交通类型
                             if (busline.getString("type").equals("地铁线路")) {
                                 routeCalRequest.setType(1);
@@ -299,6 +301,13 @@ public class GaoDeTool {
                         routeCalRequest.setStart(departure_stop.getString("name"));
                         //终点站
                         routeCalRequest.setEnd(arrival_stop.getString("name"));
+                        //花费的时间
+                        String departure_time = departure_stop.getString("time");
+                        String arrival_time = arrival_stop.getString("time");
+                        Integer costTime = Integer.parseInt(arrival_time) - Integer.parseInt(departure_time);
+                        Integer hours = costTime / 100;
+                        Integer minutes = costTime % 100;
+                        routeCalRequest.setCostTime(hours * 3600 + minutes * 60);
                         //中间站点名和站点所在区域
                         List<SiteAndAreaInfo> siteAndAreaInfoList = new ArrayList<>();
                         JSONArray via_stops = railway.getJSONArray("via_stops");

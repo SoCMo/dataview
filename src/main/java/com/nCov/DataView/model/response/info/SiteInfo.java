@@ -18,4 +18,7 @@ public class SiteInfo {
     //站点的总数
     private Integer allSiteNumber;
 
+
+    private Integer costTime;
+
 }
