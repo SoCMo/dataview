@@ -15,7 +15,7 @@ import javax.validation.constraints.NotBlank;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class SiteAndAreaInfo {
+public class  SiteAndAreaInfo {
     @NotBlank(message = "站点名不能为空")
     private String name;
 

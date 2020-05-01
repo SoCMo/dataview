@@ -1,5 +1,6 @@
 package com.nCov.DataView.model.request;
 
+import com.nCov.DataView.model.response.info.SiteInfo;
 import lombok.Data;
 import org.hibernate.validator.constraints.Range;
 
@@ -15,7 +16,7 @@ import java.util.List;
  * create: 2020/3/26
  */
 @Data
-public class RouteCalRequest {
+public class RouteCalRequest extends SiteInfo {
     @Size(min = 1, message = "城市不得少于一个")
     private List<String> citys;
 

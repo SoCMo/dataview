@@ -32,9 +32,7 @@ public class StudentController {
 
     @GetMapping("/testTool")
     public Result getResult(@RequestParam(value = "start") String start,
-                            @RequestParam(value = "end") String end,
-                            @RequestParam(value = "way") String way,
-                            @RequestParam(value = "type") Integer type) throws AllException, IOException {
-        return ResultTool.success(gaoDeTool.getSitesList(start, end, way, type));
+                            @RequestParam(value = "end") String end) throws AllException, IOException {
+        return ResultTool.success(gaoDeTool.routePlanning(start, end));
     }
 }
