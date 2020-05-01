@@ -302,15 +302,7 @@ public class GaoDeTool {
                         //终点站
                         routeCalRequest.setEnd(arrival_stop.getString("name"));
                         //花费的时间
-                        Integer departure_time = Integer.parseInt(departure_stop.getString("time"));
-                        Integer arrival_time = Integer.parseInt(arrival_stop.getString("time"));
-                        if (arrival_time <= departure_time) {
-                            arrival_time += 2400;
-                        }
-                        Integer costTime = arrival_time - departure_time;
-                        Integer hours = costTime / 100;
-                        Integer minutes = costTime % 100;
-                        routeCalRequest.setCostTime(hours * 3600 + minutes * 60);
+                        routeCalRequest.setCostTime(railway.getInteger("time"));
                         //中间站点名和站点所在区域
                         List<SiteAndAreaInfo> siteAndAreaInfoList = new ArrayList<>();
                         JSONArray via_stops = railway.getJSONArray("via_stops");
