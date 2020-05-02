@@ -526,7 +526,7 @@ public class EpidemicServiceImpl implements EpidemicService {
                     sumCalResponseNew.setType(ConstCorrespond.TRAN_TYPE[4]);
                     sumCalResponseNew.setPrice(0.0);
                     sumCalResponseNew.setSumScore(String.valueOf(Math.max(Math.max(Double.parseDouble(sumCalResponse.getSumScore()), Double.parseDouble(sumCalResponseAfter.getSumScore())), Double.parseDouble(sumCalResponseBefore.getSumScore()))));
-                    sumCalResponse.setSumTime(TimeTool.timeSlotToString(TimeTool.stringToHour(sumCalResponseBefore.getSumTime()) + TimeTool.stringToHour(sumCalResponse.getSumTime()) + TimeTool.stringToHour(sumCalResponseAfter.getSumTime())));
+                    sumCalResponseNew.setSumTime(TimeTool.timeSlotToString(TimeTool.stringToHour(sumCalResponseBefore.getSumTime()) + TimeTool.stringToHour(sumCalResponse.getSumTime()) + TimeTool.stringToHour(sumCalResponseAfter.getSumTime())));
                     sumCalResponseList.add(sumCalResponseNew);
                 }
             }
