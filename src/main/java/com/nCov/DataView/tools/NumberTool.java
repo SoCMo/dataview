@@ -31,7 +31,7 @@ public class NumberTool {
      * @Date: 2020/2/23
      */
     public static String doubleToStringWotH(Double number) {
-        return String.format("%.2f", number);
+        return String.format("%.1f", number);
     }
 
     /**

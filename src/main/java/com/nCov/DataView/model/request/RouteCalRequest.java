@@ -2,6 +2,7 @@ package com.nCov.DataView.model.request;
 
 import com.nCov.DataView.model.response.info.SiteInfo;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Range;
 
 import javax.validation.constraints.NotBlank;
@@ -16,11 +17,12 @@ import java.util.List;
  * create: 2020/3/26
  */
 @Data
+@NoArgsConstructor
 public class RouteCalRequest extends SiteInfo {
-    @Size(min = 1, message = "城市不得少于一个")
+    @Size(min = 2, message = "城市不得少于一个")
     private List<String> citys;
 
-    @Range(min = -1, max = 4, message = "交通类型错误")
+    @Range(min = 4, max = 4, message = "交通类型错误")
     private int type;
 
     @NotBlank(message = "名称不能为空")

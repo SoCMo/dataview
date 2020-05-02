@@ -382,10 +382,25 @@ public class EpidemicServiceImpl implements EpidemicService {
      * @Date: 2020/3/26
      */
     @Override
-    public Result routeCal(List<RouteCalRequest> routeCalRequestList) {
-        if (routeCalRequestList.isEmpty()) {
-            return ResultTool.error(500, "参数不能为空");
+    public Result routeCal(RouteListRequest routeListRequest) {
+        List<RouteCalRequest> routeCalRequestList = routeListRequest.getRouteCalRequestList();
+        Object before = startAndEndCal(routeListRequest.getStart(), routeCalRequestList.get(0).getStart()).getData();
+        Object after = startAndEndCal(routeCalRequestList.get(routeCalRequestList.size() - 1).getEnd(), routeListRequest.getEnd()).getData();
+        List<SumCalResponse> beforeList = new ArrayList<>();
+        List<SumCalResponse> afterList = new ArrayList<>();
+        if (before instanceof ArrayList<?>) {
+            for (Object o : (List<?>) before) {
+                beforeList.add((SumCalResponse) o);
+            }
         }
+
+        if (after instanceof ArrayList<?>) {
+            for (Object o : (List<?>) before) {
+                afterList.add((SumCalResponse) o);
+            }
+        }
+
+        List<SumCalResponse> sumCalResponseList = new ArrayList<>();
         try {
             List<RouteCalReponse> resultList = new ArrayList<>();
             List<RouteCalDO> routeCalDOList = new ArrayList<>();
@@ -408,125 +423,37 @@ public class EpidemicServiceImpl implements EpidemicService {
                 List<RouteCalDO> routeCalDataList = routeCalDOMapper.selectByExample(routeCalDataExample);
 
                 List<CityCal> cityCalList = new ArrayList<>(new HashSet<>());
-                switch (routeCalRequest.getType()) {
-                    case 0: {
-                        SiteInfo siteInfo = gaoDeTool.getSitesList(routeCalRequest.getCitys().get(0) + routeCalRequest.getStart(), routeCalRequest.getCitys().get(0) + routeCalRequest.getEnd(), routeCalRequest.getTitle(), 0);
-                        if (siteInfo != null) station(covRankResponseMap, routeCalReponse, cityCalList, siteInfo);
-                        else {
-                            for (String area : routeCalRequest.getCitys()) {
-                                CityCal cityCal = new CityCal();
-                                cityCal.setCityname(area);
-                                CovRankResponse covRankResponse = covRankResponseMap.get(fixTool.areaUni(area));
-                                if (covRankResponse == null) {
-                                    covRankResponse = covRankResponseMap.get(area);
-                                    if (covRankResponse == null) {
-                                        for (CovRankResponse covRankResponseTemp : covRankResponseMap.values()) {
-                                            if (covRankResponseTemp.getName().equals(fixTool.areaUni(area))) {
-                                                covRankResponse = covRankResponseTemp;
-                                                break;
-                                            }
-                                        }
-                                        if (covRankResponse == null) continue;
-//                                        if (covRankResponse == null){
-//                                            area = gaoDeTool.getAreaOrCity(routeCalRequest.getStart());
-//                                            covRankResponse = covRankResponseMap.get(fixTool.areaUni(area));
-//                                            if(covRankResponse == null){
-//                                                covRankResponse = covRankResponseMap.get(area);
-//                                                if (covRankResponse == null) {
-//                                                    for (CovRankResponse covRankResponseTemp : covRankResponseMap.values()) {
-//                                                        if (covRankResponseTemp.getName().equals(fixTool.areaUni(area))) {
-//                                                            covRankResponse = covRankResponseTemp;
-//                                                            break;
-//                                                        }
-//                                                    }
-//                                                    if (covRankResponse == null) continue;
-//                                                }
-//                                            }
-//                                        }
+                if (routeCalRequest.getType() == 4) {
+                    SiteInfo siteInfo = new SiteInfo();
+                    siteInfo.setAllSiteNumber(2);
+                    siteInfo.setSiteNames(new ArrayList<>());
+                    siteInfo.getSiteNames().add(new SiteAndAreaInfo(routeCalRequest.getStart(), routeCalRequest.getCitys().get(0)));
+                    siteInfo.getSiteNames().add(new SiteAndAreaInfo(routeCalRequest.getEnd(), routeCalRequest.getCitys().get(1)));
+                    routeCalReponse.setAllSiteNumber(siteInfo.getAllSiteNumber());
+                    List<StationCal> stationCalList = new ArrayList<>();
+                    for (SiteAndAreaInfo siteAndAreaInfo : siteInfo.getSiteNames()) {
+                        StationCal stationCal = new StationCal();
+                        BeanUtils.copyProperties(siteAndAreaInfo, stationCal);
+                        CovRankResponse covRankResponse = covRankResponseMap.get(fixTool.areaUni(siteAndAreaInfo.getArea()));
+                        if (covRankResponse == null) {
+                            covRankResponse = covRankResponseMap.get(siteAndAreaInfo.getArea());
+                            if (covRankResponse == null) {
+                                for (CovRankResponse covRankResponseTemp : covRankResponseMap.values()) {
+                                    if (covRankResponseTemp.getName().equals(fixTool.areaUni(siteAndAreaInfo.getArea()))) {
+                                        covRankResponse = covRankResponseTemp;
+                                        break;
                                     }
                                 }
-                                cityCal.setCityscore((int) covRankResponse.getSumScore());
-                                cityCalList.add(cityCal);
+                                if (covRankResponse == null) continue;
                             }
                         }
-                        break;
+                        stationCal.setRisk((int) (covRankResponse.getSumScore() * 10) / 10.0);
+                        stationCalList.add(stationCal);
+                        cityCalList.add(new CityCal(covRankResponse.getName(), (int) (covRankResponse.getSumScore() * 10) / 10.0));
                     }
-                    case 1: {
-                        SiteInfo siteInfo = gaoDeTool.getSitesList(routeCalRequest.getCitys().get(0) + routeCalRequest.getStart(), routeCalRequest.getCitys().get(0) + routeCalRequest.getEnd(), routeCalRequest.getTitle(), 1);
-                        if (siteInfo != null) station(covRankResponseMap, routeCalReponse, cityCalList, siteInfo);
-                        else {
-                            for (String area : routeCalRequest.getCitys()) {
-                                CityCal cityCal = new CityCal();
-                                cityCal.setCityname(area);
-                                CovRankResponse covRankResponse = covRankResponseMap.get(fixTool.areaUni(area));
-                                if (covRankResponse == null) {
-                                    covRankResponse = covRankResponseMap.get(area);
-                                    if (covRankResponse == null) {
-                                        for (CovRankResponse covRankResponseTemp : covRankResponseMap.values()) {
-                                            if (covRankResponseTemp.getName().equals(fixTool.areaUni(area))) {
-                                                covRankResponse = covRankResponseTemp;
-                                                break;
-                                            }
-                                        }
-                                        if (covRankResponse == null) continue;
-//                                        if (covRankResponse == null){
-//                                            area = gaoDeTool.getAreaOrCity(routeCalRequest.getStart());
-//                                            covRankResponse = covRankResponseMap.get(fixTool.areaUni(area));
-//                                            if(covRankResponse == null){
-//                                                covRankResponse = covRankResponseMap.get(area);
-//                                                if (covRankResponse == null) {
-//                                                    for (CovRankResponse covRankResponseTemp : covRankResponseMap.values()) {
-//                                                        if (covRankResponseTemp.getName().equals(fixTool.areaUni(area))) {
-//                                                            covRankResponse = covRankResponseTemp;
-//                                                            break;
-//                                                        }
-//                                                    }
-//                                                    if (covRankResponse == null) continue;
-//                                                }
-//                                            }
-//                                        }
-                                    }
-                                }
-                                cityCal.setCityscore((int) covRankResponse.getSumScore());
-                                cityCalList.add(cityCal);
-                            }
-                        }
-                        break;
-                    }
-                    case 3: {
-                        SiteInfo siteInfo = gaoDeTool.getSitesList(routeCalRequest.getStart(), routeCalRequest.getEnd(), routeCalRequest.getTitle(), 3);
-                        if (siteInfo != null) station(covRankResponseMap, routeCalReponse, cityCalList, siteInfo);
-                        else {
-                            for (String area : routeCalRequest.getCitys()) {
-                                CityCal cityCal = new CityCal();
-                                cityCal.setCityname(area);
-                                CovRankResponse covRankResponse = covRankResponseMap.get(fixTool.areaUni(area));
-                                if (covRankResponse == null) {
-                                    covRankResponse = covRankResponseMap.get(area);
-                                    if (covRankResponse == null) {
-                                        for (CovRankResponse covRankResponseTemp : covRankResponseMap.values()) {
-                                            if (covRankResponseTemp.getName().equals(fixTool.areaUni(area))) {
-                                                covRankResponse = covRankResponseTemp;
-                                                break;
-                                            }
-                                        }
-                                        if (covRankResponse == null) continue;
-                                    }
-                                }
-                                cityCal.setCityscore((int) covRankResponse.getSumScore());
-                                cityCalList.add(cityCal);
-                            }
-                        }
-                        break;
-                    }
-                    case 4: {
-                        SiteInfo siteInfo = new SiteInfo();
-                        siteInfo.setAllSiteNumber(2);
-                        siteInfo.getSiteNames().add(new SiteAndAreaInfo(routeCalRequest.getStart(), gaoDeTool.getAreaOrCity(routeCalRequest.getCitys().get(0) + routeCalRequest.getStart())));
-                        siteInfo.getSiteNames().add(new SiteAndAreaInfo(routeCalRequest.getEnd(), gaoDeTool.getAreaOrCity(routeCalRequest.getCitys().get(1) + routeCalRequest.getEnd())));
-                        station(covRankResponseMap, routeCalReponse, cityCalList, siteInfo);
-                        break;
-                    }
+                    routeCalReponse.setStations(stationCalList);
+                } else {
+                    return ResultTool.error(500, "请求错误，交通方式不为飞机!");
                 }
 
                 //找到当前城市信息
@@ -584,14 +511,26 @@ public class EpidemicServiceImpl implements EpidemicService {
 
             SumCalResponse sumCalResponse = new SumCalResponse();
             sumCalResponse.setResultList(resultList);
+            sumCalResponse.setSumScore(String.valueOf((int) (resultList.get(0).getFinalscore() * 10) / 10.0));
+            sumCalResponse.setType(ConstCorrespond.TRAN_TYPE[4]);
+            sumCalResponse.setSumTime(resultList.get(0).getTime());
 
-            int type = 0;
-            for (RouteCalRequest findMainType : routeCalRequestList) {
-                if (findMainType.getType() > type) type = findMainType.getType();
+            for (SumCalResponse sumCalResponseBefore : beforeList) {
+                for (SumCalResponse sumCalResponseAfter : afterList) {
+                    SumCalResponse sumCalResponseNew = new SumCalResponse();
+                    List<RouteCalReponse> routeCalReponseList = new ArrayList<>();
+                    routeCalReponseList.addAll(sumCalResponseBefore.getResultList());
+                    routeCalReponseList.addAll(sumCalResponse.getResultList());
+                    routeCalReponseList.addAll(sumCalResponseAfter.getResultList());
+                    sumCalResponseNew.setResultList(routeCalReponseList);
+                    sumCalResponseNew.setType(ConstCorrespond.TRAN_TYPE[4]);
+                    sumCalResponseNew.setPrice(0.0);
+                    sumCalResponseNew.setSumScore(String.valueOf(Math.max(Math.max(Double.parseDouble(sumCalResponse.getSumScore()), Double.parseDouble(sumCalResponseAfter.getSumScore())), Double.parseDouble(sumCalResponseBefore.getSumScore()))));
+                    sumCalResponse.setSumTime(TimeTool.timeSlotToString(TimeTool.stringToHour(sumCalResponseBefore.getSumTime()) + TimeTool.stringToHour(sumCalResponse.getSumTime()) + TimeTool.stringToHour(sumCalResponseAfter.getSumTime())));
+                    sumCalResponseList.add(sumCalResponseNew);
+                }
             }
-            sumCalResponse.setType(ConstCorrespond.TRAN_TYPE[type]);
-            sumCalResponse.setSumScore(NumberTool.doubleToStringWotH(resultList.stream().mapToDouble(RouteCalReponse::getFinalscore).max().getAsDouble()));
-            return ResultTool.success(sumCalResponse);
+            return ResultTool.success(sumCalResponseList);
         } catch (AllException e) {
             log.error(e.getMsg());
             return ResultTool.error(e.getErrCode(), e.getMsg());
@@ -601,31 +540,100 @@ public class EpidemicServiceImpl implements EpidemicService {
         }
     }
 
-    private void station(Map<String, CovRankResponse> covRankResponseMap, RouteCalReponse routeCalReponse, List<CityCal> cityCalList, SiteInfo siteInfo) {
-        routeCalReponse.setAllSiteNumber(siteInfo == null ? 0 : siteInfo.getAllSiteNumber());
-        List<StationCal> stationCalList = new ArrayList<>();
-        for (SiteAndAreaInfo siteAndAreaInfo : siteInfo.getSiteNames()) {
-            StationCal stationCal = new StationCal();
-            BeanUtils.copyProperties(siteAndAreaInfo, stationCal);
-            CovRankResponse covRankResponse = covRankResponseMap.get(fixTool.areaUni(siteAndAreaInfo.getArea()));
-            if (covRankResponse == null) {
-                covRankResponse = covRankResponseMap.get(siteAndAreaInfo.getArea());
-                if (covRankResponse == null) {
-                    for (CovRankResponse covRankResponseTemp : covRankResponseMap.values()) {
-                        if (covRankResponseTemp.getName().equals(fixTool.areaUni(siteAndAreaInfo.getArea()))) {
-                            covRankResponse = covRankResponseTemp;
-                            break;
+    /**
+     * @Description: 已知起点与终点的路径风险计算
+     * @Param: [start, end]
+     * @return: com.nCov.DataView.model.response.Result
+     * @Author: SoCMo
+     * @Date: 2020/5/1
+     */
+    @Override
+    public Result startAndEndCal(String start, String end) {
+        try {
+            List<RouteInfo> routeInfoList = gaoDeTool.routePlanning(start, end);
+            List<SumCalResponse> sumCalResponseList = new ArrayList<>();
+
+            List<CovRankResponse> covRankResponseList = this.allAreaCal(TimeTool.timeToDaySy(new Date()));
+            if (covRankResponseList.isEmpty()) {
+                throw new AllException(EmAllException.DATABASE_ERROR, "无城市风险数据！");
+            }
+
+            for (RouteInfo routeInfo : routeInfoList) {
+                SumCalResponse sumCalResponse = new SumCalResponse();
+
+                List<RouteCalReponse> routeCalReponseList = new ArrayList<>();
+                for (RouteCalRequest routeCalRequest : routeInfo.getRouteCalRequestList()) {
+                    RouteCalReponse routeCalReponse = new RouteCalReponse();
+
+                    List<CityCal> cityCalList = new ArrayList<>();
+                    List<StationCal> stationCalList = new ArrayList<>();
+                    if (routeCalRequest.getSiteNames() == null) continue;
+                    for (SiteAndAreaInfo siteAndAreaInfo : routeCalRequest.getSiteNames()) {
+                        StationCal stationCal = new StationCal();
+                        CityCal cityCal = new CityCal();
+                        CovRankResponse covRankResponse = null;
+                        for (CovRankResponse covRankResponseTemp : covRankResponseList) {
+                            if (siteAndAreaInfo.getArea().contains(covRankResponseTemp.getName())) {
+                                covRankResponse = covRankResponseTemp;
+                                break;
+                            }
+                        }
+                        if (covRankResponse == null) continue;
+                        stationCal.setRisk((int) (covRankResponse.getSumScore() * 10) / 10.0);
+                        stationCal.setName(siteAndAreaInfo.getName());
+                        stationCal.setArea(siteAndAreaInfo.getArea());
+                        stationCalList.add(stationCal);
+
+                        if (cityCalList.isEmpty() || cityCalList.stream().noneMatch(cityCal1 -> cityCal1.getCityname().equals(siteAndAreaInfo.getArea()))) {
+                            cityCal.setCityname(siteAndAreaInfo.getArea());
+                            cityCal.setCityscore(stationCal.getRisk());
+                            cityCalList.add(cityCal);
                         }
                     }
-                    if (covRankResponse == null) continue;
+
+                    routeCalReponse.setCity(cityCalList);
+                    routeCalReponse.setStations(stationCalList);
+                    routeCalReponse.setTime(String.valueOf(routeCalRequest.getCostTime() / 60 / 60) + "时" + String.valueOf(routeCalRequest.getCostTime() / 60 % 60) + "分");
+                    routeCalReponse.setTitle(routeCalRequest.getTitle());
+                    routeCalReponse.setType(routeCalRequest.getType());
+                    routeCalReponse.setStart(routeCalRequest.getStart());
+                    routeCalReponse.setEnd(routeCalRequest.getEnd());
+                    double time = TimeTool.stringToHour(routeCalReponse.getTime());
+                    routeCalReponse.setTimeScore(String.valueOf(time > 6 ? 100 : (int) (time / 6 * 1000) / 10.0));
+                    routeCalReponse.setAllSiteNumber(routeCalRequest.getAllSiteNumber());
+                    routeCalReponse.setTransportScore(NumberTool.doubleToStringWotH(
+                            ConstCorrespond.ROUTE_WEIGHT[0] / (ConstCorrespond.ROUTE_WEIGHT[0] + ConstCorrespond.ROUTE_WEIGHT[2])
+                                    * ConstCorrespond.CROWD[routeCalRequest.getType()]
+                                    + ConstCorrespond.ROUTE_WEIGHT[2] / (ConstCorrespond.ROUTE_WEIGHT[0] + ConstCorrespond.ROUTE_WEIGHT[2])
+                                    * ConstCorrespond.CLEAN_SCORE[routeCalRequest.getType()]
+                    ));
+
+                    double max = cityCalList.isEmpty() ? 0 : cityCalList.stream().mapToDouble(CityCal::getCityscore).max().getAsDouble();
+                    routeCalReponse.setFinalscore(ConstCorrespond.ROUTE_WEIGHT[0] * ConstCorrespond.CROWD[routeCalRequest.getType()]
+                            + ConstCorrespond.ROUTE_WEIGHT[1] * (time >= 6 ? 100 : (time / 6 * 100))
+                            + ConstCorrespond.ROUTE_WEIGHT[2] * ConstCorrespond.CLEAN_SCORE[routeCalRequest.getType()]
+                            + ConstCorrespond.ROUTE_WEIGHT[3] * max);
+                    routeCalReponseList.add(routeCalReponse);
                 }
+
+                sumCalResponse.setResultList(routeCalReponseList);
+                sumCalResponse.setSumScore(routeCalReponseList.isEmpty() ? "0" : String.valueOf((int) (routeCalReponseList.stream().mapToDouble(RouteCalReponse::getFinalscore).max().getAsDouble() * 10) / 10.0));
+                sumCalResponse.setPrice(routeInfo.getPrice());
+                sumCalResponse.setSumTime(TimeTool.timeSlotToString(routeInfo.getSumTime() / 60 / 60));
+                sumCalResponse.setType(routeCalReponseList.isEmpty() ? "无交通方式" : ConstCorrespond.TRAN_TYPE[routeCalReponseList.stream().mapToInt(RouteCalReponse::getType).max().getAsInt()]);
+                sumCalResponseList.add(sumCalResponse);
             }
-            stationCal.setRisk((int) covRankResponse.getSumScore());
-            stationCalList.add(stationCal);
-            cityCalList.add(new CityCal(covRankResponse.getName(), (int) covRankResponse.getSumScore()));
+
+            return ResultTool.success(sumCalResponseList);
+        } catch (AllException e) {
+            log.error(e.getMsg());
+            return ResultTool.error(500, e.getMsg());
+        } catch (IOException | ParseException e) {
+            log.error(e.getMessage());
+            return ResultTool.error(500, e.getMessage());
         }
-        routeCalReponse.setStations(stationCalList);
     }
+
 
     /**
      * @Description: 同一终点和起点的不同路径进行计算
@@ -1250,7 +1258,7 @@ public class EpidemicServiceImpl implements EpidemicService {
                                 }
                             }
                         }
-                        cityCal.setCityscore(impAreaDO.getSumScore().intValue());
+                        cityCal.setCityscore((int) (impAreaDO.getSumScore() * 10) / 10.0);
                         routeCalReponse.getCity().add(cityCal);
                     }
                     pathResponse.getResultList().add(routeCalReponse);

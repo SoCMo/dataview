@@ -1,6 +1,7 @@
 package com.nCov.DataView.model.response.info;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
@@ -11,10 +12,15 @@ import java.util.List;
  * create: 2020/3/28
  */
 @Data
+@NoArgsConstructor
 public class SumCalResponse {
-    List<RouteCalReponse> resultList;
+    private List<RouteCalReponse> resultList;
 
-    String sumScore;
+    private String sumScore;
 
-    String Type;
+    private String sumTime;
+
+    private String type;
+
+    private Double price;
 }
