@@ -528,7 +528,9 @@ public class EpidemicServiceImpl implements EpidemicService {
                     sumCalResponseNew.setSumScore(String.valueOf(Math.max(Math.max(Double.parseDouble(sumCalResponse.getSumScore()), Double.parseDouble(sumCalResponseAfter.getSumScore())), Double.parseDouble(sumCalResponseBefore.getSumScore()))));
                     sumCalResponseNew.setSumTime(TimeTool.timeSlotToString(TimeTool.stringToHour(sumCalResponseBefore.getSumTime()) + TimeTool.stringToHour(sumCalResponse.getSumTime()) + TimeTool.stringToHour(sumCalResponseAfter.getSumTime())));
                     sumCalResponseList.add(sumCalResponseNew);
+                    if (sumCalResponseList.size() > 5) break;
                 }
+                if (sumCalResponseList.size() > 5) break;
             }
             return ResultTool.success(sumCalResponseList);
         } catch (AllException e) {
@@ -581,7 +583,7 @@ public class EpidemicServiceImpl implements EpidemicService {
                         if (covRankResponse == null) continue;
                         stationCal.setRisk((int) (covRankResponse.getSumScore() * 10) / 10.0);
                         stationCal.setName(siteAndAreaInfo.getName());
-                        stationCal.setArea(siteAndAreaInfo.getArea());
+                        stationCal.setArea(covRankResponse.getName());
                         stationCalList.add(stationCal);
 
                         if (cityCalList.isEmpty() || cityCalList.stream().noneMatch(cityCal1 -> cityCal1.getCityname().equals(siteAndAreaInfo.getArea()))) {
