@@ -93,7 +93,19 @@ public class EpidemicController {
      */
     @PostMapping("/routeCal")
     public Result routeCal(@Validated @RequestBody RouteListRequest RouteListRequest) {
-        return epidemicService.routeCal(RouteListRequest.getRouteCalRequestList());
+        return epidemicService.routeCal(RouteListRequest);
+    }
+
+    /**
+     * @Description: 已知起点、终点的路线评估
+     * @Param: [start, end]
+     * @return: com.nCov.DataView.model.response.Result
+     * @Author: SoCMo
+     * @Date: 2020/5/1
+     */
+    @PostMapping("/startAndEndCal")
+    public Result startAndEndCal(@Validated @RequestBody StartAndEndCalRequest startAndEndCalRequest) {
+        return epidemicService.startAndEndCal(startAndEndCalRequest.getStart(), startAndEndCalRequest.getEnd());
     }
 
     /**

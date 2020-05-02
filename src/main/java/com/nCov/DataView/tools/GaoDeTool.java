@@ -15,13 +15,10 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
-import org.apache.xmlbeans.impl.xb.xsdschema.All;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.converter.support.AllEncompassingFormHttpMessageConverter;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpUtils;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -278,9 +275,6 @@ public class GaoDeTool {
                                 }
                                 routeCalRequest.setSiteNames(siteAndAreaInfoList);
                                 routeCalRequest.setAllSiteNumber(siteAndAreaInfoList.size());
-                            } else {
-                                routeCalRequest.setAllSiteNumber(0);
-                                routeCalRequest.setSiteNames(null);
                             }
                             routeCalRequestList.add(routeCalRequest);
 //                        }
@@ -319,9 +313,6 @@ public class GaoDeTool {
                             }
                             routeCalRequest.setSiteNames(siteAndAreaInfoList);
                             routeCalRequest.setAllSiteNumber(siteAndAreaInfoList.size());
-                        } else {
-                            routeCalRequest.setAllSiteNumber(0);
-                            routeCalRequest.setSiteNames(null);
                         }
                         routeCalRequestList.add(routeCalRequest);
                     }

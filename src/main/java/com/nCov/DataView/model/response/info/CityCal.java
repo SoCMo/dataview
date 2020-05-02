@@ -16,5 +16,5 @@ import lombok.NoArgsConstructor;
 public class CityCal {
     private String cityname;
 
-    private Integer cityscore;
+    private Double cityscore;
 }

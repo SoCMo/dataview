@@ -1,6 +1,7 @@
 package com.nCov.DataView.model.response.info;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
@@ -11,6 +12,7 @@ import java.util.List;
  * create: 2020/4/29
  */
 @Data
+@NoArgsConstructor
 public class SiteInfo {
     //存储每一段经过的站点，和站点所在的城市或区
     private List<SiteAndAreaInfo> siteNames;

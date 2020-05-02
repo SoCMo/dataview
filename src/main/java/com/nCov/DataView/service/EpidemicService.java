@@ -8,7 +8,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.text.ParseException;
-import java.util.List;
 
 /**
  * program: EpidemicService
@@ -69,7 +68,16 @@ public interface EpidemicService {
      * @Author: SoCMo
      * @Date: 2020/3/28
      */
-    public Result routeCal(List<RouteCalRequest> routeCalRequestList);
+    public Result routeCal(RouteListRequest routeListRequest);
+
+    /**
+     * @Description: 出发点和终点的路线评估
+     * @Param: [start, end]
+     * @return: com.nCov.DataView.model.response.Result
+     * @Author: SoCMo
+     * @Date: 2020/5/1
+     */
+    public Result startAndEndCal(String start, String end);
 
     /**
      * @Description: 同一终点和起点的不同路径进行计算

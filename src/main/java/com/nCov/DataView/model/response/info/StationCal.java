@@ -14,5 +14,5 @@ public class StationCal {
 
     private String area;
 
-    private Integer risk;
+    private Double risk;
 }
