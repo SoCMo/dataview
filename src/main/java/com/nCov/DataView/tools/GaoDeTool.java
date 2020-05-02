@@ -239,9 +239,9 @@ public class GaoDeTool {
                     JSONArray spaces = railway.getJSONArray("spaces");
 
                     if (buslines.size() != 0) {
-                        for (int k = 0; k < buslines.size(); ++k) {
+//                        for (int k = 0; k < buslines.size(); ++k) {
                             RouteCalRequest routeCalRequest = new RouteCalRequest();
-                            JSONObject busline = buslines.getJSONObject(k);
+                            JSONObject busline = buslines.getJSONObject(0);
 
                             JSONObject departure_stop = busline.getJSONObject("departure_stop");
                             JSONObject arrival_stop = busline.getJSONObject("arrival_stop");
@@ -283,7 +283,7 @@ public class GaoDeTool {
                                 routeCalRequest.setSiteNames(null);
                             }
                             routeCalRequestList.add(routeCalRequest);
-                        }
+//                        }
                     }
 
                     if (spaces.size() != 0) {
