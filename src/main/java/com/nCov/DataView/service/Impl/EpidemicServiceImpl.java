@@ -571,7 +571,7 @@ public class EpidemicServiceImpl implements EpidemicService {
                     List<StationCal> stationCalList = new ArrayList<>();
                     if (routeCalRequest.getSiteNames() == null) {
                         routeCalRequest.setSiteNames(new ArrayList<>());
-                        routeCalReponse.setAllSiteNumber(0);
+                        routeCalRequest.setAllSiteNumber(0);
                     }
                     for (SiteAndAreaInfo siteAndAreaInfo : routeCalRequest.getSiteNames()) {
                         StationCal stationCal = new StationCal();
