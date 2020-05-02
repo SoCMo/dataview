@@ -583,11 +583,12 @@ public class EpidemicServiceImpl implements EpidemicService {
                         if (covRankResponse == null) continue;
                         stationCal.setRisk((int) (covRankResponse.getSumScore() * 10) / 10.0);
                         stationCal.setName(siteAndAreaInfo.getName());
-                        stationCal.setArea(covRankResponse.getName());
+                        stationCal.setArea(siteAndAreaInfo.getArea());
                         stationCalList.add(stationCal);
 
-                        if (cityCalList.isEmpty() || cityCalList.stream().noneMatch(cityCal1 -> cityCal1.getCityname().equals(siteAndAreaInfo.getArea()))) {
-                            cityCal.setCityname(siteAndAreaInfo.getArea());
+                        String city = covRankResponse.getName();
+                        if (cityCalList.isEmpty() || cityCalList.stream().noneMatch(cityCal1 -> cityCal1.getCityname().equals(city))) {
+                            cityCal.setCityname(city);
                             cityCal.setCityscore(stationCal.getRisk());
                             cityCalList.add(cityCal);
                         }
