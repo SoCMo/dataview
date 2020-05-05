@@ -17,4 +17,6 @@ public class MyRisk {
     private List<DateCal> dateCalList;
 
     private String todayRisk;
+
+    private String area;
 }

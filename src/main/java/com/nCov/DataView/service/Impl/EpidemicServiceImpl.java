@@ -140,6 +140,7 @@ public class EpidemicServiceImpl implements EpidemicService {
                 calendar.add(Calendar.DATE, 1);
             }
 
+            myRisk.setArea(city);
             myRisk.setTodayRisk(myRisk.getDateCalList().get(myRisk.getDateCalList().size() - 1).getRisk());
             return ResultTool.success(myRisk);
         } catch (AllException e) {
