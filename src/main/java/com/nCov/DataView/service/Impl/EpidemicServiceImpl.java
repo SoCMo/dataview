@@ -94,42 +94,57 @@ public class EpidemicServiceImpl implements EpidemicService {
     @Override
     public Result areaInfo(AreaInfoRequest areaInfoRequest) {
         try {
-            CovDataExample covDataExample = new CovDataExample();
-            covDataExample.createCriteria()
-                .andProvincenameLike(areaInfoRequest.getProvinceName() + "%")
-                    .andAreanameLike(areaInfoRequest.getCityName() + "%")
-                    .andIsprovinceEqualTo(0);
-            covDataExample.setOrderByClause("date DESC");
-            List<CovData> covDataList = covDataMapper.selectByExample(covDataExample);
-            if (covDataList.isEmpty()) {
-                throw new AllException(EmAllException.DATABASE_ERROR, "查询数据有误");
-            }
-            Calendar calendar = new GregorianCalendar();
-            calendar.setTime(TimeTool.stringToDay(areaInfoRequest.getDate()));
-            CovData getCovData = null;
-            for (CovData covData : covDataList) {
-                if (!covData.getDate().before(calendar.getTime())) {
-                    getCovData = covData;
+            String city = gaoDeTool.getAreaOrCity(areaInfoRequest.getArea());
+            Calendar calendarToday = TimeTool.todayCreate();
+            Calendar calendar = TimeTool.todayCreate();
+            calendar.add(Calendar.DATE, -13);
+
+            ImpAreaDOExample impAreaDOExample = new ImpAreaDOExample();
+            impAreaDOExample.createCriteria().andNameEqualTo(fixTool.areaUni(city)).andDateGreaterThanOrEqualTo(calendar.getTime());
+            List<ImpAreaDO> impAreaDOList = impAreaDOMapper.selectByExample(impAreaDOExample);
+            if (impAreaDOList.isEmpty()) {
+                AreaDOExample areaDOExample = new AreaDOExample();
+                areaDOExample.createCriteria().andNameLike(fixTool.areaUni(city) + "%");
+                List<AreaDO> areaDOList = areaDOMapper.selectByExample(areaDOExample);
+                if (areaDOList.isEmpty()) {
+                    throw new AllException(EmAllException.DATABASE_ERROR, "该地级行政区划暂无数据！");
                 }
             }
-            if (getCovData == null) {
-                throw new AllException(EmAllException.BAD_REQUEST, "数据不存在");
+
+            MyRisk myRisk = new MyRisk();
+            myRisk.setDateCalList(new ArrayList<>());
+            while (!calendar.getTime().after(calendarToday.getTime())) {
+                ImpAreaDO impAreaDO = null;
+                for (ImpAreaDO impAreaDOTemp : impAreaDOList) {
+                    if (TimeTool.timeToDaySy(impAreaDOTemp.getDate()).equals(TimeTool.timeToDaySy(calendar.getTime()))) {
+                        impAreaDO = impAreaDOTemp;
+                        break;
+                    }
+                }
+
+                if (impAreaDO == null) {
+                    this.allAreaCal(TimeTool.timeToDaySy(calendar.getTime()));
+                    ImpAreaDOExample impAreaDOExample1 = new ImpAreaDOExample();
+                    impAreaDOExample1.createCriteria().andDateEqualTo(calendar.getTime()).andNameLike(fixTool.areaUni(city) + "%");
+                    List<ImpAreaDO> impAreaDOList1 = impAreaDOMapper.selectByExample(impAreaDOExample1);
+                    if (impAreaDOList1.isEmpty()) {
+                        throw new AllException(EmAllException.DATABASE_ERROR, "该地级行政区划暂无数据！");
+                    }
+                    impAreaDO = impAreaDOList1.get(0);
+                }
+
+                DateCal dateCal = new DateCal();
+                dateCal.setDate(TimeTool.timeToDaySy(calendar.getTime()));
+                dateCal.setRisk(String.valueOf(impAreaDO.getSumScore().intValue()));
+                myRisk.getDateCalList().add(dateCal);
+                calendar.add(Calendar.DATE, 1);
             }
 
-            AreaInfoResponse areaInfoResponse = new AreaInfoResponse();
-            BeanUtils.copyProperties(getCovData, areaInfoResponse);
-            List<AreaDO> areaDOList = areaDOMapper.mapSelectByName(areaInfoRequest.getCityName() + "%");
-            if (areaDOList.size() > 1) {
-                throw new AllException(EmAllException.DATABASE_ERROR, "查询数据有误");
-            }
-            areaInfoResponse.Calculation(areaDOList.size() == 1 ? areaDOList.get(0).getPopulation() : 0);
-            return ResultTool.success(areaInfoResponse);
+            myRisk.setTodayRisk(myRisk.getDateCalList().get(myRisk.getDateCalList().size() - 1).getRisk());
+            return ResultTool.success(myRisk);
         } catch (AllException e) {
             log.error(e.getMsg());
             return ResultTool.error(e.getErrCode(), e.getMsg());
-        } catch (ParseException e) {
-            log.error(e.getMessage());
-            return ResultTool.error(500, "日期格式错误！");
         } catch (Exception e) {
             log.error(e.getMessage());
             return ResultTool.error(500, e.getMessage());

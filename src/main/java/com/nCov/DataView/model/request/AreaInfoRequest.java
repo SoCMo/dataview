@@ -15,11 +15,5 @@ import javax.validation.constraints.NotBlank;
 @Validated
 public class AreaInfoRequest {
     @NotBlank(message = "省名不能为空")
-    String provinceName;
-
-    @NotBlank(message = "城市名不能为空")
-    String cityName;
-
-    @NotBlank(message = "时间不能为空")
-    String date;
+    String area;
 }
