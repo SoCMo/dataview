@@ -119,7 +119,7 @@ public class TimeTool {
      */
     public static Calendar todayCreate() {
         Calendar calendarNow = Calendar.getInstance();
-        calendarNow.set(calendarNow.get(Calendar.YEAR), calendarNow.get(Calendar.MONTH), calendarNow.get(Calendar.DATE), 0, 0, 0);
+        calendarNow.set(2020, Calendar.APRIL, 4, 0, 0, 0);
         return calendarNow;
     }
 

@@ -56,7 +56,8 @@ public class MapServiceImpl implements MapService {
             CovDataExample covDataExample = new CovDataExample();
             covDataExample.createCriteria()
                     .andIsprovinceEqualTo(1)
-                    .andDateEqualTo(TimeTool.stringToDay(date));
+                    .andDateEqualTo(TimeTool.stringToDay(date))
+                    .andDateLessThan(TimeTool.stringToDay("2020-04-04"));
             List<CovData> covDataList = covDataMapper.selectByExample(covDataExample);
             if (covDataList.isEmpty()) {
                 throw new AllException(EmAllException.DATABASE_ERROR, date + "数据为空！");
@@ -105,7 +106,6 @@ public class MapServiceImpl implements MapService {
             List<AbroadInputDO> abroadInputDOList = abroadInputDOMapper.selectByExample(abroadInputDOExample);
             abroadInputDOExample.clear();
 
-            Calendar calendarAb = Calendar.getInstance();
             calendar.setTime(TimeTool.stringToDay(date));
             calendar.add(Calendar.DATE, -1);
             abroadInputDOExample.createCriteria().andDateEqualTo(calendar.getTime());

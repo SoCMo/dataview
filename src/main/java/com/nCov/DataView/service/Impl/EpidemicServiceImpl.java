@@ -302,7 +302,8 @@ public class EpidemicServiceImpl implements EpidemicService {
             covDataExample.createCriteria()
                     .andProvincenameLike(provinceMap.get(areaDOList.get(0).getParentid()).getName() + "%")
                     .andAreanameLike(name + "%")
-                    .andIsprovinceEqualTo(0);
+                    .andIsprovinceEqualTo(0)
+                    .andDateLessThan(TimeTool.stringToDay("2020-04-04"));
             covDataExample.setOrderByClause("date ASC");
             List<CovData> covDataList = covDataMapper.selectByExample(covDataExample);
             if (covDataList.isEmpty()) {
@@ -351,6 +352,7 @@ public class EpidemicServiceImpl implements EpidemicService {
             }
 
             Calendar calendarNow = Calendar.getInstance();
+            calendarNow.set(2020, Calendar.APRIL, 4);
             while (TimeTool.dayDiffDate(calendarNow.getTime(), calendarNeed.getTime()) <= 0) {
                 DateInfoResponse dateInfoResponseEnd = DateInfoResponse.objectCopy(dateInfoResponseList.get(dateInfoResponseList.size() - 1));
                 dateInfoResponseEnd.setDate(TimeTool.timeToDaySy(calendarNeed.getTime()));
@@ -496,7 +498,7 @@ public class EpidemicServiceImpl implements EpidemicService {
                     //准备插入数据库的数据
                     double time = routeCalRequest.getDistance() / 1000.0 / ConstCorrespond.SPEED[routeCalRequest.getType()];
                     routeCalDO.setTime(TimeTool.timeSlotToString(time));
-                    routeCalDO.setDate(new Date());
+                    routeCalDO.setDate(TimeTool.stringToDay("2020-04-04"));
                     routeCalDO.setScore(
                             ConstCorrespond.ROUTE_WEIGHT[0] * ConstCorrespond.CROWD[routeCalRequest.getType()]
                                     + ConstCorrespond.ROUTE_WEIGHT[1] * (time >= 6 ? 100 : (time / 6 * 100))
@@ -1510,6 +1512,7 @@ public class EpidemicServiceImpl implements EpidemicService {
     @Transactional
     @Cacheable(value = "allAreaCal", key = "#date")
     public List<CovRankResponse> allAreaCal(String date) throws AllException, ParseException {
+        date = "2020-04-04";
         ImpAreaDOExample impAreaDOExample = new ImpAreaDOExample();
         impAreaDOExample.createCriteria().andDateEqualTo(TimeTool.stringToDay(date));
         List<ImpAreaDO> impAreaDOList = impAreaDOMapper.selectByExample(impAreaDOExample);

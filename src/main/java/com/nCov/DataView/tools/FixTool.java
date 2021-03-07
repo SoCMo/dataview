@@ -167,7 +167,7 @@ public class FixTool {
             for (int i = 0; i < jsonArray.size(); i++) {
                 JSONObject provinceData = jsonArray.getJSONObject(i);
                 JSONArray cityArray = provinceData.getJSONArray("cities");
-                if (provinceData.getString("countryName").equals("中国") && cityArray != null && TimeTool.timeToDaySy(provinceData.getDate("updateTime")).equals(TimeTool.timeToDaySy(new Date()))) {
+                if (provinceData.getString("countryName").equals("中国") && cityArray != null && TimeTool.timeToDaySy(provinceData.getDate("updateTime")).equals("2020-04-04")) {
 
                     //插入或更新省的数据
                     CovDataExample covDataExamplePro = new CovDataExample();
